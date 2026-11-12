@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
+
+@theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, Consolas, monospace;
+
+  --color-bg: #090d1a;
+  --color-surface: #101729;
+  --color-card: #151e32;
+  --color-raised: #1b2942;
+  --color-line: #233354;
+  --color-ink: #f8fafc;
+  --color-mute: #94a3b8;
+  --color-faint: #64748b;
+
+  --color-blue: #2563eb;
+  --color-sky: #3b82f6;
+  --color-cyan: #06b6d4;
+  --color-ice: #67e8f9;
+
+  --color-ok: #22c55e;
+  --color-gold: #fbbf24;
+  --color-flame: #f97316;
+  --color-bad: #ef4444;
+
+  --animate-pop: pop 0.35s cubic-bezier(0.2, 1.4, 0.4, 1);
+  --animate-rise: rise 0.3s ease-out;
+  --animate-bob: bob 3.2s ease-in-out infinite;
+  --animate-shake: shake 0.35s ease-in-out;
+
+  @keyframes pop {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  @keyframes rise {
+    from { transform: translateY(8px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.006em;
+}
+
+::selection { background: rgb(37 99 235 / 0.45); }
+
+* { scrollbar-width: thin; scrollbar-color: #233354 transparent; }
+
+:focus-visible { outline: 2px solid var(--color-ice); outline-offset: 2px; border-radius: 6px; }
+
+.grad-primary { background: linear-gradient(135deg, #2563eb, #06b6d4); }
+.grad-secondary { background: linear-gradient(135deg, #1d4ed8, #38bdf8); }
+.grad-premium { background: linear-gradient(135deg, #0f172a, #2563eb); }
+
+.tnum { font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
