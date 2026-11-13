@@ -60,7 +60,7 @@ function QuestionStep({ question, onAnswered, onNext }: { question: Question; on
                       onClick={() => setPicked(i)}
                       className={cx(
                         'flex min-h-[60px] items-center gap-4 rounded-xl border-2 border-b-4 px-4 py-3 text-left transition-colors enabled:active:translate-y-0.5 enabled:active:border-b-2',
-                        isAnswer ? 'border-green bg-green-soft text-ok' : isWrongPick ? 'border-bad bg-bad-soft text-bad-dark' : selected ? 'border-blue-line bg-blue-soft text-blue' : 'border-line bg-white text-body enabled:hover:bg-surface',
+                        isAnswer ? 'border-green bg-green-soft text-ok' : isWrongPick ? 'border-bad bg-bad-soft text-bad-dark' : selected ? 'border-blue-line bg-blue-soft text-blue' : 'border-line bg-card text-body enabled:hover:bg-surface',
                       )}
                     >
                       <span className={cx('tnum flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border-2 text-[15px] font-bold', isAnswer ? 'border-green' : isWrongPick ? 'border-bad' : selected ? 'border-blue-line' : 'border-line text-faint')}>{i + 1}</span>
@@ -83,7 +83,7 @@ function QuestionStep({ question, onAnswered, onNext }: { question: Question; on
                 spellCheck={false}
                 autoCapitalize="off"
                 size={Math.max(6, typed.length + 1)}
-                className={cx('mx-0.5 rounded-lg border-2 bg-white px-2 py-0.5 text-center font-mono font-bold outline-none', verdict === true ? 'border-green text-ok' : verdict === false ? 'border-bad text-bad-dark' : 'border-blue-line text-blue')}
+                className={cx('mx-0.5 rounded-lg border-2 bg-card px-2 py-0.5 text-center font-mono font-bold outline-none', verdict === true ? 'border-green text-ok' : verdict === false ? 'border-bad text-bad-dark' : 'border-blue-line text-blue')}
               />
               {after}
             </pre>
@@ -176,7 +176,7 @@ export function LessonPage() {
   const finished = step === totalSteps
 
   return (
-    <div className="flex h-full flex-col bg-white">
+    <div className="flex h-full flex-col bg-card">
       {!finished && (
         <header className="mx-auto flex w-full max-w-[1008px] shrink-0 items-center gap-4 px-4 pb-2 pt-6">
           <Link to={`/learn/${course.id}`} aria-label="Leave lesson" className="text-faint hover:text-mute"><X size={26} strokeWidth={3} /></Link>
@@ -251,7 +251,7 @@ export function LessonPage() {
                 ].map((item) => (
                   <div key={item.label} className="rounded-2xl border-2 p-0.5" style={{ borderColor: item.color, background: item.color }}>
                     <dt className="label py-1 text-[11px] text-white">{item.label}</dt>
-                    <dd className="tnum flex h-14 items-center justify-center gap-1.5 rounded-[13px] bg-white text-xl font-bold" style={{ color: item.color }}>{item.value}</dd>
+                    <dd className="tnum flex h-14 items-center justify-center gap-1.5 rounded-[13px] bg-card text-xl font-bold" style={{ color: item.color }}>{item.value}</dd>
                   </div>
                 ))}
               </dl>

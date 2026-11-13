@@ -29,9 +29,9 @@ interface Answers { language: LangId | null; reason: string | null; level: strin
 // ── Pieces ────────────────────────────────────────────────────────────────
 function Bubble({ children, tail, className }: { children: ReactNode; tail: 'left' | 'bottom'; className?: string }) {
   return (
-    <div className={cx('animate-pop relative rounded-2xl border-2 border-line bg-white px-5 py-3.5 text-[19px] font-bold leading-snug text-ink', className)}>
+    <div className={cx('animate-pop relative rounded-2xl border-2 border-line bg-card px-5 py-3.5 text-[19px] font-bold leading-snug text-ink', className)}>
       {children}
-      <span aria-hidden="true" className={cx('absolute h-4 w-4 rotate-45 border-line bg-white', tail === 'left' ? '-left-[9px] bottom-6 border-b-2 border-l-2' : '-bottom-[9px] left-1/2 -ml-2 border-b-2 border-r-2')} />
+      <span aria-hidden="true" className={cx('absolute h-4 w-4 rotate-45 border-line bg-card', tail === 'left' ? '-left-[9px] bottom-6 border-b-2 border-l-2' : '-bottom-[9px] left-1/2 -ml-2 border-b-2 border-r-2')} />
     </div>
   )
 }
@@ -66,7 +66,7 @@ function Bars({ level }: { level: number }) {
   return (
     <span className="flex h-6 items-end gap-[3px]" aria-hidden="true">
       {[1, 2, 3, 4].map((n) => (
-        <span key={n} className="w-[5px] rounded-sm" style={{ height: 6 + n * 4, background: n <= level ? '#1CB0F6' : '#E5E5E5' }} />
+        <span key={n} className="w-[5px] rounded-sm" style={{ height: 6 + n * 4, background: n <= level ? '#1CB0F6' : 'var(--color-line)' }} />
       ))}
     </span>
   )
@@ -84,7 +84,7 @@ function Dreams() {
   return (
     <>
       {FLOATERS.map(({ icon: Icon, style, delay }, i) => (
-        <span key={i} className="animate-bob absolute flex h-11 w-11 items-center justify-center rounded-full border-2 border-line bg-white text-blue" style={{ ...style, animationDelay: `${delay}ms` }} aria-hidden="true">
+        <span key={i} className="animate-bob absolute flex h-11 w-11 items-center justify-center rounded-full border-2 border-line bg-card text-blue" style={{ ...style, animationDelay: `${delay}ms` }} aria-hidden="true">
           <Icon size={22} strokeWidth={2.4} />
         </span>
       ))}
@@ -93,7 +93,7 @@ function Dreams() {
 }
 
 const BellBadge = (
-  <span className="absolute -right-4 top-1 flex h-14 w-14 items-center justify-center rounded-full border-2 border-line bg-white" aria-hidden="true">
+  <span className="absolute -right-4 top-1 flex h-14 w-14 items-center justify-center rounded-full border-2 border-line bg-card" aria-hidden="true">
     <Bell className="bell-ring text-gold-dark" size={28} strokeWidth={2.4} fill="currentColor" />
   </span>
 )
@@ -243,7 +243,7 @@ export function Onboarding() {
   const wide = 'w-full sm:w-[240px]'
 
   return (
-    <div className="flex h-full flex-col bg-white">
+    <div className="flex h-full flex-col bg-card">
       <header className="mx-auto flex w-full max-w-[1008px] shrink-0 items-center gap-4 px-4 pb-2 pt-6">
         <button onClick={back} aria-label="Back" className={cx('text-faint hover:text-mute', (index === 0 || step === 'done') && 'invisible')}><ArrowLeft size={26} strokeWidth={3} /></button>
         <div className="h-4 flex-1 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow={index + 1} aria-valuemin={1} aria-valuemax={STEPS.length} aria-label="Welcome progress">

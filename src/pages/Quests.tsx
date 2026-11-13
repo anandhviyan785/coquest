@@ -137,7 +137,7 @@ function BadgesTab() {
         {STREAK_REWARDS.map((r) => {
           const claimed = state.streakRewards.includes(r.days)
           return (
-            <li key={r.days} className={cx('rounded-2xl border-2 p-4', claimed ? 'border-flame bg-[#FFF5E0]' : 'border-line')}>
+            <li key={r.days} className={cx('rounded-2xl border-2 p-4', claimed ? 'border-flame bg-notice' : 'border-line')}>
               <p className="flex items-center gap-2 text-[17px] font-bold text-body"><FlameIcon size={26} muted={!claimed} />{r.days} days</p>
               <p className="mt-1 text-[15px] text-mute">+{r.xp} XP and {r.freezes} streak freeze{r.freezes === 1 ? '' : 's'}</p>
             </li>

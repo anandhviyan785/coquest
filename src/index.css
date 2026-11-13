@@ -21,6 +21,7 @@
   --color-body: #4b4b4b;
   --color-mute: #777777;
   --color-faint: #afafaf;
+  --color-notice: #fff8dc;
 
   /* Primary action */
   --color-green: #58cc02;
@@ -72,6 +73,31 @@
   }
 }
 
+
+/* Dark theme: the same tokens, re-pointed. Light is the default above. */
+:root[data-theme='dark'] {
+  --color-bg: #131f24;
+  --color-surface: #1c2b33;
+  --color-card: #1a272e;
+  --color-raised: #202f36;
+  --color-line: #37464f;
+  --color-ink: #f1f7fb;
+  --color-body: #dce6ec;
+  --color-mute: #99aab5;
+  --color-faint: #6b808c;
+  --color-notice: #3a3316;
+  --color-blue-soft: #16384a;
+  --color-blue-line: #2d7da6;
+  --color-green-soft: #1f3a12;
+  --color-bad-soft: #43201f;
+  --color-ok: #7ad43a;
+  --color-bad-dark: #ff7676;
+  --color-blue-dark: #49c0f8;
+  --scrollbar: #37464f;
+  color-scheme: dark;
+}
+:root[data-theme='dark'] ::selection { background: #1d5775; }
+
 html, body, #root { height: 100%; }
 
 body {
@@ -84,7 +110,8 @@ body {
 
 ::selection { background: var(--color-blue-soft); }
 
-* { scrollbar-width: thin; scrollbar-color: #d6d6d6 transparent; }
+* { scrollbar-width: thin; scrollbar-color: var(--scrollbar) transparent; }
+:root { --scrollbar: #d6d6d6; color-scheme: light; }
 
 :focus-visible { outline: 2px solid var(--color-blue); outline-offset: 2px; border-radius: 8px; }
 /* For inputs whose wrapper already shows a focus ring (via :focus-within). */

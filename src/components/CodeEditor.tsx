@@ -1,5 +1,6 @@
 import Editor from '@monaco-editor/react'
 import type { BeforeMount } from '@monaco-editor/react'
+import { useResolvedTheme } from '../lib/theme'
 import type { LangId } from '../lib/types'
 
 const MONACO_LANG: Record<LangId, string> = {
@@ -35,17 +36,45 @@ const defineTheme: BeforeMount = (monaco) => {
       'scrollbarSlider.background': '#E5E5E599',
     },
   })
+  monaco.editor.defineTheme('coquest-dark', {
+    base: 'vs-dark',
+    inherit: true,
+    rules: [
+      { token: 'comment', foreground: '6B808C', fontStyle: 'italic' },
+      { token: 'keyword', foreground: '49C0F8', fontStyle: 'bold' },
+      { token: 'string', foreground: '8BDB4A' },
+      { token: 'number', foreground: 'FFB347' },
+      { token: 'type', foreground: 'CE82FF' },
+      { token: 'tag', foreground: '49C0F8' },
+      { token: 'attribute.name', foreground: 'CE82FF' },
+      { token: 'attribute.value', foreground: '8BDB4A' },
+    ],
+    colors: {
+      'editor.background': '#1A272E',
+      'editor.foreground': '#DCE6EC',
+      'editorLineNumber.foreground': '#4A5D69',
+      'editorLineNumber.activeForeground': '#99AAB5',
+      'editor.lineHighlightBackground': '#202F36',
+      'editor.lineHighlightBorder': '#00000000',
+      'editor.selectionBackground': '#1D5775',
+      'editorCursor.foreground': '#1CB0F6',
+      'editorIndentGuide.background1': '#2A3A43',
+      'editorGutter.background': '#1A272E',
+      'scrollbarSlider.background': '#37464F99',
+    },
+  })
 }
 
 interface Props { lang: LangId; value: string; onChange: (code: string) => void; height?: number | string; readOnly?: boolean }
 
 export function CodeEditor({ lang, value, onChange, height = 320, readOnly = false }: Props) {
+  const theme = useResolvedTheme()
   return (
-    <div className="overflow-hidden rounded-2xl border-2 border-line bg-white">
+    <div className="overflow-hidden rounded-2xl border-2 border-line bg-card">
       <Editor
         height={height}
         language={MONACO_LANG[lang]}
-        theme="coquest"
+        theme={theme === 'dark' ? 'coquest-dark' : 'coquest'}
         value={value}
         beforeMount={defineTheme}
         onChange={(next) => onChange(next ?? '')}

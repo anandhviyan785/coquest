@@ -18,7 +18,7 @@ function Shields({ current }: { current?: string }) {
     <div className="flex items-end justify-center gap-1">
       {LEAGUES.map((l) => {
         const active = l.id === current
-        return <LeagueIcon key={l.id} size={active ? 84 : 44} color={current === undefined || active ? l.color : '#E5E5E5'} />
+        return <LeagueIcon key={l.id} size={active ? 84 : 44} color={current === undefined || active ? l.color : 'var(--color-line)'} />
       })}
     </div>
   )

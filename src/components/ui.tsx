@@ -14,7 +14,7 @@ const VARIANT: Record<Variant, string> = {
   blue: 'bg-blue text-white border-blue-dark hover:brightness-105',
   danger: 'bg-bad text-white border-bad-dark hover:brightness-105',
   gold: 'bg-gold text-white border-gold-dark hover:brightness-105',
-  secondary: 'bg-white text-blue border-2 border-line hover:bg-surface',
+  secondary: 'bg-card text-blue border-2 border-line hover:bg-surface',
   ghost: 'bg-transparent text-mute border-transparent hover:bg-surface hover:text-body',
 }
 const SIZE: Record<Size, string> = {
@@ -95,7 +95,7 @@ export function Tabs<T extends string>({ tabs, value, onChange, className }: { t
 /** The kit's bottom action bar: neutral, or a green / red result panel. Used by lessons and the welcome flow. */
 export function ScreenFooter({ tone = 'neutral', children }: { tone?: 'neutral' | 'good' | 'bad'; children: ReactNode }) {
   return (
-    <footer className={cx('shrink-0 px-4 py-5', tone === 'good' ? 'bg-green-soft' : tone === 'bad' ? 'bg-bad-soft' : 'border-t-2 border-line bg-white')}>
+    <footer className={cx('shrink-0 px-4 py-5', tone === 'good' ? 'bg-green-soft' : tone === 'bad' ? 'bg-bad-soft' : 'border-t-2 border-line bg-card')}>
       <div className="mx-auto flex w-full max-w-[1008px] flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">{children}</div>
     </footer>
   )
@@ -190,7 +190,7 @@ export function Modal({ open, onClose, children }: { open: boolean; onClose: () 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
       <button aria-label="Close" className="absolute inset-0 cursor-default bg-black/50" onClick={onClose} />
-      <div className="animate-pop relative w-full max-w-md rounded-2xl bg-white p-6">{children}</div>
+      <div className="animate-pop relative w-full max-w-md rounded-2xl bg-card p-6">{children}</div>
     </div>
   )
 }

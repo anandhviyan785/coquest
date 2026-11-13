@@ -67,8 +67,8 @@ function NodePopover({ node, color, onClose }: { node: PathNode; color: { fill: 
   }, [onClose])
 
   return (
-    <div ref={ref} role="dialog" aria-label={node.title} className="animate-pop absolute left-1/2 top-full z-20 mt-4 w-[296px] -translate-x-1/2 rounded-2xl p-4 text-left" style={{ background: locked ? '#F7F7F7' : color.fill, border: locked ? '2px solid #E5E5E5' : undefined }}>
-      <span className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 rotate-45 rounded-[3px]" style={{ background: locked ? '#F7F7F7' : color.fill, borderLeft: locked ? '2px solid #E5E5E5' : undefined, borderTop: locked ? '2px solid #E5E5E5' : undefined }} />
+    <div ref={ref} role="dialog" aria-label={node.title} className="animate-pop absolute left-1/2 top-full z-20 mt-4 w-[296px] -translate-x-1/2 rounded-2xl p-4 text-left" style={{ background: locked ? 'var(--color-surface)' : color.fill, border: locked ? '2px solid var(--color-line)' : undefined }}>
+      <span className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 rotate-45 rounded-[3px]" style={{ background: locked ? 'var(--color-surface)' : color.fill, borderLeft: locked ? '2px solid var(--color-line)' : undefined, borderTop: locked ? '2px solid var(--color-line)' : undefined }} />
       <p className={cx('text-[17px] font-bold', locked ? 'text-faint' : 'text-white')}>{node.title}</p>
       <p className={cx('mt-1 text-[15px]', locked ? 'text-faint' : 'text-white/90')}>
         {locked ? 'Complete all the steps above to unlock this.' : boss ? `${boss.boss.monster} · ${boss.boss.stages.length} stages` : lesson?.lesson.summary}
@@ -109,9 +109,9 @@ function UnitSection({ course, unit, index, nodes, selected, onSelect }: { cours
           return (
             <div key={node.id} className="absolute left-1/2" style={{ top: i * NODE_GAP, transform: `translateX(calc(-50% + ${node.dx}px))`, zIndex: isOpen ? 20 : 1 }}>
               {node.state === 'current' && (
-                <span className="label animate-bob pointer-events-none absolute -top-11 left-1/2 z-10 -translate-x-1/2 rounded-xl border-2 border-line bg-white px-3 py-2 text-[13px]" style={{ color: color.fill }}>
+                <span className="label animate-bob pointer-events-none absolute -top-11 left-1/2 z-10 -translate-x-1/2 rounded-xl border-2 border-line bg-card px-3 py-2 text-[13px]" style={{ color: color.fill }}>
                   Start
-                  <span className="absolute -bottom-[7px] left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-b-2 border-r-2 border-line bg-white" />
+                  <span className="absolute -bottom-[7px] left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-b-2 border-r-2 border-line bg-card" />
                 </span>
               )}
               <button
@@ -119,7 +119,7 @@ function UnitSection({ course, unit, index, nodes, selected, onSelect }: { cours
                 aria-label={`${node.title}${node.state === 'locked' ? ' (locked)' : node.state === 'done' ? ' (completed)' : ''}`}
                 aria-expanded={isOpen}
                 className={cx('relative flex items-center justify-center rounded-[50%] transition-transform active:translate-y-2', node.state === 'current' && 'outline outline-[6px] outline-offset-[6px] outline-line')}
-                style={{ width: NODE_W, height: NODE_H, background: coloured ? color.fill : '#E5E5E5', boxShadow: `0 8px 0 ${coloured ? color.edge : '#B7B7B7'}`, color: coloured ? '#fff' : '#AFAFAF' }}
+                style={{ width: NODE_W, height: NODE_H, background: coloured ? color.fill : 'var(--color-line)', boxShadow: `0 8px 0 ${coloured ? color.edge : '#B7B7B7'}`, color: coloured ? '#fff' : '#AFAFAF' }}
               >
                 {node.state === 'locked' ? (node.boss ? <Skull size={30} strokeWidth={2.4} /> : <Lock size={26} strokeWidth={3} />) : node.boss ? <Skull size={32} strokeWidth={2.4} /> : node.state === 'done' ? <Check size={32} strokeWidth={4} /> : <Star size={30} fill="currentColor" />}
               </button>
@@ -169,7 +169,7 @@ export function Learn() {
           const active = c.id === course.id
           const pct = courseProgress(c, state.lessons).pct
           return (
-            <button key={c.id} role="tab" aria-selected={active} onClick={() => navigate(`/learn/${c.id}`)} className={cx('flex shrink-0 items-center gap-2.5 rounded-xl border-2 border-b-4 px-3 py-2 transition-colors', active ? 'border-blue-line bg-blue-soft' : 'border-line bg-white hover:bg-surface')}>
+            <button key={c.id} role="tab" aria-selected={active} onClick={() => navigate(`/learn/${c.id}`)} className={cx('flex shrink-0 items-center gap-2.5 rounded-xl border-2 border-b-4 px-3 py-2 transition-colors', active ? 'border-blue-line bg-blue-soft' : 'border-line bg-card hover:bg-surface')}>
               <LangLogo lang={c.id} size={30} />
               <span className="text-left">
                 <span className={cx('block text-[15px] font-bold leading-tight', active ? 'text-blue' : 'text-body')}>{c.name}</span>
@@ -192,7 +192,7 @@ export function Learn() {
       </Link>
 
       {needsCompiler(course.id) && !compilerConfigured && (
-        <p className="mb-6 rounded-2xl border-2 border-gold bg-[#FFF8DC] px-5 py-4 text-[15px] font-bold leading-relaxed text-body" role="note">{COMPILER_HELP} Until then you can read these lessons and answer the questions, but the coding exercises cannot be checked.</p>
+        <p className="mb-6 rounded-2xl border-2 border-gold bg-notice px-5 py-4 text-[15px] font-bold leading-relaxed text-body" role="note">{COMPILER_HELP} Until then you can read these lessons and answer the questions, but the coding exercises cannot be checked.</p>
       )}
 
       {units.map(({ unit, nodes }, i) => (

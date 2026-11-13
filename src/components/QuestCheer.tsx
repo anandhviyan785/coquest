@@ -27,7 +27,7 @@ export function QuestCheer() {
   return (
     <div className="mb-6 flex items-center gap-4" role="status">
       <Mascot expression={met ? 'victorious' : 'happy'} motion={met ? 'jump' : 'sway'} size={72} />
-      <p className="relative rounded-2xl border-2 border-line bg-white px-4 py-3 text-[16px] font-bold text-body before:absolute before:-left-[9px] before:top-1/2 before:h-4 before:w-4 before:-translate-y-1/2 before:rotate-45 before:border-b-2 before:border-l-2 before:border-line before:bg-white">{message}</p>
+      <p className="relative rounded-2xl border-2 border-line bg-card px-4 py-3 text-[16px] font-bold text-body before:absolute before:-left-[9px] before:top-1/2 before:h-4 before:w-4 before:-translate-y-1/2 before:rotate-45 before:border-b-2 before:border-l-2 before:border-line before:bg-card">{message}</p>
     </div>
   )
 }

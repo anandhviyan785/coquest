@@ -104,7 +104,7 @@ export function Workbench({ lang, exercise, onCheck, onCodeChange, editorHeight 
       <div className={cx('grid gap-4', isMarkup && 'lg:grid-cols-2')}>
         <CodeEditor lang={lang} value={code} onChange={update} height={editorHeight} readOnly={disabled} />
         {isMarkup && (
-          <div className="overflow-hidden rounded-xl border-2 border-line bg-white" style={{ height: editorHeight }}>
+          <div className="overflow-hidden rounded-xl border-2 border-line bg-card" style={{ height: editorHeight }}>
             <iframe title="Preview" sandbox="" srcDoc={previewDocument(lang, preview, exercise.markup)} className="h-full w-full" />
           </div>
         )}

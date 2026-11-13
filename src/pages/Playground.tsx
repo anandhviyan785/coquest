@@ -118,7 +118,7 @@ export function Playground() {
 
         <div className="flex flex-col gap-4">
           {isMarkup ? (
-            <div className="flex-1 overflow-hidden rounded-xl border-2 border-line bg-white" style={{ minHeight: 300 }}>
+            <div className="flex-1 overflow-hidden rounded-xl border-2 border-line bg-card" style={{ minHeight: 300 }}>
               <iframe title="Preview" sandbox="" srcDoc={previewDocument(lang, preview, lang === 'css' ? CSS_MARKUP : undefined)} className="h-full w-full" style={{ minHeight: 500 }} />
             </div>
           ) : (

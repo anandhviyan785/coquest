@@ -20,7 +20,7 @@ export function OptionButton({ selected, onClick, icon, title, hint, right }: Pr
       onClick={onClick}
       className={cx(
         'flex min-h-[60px] w-full items-center gap-4 rounded-xl border-2 border-b-4 px-4 py-3 text-left transition-colors active:translate-y-0.5 active:border-b-2',
-        selected ? 'border-blue-line bg-blue-soft text-blue' : 'border-line bg-white text-body hover:bg-surface',
+        selected ? 'border-blue-line bg-blue-soft text-blue' : 'border-line bg-card text-body hover:bg-surface',
       )}
     >
       {icon && <span className="flex h-9 w-9 shrink-0 items-center justify-center">{icon}</span>}

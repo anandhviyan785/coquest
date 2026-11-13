@@ -52,7 +52,7 @@ function Field({ label, icon: Icon, error, trailing, ...input }: FieldProps) {
   return (
     <div>
       <label htmlFor={id} className="mb-1.5 block text-[13px] font-bold text-mute">{label}</label>
-      <div className={cx('flex h-[52px] items-center gap-3 rounded-xl border-2 px-4 transition-colors focus-within:border-blue-line focus-within:bg-white', error ? 'border-bad bg-bad-soft/40' : 'border-line bg-surface')}>
+      <div className={cx('flex h-[52px] items-center gap-3 rounded-xl border-2 px-4 transition-colors focus-within:border-blue-line focus-within:bg-card', error ? 'border-bad bg-bad-soft/40' : 'border-line bg-surface')}>
         <Icon size={19} strokeWidth={2.4} className="shrink-0 text-faint" aria-hidden="true" />
         <input id={id} aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined} className="bare-focus h-full min-w-0 flex-1 bg-transparent text-[16px] font-semibold text-ink outline-none placeholder:font-medium placeholder:text-faint" {...input} />
         {trailing}
@@ -92,14 +92,14 @@ function BrandPanel() {
         <ul className="mt-8 max-w-md space-y-4">
           {POINTS.map(({ icon: Icon, text }) => (
             <li key={text} className="flex items-start gap-3.5 text-[16px] font-medium leading-snug text-body">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-blue"><Icon size={19} strokeWidth={2.4} /></span>
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-card text-blue"><Icon size={19} strokeWidth={2.4} /></span>
               <span className="pt-1.5">{text}</span>
             </li>
           ))}
         </ul>
       </div>
       <div className="relative flex items-center gap-3">
-        {COURSES.map((c) => <span key={c.id} className="flex h-11 w-11 items-center justify-center rounded-xl bg-white"><LangLogo lang={c.id} size={26} /></span>)}
+        {COURSES.map((c) => <span key={c.id} className="flex h-11 w-11 items-center justify-center rounded-xl bg-card"><LangLogo lang={c.id} size={26} /></span>)}
       </div>
     </aside>
   )
@@ -199,11 +199,11 @@ export function Auth() {
   )
 
   return (
-    <div className="grid min-h-full bg-white lg:grid-cols-[minmax(0,1fr)_minmax(480px,580px)]">
+    <div className="grid min-h-full bg-card lg:grid-cols-[minmax(0,1fr)_minmax(480px,580px)]">
       <BrandPanel />
 
       <main className="flex flex-col justify-center bg-surface/60 px-5 py-8 sm:px-10">
-        <div className="mx-auto w-full max-w-[420px] rounded-3xl border-2 border-line bg-white p-6 shadow-[0_12px_40px_-16px_rgba(28,176,246,0.35)] sm:p-8">
+        <div className="mx-auto w-full max-w-[420px] rounded-3xl border-2 border-line bg-card p-6 shadow-[0_12px_40px_-16px_rgba(28,176,246,0.35)] sm:p-8">
           <div className="mb-6 flex flex-col items-center lg:hidden">
             <Wordmark size={30} />
             <Mascot expression="happy" motion="wave" size={104} className="mt-3" />
@@ -214,7 +214,7 @@ export function Auth() {
 
           <div role="tablist" aria-label="Sign up or log in" className="mb-6 grid grid-cols-2 rounded-xl bg-surface p-1">
             {(['signup', 'login'] as const).map((m) => (
-              <button key={m} role="tab" aria-selected={mode === m} onClick={() => go(m)} className={cx('h-10 rounded-lg text-[14px] font-bold transition-colors', mode === m ? 'bg-white text-blue ring-2 ring-line' : 'text-mute hover:text-body')}>
+              <button key={m} role="tab" aria-selected={mode === m} onClick={() => go(m)} className={cx('h-10 rounded-lg text-[14px] font-bold transition-colors', mode === m ? 'bg-card text-blue ring-2 ring-line' : 'text-mute hover:text-body')}>
                 {m === 'signup' ? 'Sign up' : 'Log in'}
               </button>
             ))}

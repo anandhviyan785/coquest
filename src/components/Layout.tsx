@@ -82,7 +82,7 @@ function MoreMenu({ placement }: { placement: 'side' | 'top' }) {
         </button>
       )}
       {open && (
-        <div role="menu" className={cx('animate-rise absolute z-50 w-60 overflow-hidden rounded-2xl border-2 border-line bg-white py-2', placement === 'side' ? 'left-full top-0 ml-3' : 'bottom-full right-0 mb-3')}>
+        <div role="menu" className={cx('animate-rise absolute z-50 w-60 overflow-hidden rounded-2xl border-2 border-line bg-card py-2', placement === 'side' ? 'left-full top-0 ml-3' : 'bottom-full right-0 mb-3')}>
           {MORE.map(({ to, label, icon: Icon }) => (
             <NavLink key={to} to={to} role="menuitem" className={({ isActive }) => cx('label flex items-center gap-3 px-5 py-3 text-[13px]', isActive ? 'bg-blue-soft text-blue' : 'text-mute hover:bg-surface')}>
               <Icon size={18} strokeWidth={2.4} />{label}
@@ -199,7 +199,7 @@ function TabBar() {
   const { state } = useApp()
   const tab = (active: boolean) => cx('flex h-12 w-12 items-center justify-center rounded-xl border-2', active ? 'border-blue-line bg-blue-soft' : 'border-transparent')
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t-2 border-line bg-white px-2 py-2 lg:hidden" aria-label="Main">
+    <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t-2 border-line bg-card px-2 py-2 lg:hidden" aria-label="Main">
       {TABS.map(({ to, label, icon: Icon }) => (
         <NavLink key={to} to={to} end={to === '/'} aria-label={label} className={({ isActive }) => tab(isActive)}><Icon size={32} /></NavLink>
       ))}
@@ -216,7 +216,7 @@ function ToastCard({ toast, onDone }: { toast: Toast; onDone: () => void }) {
   }, [onDone])
   const tone = toast.kind === 'error' ? 'border-bad' : toast.kind === 'achievement' ? 'border-gold' : 'border-blue-line'
   return (
-    <div className={cx('animate-rise flex w-80 max-w-[calc(100vw-2rem)] items-start gap-3 rounded-2xl border-2 bg-white p-4', tone)} role="status">
+    <div className={cx('animate-rise flex w-80 max-w-[calc(100vw-2rem)] items-start gap-3 rounded-2xl border-2 bg-card p-4', tone)} role="status">
       {toast.kind === 'achievement' && <QuestsIcon size={30} />}
       {toast.kind === 'level' && <BoltIcon size={28} />}
       <div className="min-w-0 flex-1">
@@ -263,7 +263,7 @@ export function Layout({ rail = false }: { rail?: boolean }) {
       <Sidebar />
       <div className="flex min-w-0 flex-1 justify-center gap-12 px-4 lg:px-6">
         <div className={cx('w-full min-w-0 pb-28 lg:pb-12', rail ? 'max-w-[592px]' : 'max-w-[1008px]')}>
-          <StatBar className={cx('sticky top-0 z-30 -mx-4 border-b-2 border-line bg-white px-4 py-2', rail ? 'xl:hidden' : '', 'lg:static lg:mx-0 lg:justify-end lg:gap-6 lg:border-b-0 lg:px-0 lg:pt-6')} />
+          <StatBar className={cx('sticky top-0 z-30 -mx-4 border-b-2 border-line bg-card px-4 py-2', rail ? 'xl:hidden' : '', 'lg:static lg:mx-0 lg:justify-end lg:gap-6 lg:border-b-0 lg:px-0 lg:pt-6')} />
           {syncError && <p className="mt-4 rounded-xl border-2 border-bad bg-bad-soft px-4 py-2.5 text-sm font-bold text-bad-dark" role="alert">Not saved — {syncError}</p>}
           <main className="pt-6">
             <Outlet />

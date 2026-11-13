@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { GoalPicker } from '../components/GoalPicker'
 import { Button, Modal, PageHeader, Panel, cx } from '../components/ui'
+import { ThemePicker } from '../components/ThemePicker'
 import { notificationPermission, requestNotifications, showNotification } from '../lib/notify'
 import type { Permission } from '../lib/notify'
 import { fetchReminderPref, setReminderPref, signedInEmail } from '../lib/repo'
@@ -150,6 +151,9 @@ export function Settings() {
           ) : (
             <span className="rounded-md border-2 border-line px-2.5 py-1 text-xs font-semibold text-mute">Not available</span>
           )}
+        </Row>
+        <Row title="Appearance" hint="Light, dark, or follow your device.">
+          <ThemePicker />
         </Row>
         <Row title="Welcome tour" hint="Meet QUEST again and choose your language, reason, level and daily goal afresh.">
           <Button variant="secondary" onClick={() => patch({ onboarded: false })}>Replay</Button>

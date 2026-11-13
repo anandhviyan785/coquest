@@ -8,10 +8,10 @@ import { totals } from '../lib/gamification'
 import type { LangId } from '../lib/types'
 import { useApp } from '../state/AppContext'
 
-const TOOLTIP = { contentStyle: { background: '#FFFFFF', border: '2px solid #E5E5E5', borderRadius: 10, fontSize: 13 }, labelStyle: { color: '#777777' }, cursor: { fill: 'rgba(148,163,184,0.08)' } }
-const AXIS = { tickLine: false, axisLine: false, tick: { fill: '#AFAFAF', fontSize: 12 } }
+const TOOLTIP = { contentStyle: { background: 'var(--color-card)', border: '2px solid var(--color-line)', color: 'var(--color-ink)', borderRadius: 10, fontSize: 13 }, labelStyle: { color: 'var(--color-mute)' }, cursor: { fill: 'rgba(148,163,184,0.08)' } }
+const AXIS = { tickLine: false, axisLine: false, tick: { fill: 'var(--color-faint)', fontSize: 12 } }
 const HEAT_WEEKS = 18
-const HEAT = ['#E5E5E5', '#DDF4FF', '#84D8FF', '#1CB0F6', '#1899D6']
+const HEAT = ['var(--color-line)', 'var(--color-blue-soft)', '#84D8FF', '#1CB0F6', '#1899D6']
 
 const minutes = (seconds: number): string => (seconds >= 3600 ? `${(seconds / 3600).toFixed(1)} h` : `${Math.round(seconds / 60)} min`)
 
@@ -93,10 +93,10 @@ export function Stats() {
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={month} margin={{ top: 6, right: 6, bottom: 0, left: -18 }}>
                 <defs><linearGradient id="xpFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1CB0F6" stopOpacity={0.35} /><stop offset="100%" stopColor="#1CB0F6" stopOpacity={0} /></linearGradient></defs>
-                <CartesianGrid stroke="#E5E5E5" vertical={false} />
+                <CartesianGrid stroke="var(--color-line)" vertical={false} />
                 <XAxis dataKey="date" {...AXIS} interval={6} />
                 <YAxis {...AXIS} allowDecimals={false} />
-                <Tooltip {...TOOLTIP} cursor={{ stroke: '#E5E5E5' }} formatter={(v) => [`${v} XP`, 'Earned']} />
+                <Tooltip {...TOOLTIP} cursor={{ stroke: 'var(--color-line)' }} formatter={(v) => [`${v} XP`, 'Earned']} />
                 <Area type="monotone" dataKey="xp" stroke="#1CB0F6" strokeWidth={2} fill="url(#xpFill)" />
               </AreaChart>
             </ResponsiveContainer>
@@ -108,7 +108,7 @@ export function Stats() {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={week} margin={{ top: 6, right: 6, bottom: 0, left: -18 }}>
-                <CartesianGrid stroke="#E5E5E5" vertical={false} />
+                <CartesianGrid stroke="var(--color-line)" vertical={false} />
                 <XAxis dataKey="day" {...AXIS} />
                 <YAxis {...AXIS} allowDecimals={false} />
                 <Tooltip {...TOOLTIP} formatter={(v) => [`${v} min`, 'Time']} />
