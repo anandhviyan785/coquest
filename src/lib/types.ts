@@ -73,9 +73,21 @@ export interface LessonResult { at: string; accuracy: number; xp: number; perfec
 export type HistoryKind = 'lesson' | 'boss' | 'daily' | 'duel' | 'reward'
 export interface HistoryItem { at: string; kind: HistoryKind; title: string; xp: number }
 
+/** What the player told QUEST in the welcome flow. */
+export interface Profile {
+  language: LangId | null
+  reason: string | null
+  level: string | null
+  /** True when the player allowed practice reminders. */
+  reminders: boolean
+}
+
 export interface UserState {
   username: string
   avatar: string
+  /** False until the player has finished the welcome flow. */
+  onboarded: boolean
+  profile: Profile
   xp: number
   streak: number
   longestStreak: number

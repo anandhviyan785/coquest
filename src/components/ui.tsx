@@ -92,6 +92,15 @@ export function Tabs<T extends string>({ tabs, value, onChange, className }: { t
   )
 }
 
+/** The kit's bottom action bar: neutral, or a green / red result panel. Used by lessons and the welcome flow. */
+export function ScreenFooter({ tone = 'neutral', children }: { tone?: 'neutral' | 'good' | 'bad'; children: ReactNode }) {
+  return (
+    <footer className={cx('shrink-0 px-4 py-5', tone === 'good' ? 'bg-green-soft' : tone === 'bad' ? 'bg-bad-soft' : 'border-t-2 border-line bg-white')}>
+      <div className="mx-auto flex w-full max-w-[1008px] flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">{children}</div>
+    </footer>
+  )
+}
+
 // ── Progress ──────────────────────────────────────────────────────────────
 export function Bar({ value, max, color = 'var(--color-gold)', className }: { value: number; max: number; color?: string; className?: string }) {
   const pct = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0

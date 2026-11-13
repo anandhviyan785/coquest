@@ -244,7 +244,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const update = useCallback((change: (s: UserState) => UserState) => commit(change(stateRef.current)), [commit])
 
   const resetProgress = useCallback(() => {
-    commit({ ...newUserState(stateRef.current.username), avatar: stateRef.current.avatar, createdAt: stateRef.current.createdAt })
+    const { username, avatar, createdAt, profile } = stateRef.current
+    // A reset clears progress but does not send the player back through the welcome flow.
+    commit({ ...newUserState(username), avatar, createdAt, profile, onboarded: true })
   }, [commit])
 
   const value = useMemo<AppValue>(() => ({

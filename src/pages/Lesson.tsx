@@ -1,11 +1,10 @@
 import { X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import type { ReactNode } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { BoltIcon, GemIcon } from '../components/icons'
 import { Toasts, useRewardToasts } from '../components/Layout'
 import { Mascot } from '../components/Mascot'
-import { Button, Code, LinkButton, Prose, cx } from '../components/ui'
+import { Button, Code, LinkButton, Prose, ScreenFooter as LessonFooter, cx } from '../components/ui'
 import { Workbench } from '../components/Workbench'
 import type { CheckSummary } from '../components/Workbench'
 import { findLesson, isUnlocked, nextStep, stepPath, stepTitle } from '../content'
@@ -17,15 +16,6 @@ const MAX_TRACKED_SECONDS = 30 * 60
 const REPLAY_XP = 5
 
 interface Tally { correct: number; attempts: number }
-
-/** The kit's lesson footer: a neutral bar with the action, or a green / red result panel. */
-export function LessonFooter({ tone = 'neutral', children }: { tone?: 'neutral' | 'good' | 'bad'; children: ReactNode }) {
-  return (
-    <footer className={cx('shrink-0 px-4 py-5', tone === 'good' ? 'bg-green-soft' : tone === 'bad' ? 'bg-bad-soft' : 'border-t-2 border-line bg-white')}>
-      <div className="mx-auto flex w-full max-w-[1008px] flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">{children}</div>
-    </footer>
-  )
-}
 
 function QuestionStep({ question, onAnswered, onNext }: { question: Question; onAnswered: (correct: boolean) => void; onNext: () => void }) {
   const [picked, setPicked] = useState<number | null>(null)

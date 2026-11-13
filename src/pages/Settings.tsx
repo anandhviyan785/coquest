@@ -1,13 +1,15 @@
 import { Download, LogOut, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
+import { GoalPicker } from '../components/GoalPicker'
 import { Button, Modal, PageHeader, Panel, cx } from '../components/ui'
-import { DAILY_GOALS } from '../lib/gamification'
+import { notificationPermission, requestNotifications, showNotification } from '../lib/notify'
+import type { Permission } from '../lib/notify'
 import { fetchReminderPref, setReminderPref, signedInEmail } from '../lib/repo'
+import { REMINDER_HOUR } from '../lib/useDailyReminder'
 import { useApp } from '../state/AppContext'
 
 const USERNAME = /^[A-Za-z0-9_]{3,20}$/
-const GOAL_LABEL: Record<number, string> = { 20: 'Casual', 50: 'Regular', 100: 'Serious', 150: 'Intense' }
 
 function Row({ title, hint, children }: { title: string; hint: string; children: React.ReactNode }) {
   return (
@@ -25,6 +27,16 @@ export function Settings() {
   const [confirm, setConfirm] = useState<'reset' | 'leave' | null>(null)
   const [reminders, setReminders] = useState<boolean | null>(null)
   const [email, setEmail] = useState<string | null>(null)
+  const [permission, setPermission] = useState<Permission>(notificationPermission)
+  const practiceReminders = state.profile.reminders && permission === 'granted'
+
+  const enablePracticeReminders = async () => {
+    const result = await requestNotifications()
+    setPermission(result)
+    if (result !== 'granted') return
+    patch({ profile: { ...state.profile, reminders: true } })
+    void showNotification('Reminders are on', 'I will nudge you to practise in the evening if you have not reached your goal.')
+  }
 
   useEffect(() => {
     if (!cloud || !userId) return
@@ -111,15 +123,21 @@ export function Settings() {
 
       <h2 className="mb-2.5 text-[13px] font-semibold uppercase tracking-[0.08em] text-mute">Learning</h2>
       <Panel className="mb-7">
-        <Row title="Daily goal" hint="How much XP you aim to earn each day. A lesson is worth 20–30 XP.">
-          <div className="flex gap-1.5" role="radiogroup" aria-label="Daily goal">
-            {DAILY_GOALS.map((goal) => (
-              <button key={goal} role="radio" aria-checked={state.dailyGoal === goal} onClick={() => patch({ dailyGoal: goal })} className={cx('rounded-[10px] border px-3 py-1.5 text-center transition-colors', state.dailyGoal === goal ? 'border-sky bg-raised' : 'border-line hover:border-sky/50')}>
-                <span className="tnum block text-sm font-semibold">{goal} XP</span>
-                <span className="block text-[11px] text-mute">{GOAL_LABEL[goal]}</span>
-              </button>
-            ))}
+        <div className="border-b-2 border-line px-6 py-5">
+          <p className="text-sm font-semibold">Daily goal</p>
+          <p className="mt-0.5 text-[13px] text-mute">How much XP you aim to earn each day. A lesson is worth 20–30 XP.</p>
+          <div className="mt-4 max-w-md">
+            <GoalPicker value={state.dailyGoal} onChange={(goal) => { if (goal !== null) patch({ dailyGoal: goal }) }} />
           </div>
+        </div>
+        <Row title="Practice reminders" hint={`A notification after ${REMINDER_HOUR}:00 if you have not reached your daily goal. Works while CoQuest is open in a browser tab.`}>
+          {permission === 'unsupported' || permission === 'denied' ? (
+            <span className="rounded-md border-2 border-line px-2.5 py-1 text-xs font-semibold text-mute">{permission === 'denied' ? 'Blocked in your browser' : 'Not supported here'}</span>
+          ) : (
+            <button role="switch" aria-checked={practiceReminders} aria-label="Practice reminders" onClick={() => (practiceReminders ? patch({ profile: { ...state.profile, reminders: false } }) : void enablePracticeReminders())} className={cx('relative h-8 w-14 shrink-0 rounded-full transition-colors', practiceReminders ? 'bg-blue' : 'bg-line')}>
+              <span className={cx('absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-[left]', practiceReminders ? 'left-7' : 'left-1')} />
+            </button>
+          )}
         </Row>
         <Row
           title="Email reminders"
@@ -132,6 +150,9 @@ export function Settings() {
           ) : (
             <span className="rounded-md border-2 border-line px-2.5 py-1 text-xs font-semibold text-mute">Not available</span>
           )}
+        </Row>
+        <Row title="Welcome tour" hint="Meet QUEST again and choose your language, reason, level and daily goal afresh.">
+          <Button variant="secondary" onClick={() => patch({ onboarded: false })}>Replay</Button>
         </Row>
         <Row title="Streak freezes" hint="A freeze is used automatically to protect your streak when you miss a day. Earn more at 7, 30 and 100-day streaks.">
           <span className="tnum text-xl font-semibold">{state.freezes}</span>

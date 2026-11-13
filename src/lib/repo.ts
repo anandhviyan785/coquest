@@ -7,7 +7,14 @@ import type { UserState } from './types'
 export const hydrate = (raw: unknown, fallbackName: string): UserState => {
   const base = newUserState(fallbackName)
   if (!raw || typeof raw !== 'object') return base
-  return { ...base, ...(raw as Partial<UserState>) }
+  const saved = raw as Partial<UserState>
+  return {
+    ...base,
+    ...saved,
+    profile: { ...base.profile, ...saved.profile },
+    // Anyone who already had saved progress before the welcome flow existed skips it.
+    onboarded: saved.onboarded ?? true,
+  }
 }
 
 // ── Cloud mode ────────────────────────────────────────────────────────────

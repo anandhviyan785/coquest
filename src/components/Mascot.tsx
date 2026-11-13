@@ -98,15 +98,30 @@ function MouthShape({ kind }: { kind: Mouth }) {
   }
 }
 
-function Arm({ side, angle, fill }: { side: 'left' | 'right'; angle: number; fill: string }) {
-  const x = side === 'left' ? 44 : 156
+type Swing = 'wave' | 'pump' | 'pump-rev'
+
+const SWING_CLASS: Record<Swing, string> = { wave: 'q-wave', pump: 'q-pump', 'pump-rev': 'q-pump q-rev' }
+
+function Arm({ side, angle, fill, swing }: { side: 'left' | 'right'; angle: number; fill: string; swing?: Swing }) {
+  // A waving arm pivots from the edge of the body so the hand clears the silhouette.
+  const waving = swing === 'wave'
+  const x = side === 'left' ? (waving ? 36 : 44) : waving ? 164 : 156
+  const y = waving ? 108 : 120
   const rot = side === 'left' ? angle : -angle
   return (
-    <g transform={`translate(${x} 120) rotate(${rot})`}>
-      <ellipse cx="0" cy="13" rx="9.5" ry="17" fill={fill} stroke="#1741B8" strokeWidth="1.5" />
+    <g transform={`translate(${x} ${y}) rotate(${rot})`}>
+      {/* The inner group swings around the shoulder, which is the origin of this coordinate system. */}
+      <g className={swing ? SWING_CLASS[swing] : undefined}>
+        <ellipse cx="0" cy="13" rx="9.5" ry="17" fill={fill} stroke="#1741B8" strokeWidth="1.5" />
+      </g>
     </g>
   )
 }
+
+/** Whole-character movement, defined in index.css. Independent of the facial expression. */
+export type Motion = 'wave' | 'jump' | 'tilt' | 'nod' | 'sway' | 'pump' | 'float'
+
+const MOTION_CLASS: Partial<Record<Motion, string>> = { jump: 'q-jump', tilt: 'q-tilt', nod: 'q-nod', sway: 'q-sway', float: 'q-float' }
 
 interface MascotProps {
   expression?: Expression
@@ -114,11 +129,14 @@ interface MascotProps {
   className?: string
   /** Gentle idle float. Off by default so QUEST stays calm in dense layouts. */
   float?: boolean
+  /** An animation for the welcome flow and celebrations. Off by default. */
+  motion?: Motion
 }
 
-export function Mascot({ expression = 'curious', size = 160, className = '', float = false }: MascotProps) {
+export function Mascot({ expression = 'curious', size = 160, className = '', float = false, motion }: MascotProps) {
   const uid = useId().replace(/:/g, '')
   const pose = POSES[expression]
+  const arms: [number, number] = motion === 'wave' ? [8, 135] : motion === 'pump' ? [95, 95] : pose.arms
   const id = (name: string) => `${name}-${uid}`
 
   return (
@@ -129,6 +147,7 @@ export function Mascot({ expression = 'curious', size = 160, className = '', flo
       role="img"
       aria-label={`QUEST looking ${expression}`}
       className={`${float ? 'animate-bob' : ''} ${className}`}
+      style={{ overflow: 'visible' }}
     >
       <defs>
         <radialGradient id={id('body')} cx="38%" cy="28%" r="80%">
@@ -153,6 +172,7 @@ export function Mascot({ expression = 'curious', size = 160, className = '', flo
 
       <ellipse cx="100" cy="198" rx="50" ry="6.5" fill="#000" opacity="0.32" />
 
+      <g className={motion && MOTION_CLASS[motion] ? `q-motion ${MOTION_CLASS[motion]}` : undefined}>
       <g transform={`rotate(${pose.tilt} 100 180)`}>
         {/* feet */}
         <ellipse cx="78" cy="184" rx="16" ry="10" fill="#1A45C4" />
@@ -198,8 +218,9 @@ export function Mascot({ expression = 'curious', size = 160, className = '', flo
         <MouthShape kind={pose.mouth} />
 
         {/* arms */}
-        <Arm side="left" angle={pose.arms[0]} fill="#2459DE" />
-        <Arm side="right" angle={pose.arms[1]} fill="#2459DE" />
+        <Arm side="left" angle={arms[0]} fill="#2459DE" swing={motion === 'pump' ? 'pump-rev' : undefined} />
+        <Arm side="right" angle={arms[1]} fill="#2459DE" swing={motion === 'wave' ? 'wave' : motion === 'pump' ? 'pump' : undefined} />
+      </g>
       </g>
 
       {pose.zzz && (

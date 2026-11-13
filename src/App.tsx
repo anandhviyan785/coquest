@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { Mascot } from './components/Mascot'
+import { useDailyReminder } from './lib/useDailyReminder'
 import { Auth } from './pages/Auth'
 import { BossBattle } from './pages/BossBattle'
 import { Bosses } from './pages/Bosses'
@@ -10,6 +11,7 @@ import { Glossary } from './pages/Glossary'
 import { Leaderboard } from './pages/Leaderboard'
 import { Learn } from './pages/Learn'
 import { LessonPage } from './pages/Lesson'
+import { Onboarding } from './pages/Onboarding'
 import { Playground } from './pages/Playground'
 import { Profile } from './pages/Profile'
 import { Quests } from './pages/Quests'
@@ -20,7 +22,8 @@ import { Tutor } from './pages/Tutor'
 import { useApp } from './state/AppContext'
 
 export default function App() {
-  const { status } = useApp()
+  const { status, state } = useApp()
+  useDailyReminder()
 
   if (status === 'loading') {
     return (
@@ -31,6 +34,8 @@ export default function App() {
     )
   }
   if (status === 'signedOut') return <Auth />
+  // New players meet QUEST first; everyone who already has progress skips this.
+  if (!state.onboarded) return <Onboarding />
 
   return (
     <Routes>

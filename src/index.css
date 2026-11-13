@@ -98,6 +98,46 @@ body {
 
 .tnum { font-variant-numeric: tabular-nums; }
 
+/* ── QUEST motion (welcome flow and celebrations) ─────────────────────────── */
+.q-motion { transform-box: fill-box; transform-origin: 50% 100%; }
+.q-wave, .q-pump { transform-origin: 0 0; }
+.q-wave { animation: q-wave 0.5s ease-in-out infinite alternate; }
+.q-pump { animation: q-pump 0.45s ease-in-out infinite alternate; }
+.q-pump.q-rev { animation-direction: alternate-reverse; }
+.q-jump { animation: q-jump 1.1s ease-in-out infinite; }
+.q-tilt { animation: q-tilt 2.4s ease-in-out infinite; }
+.q-nod { animation: q-nod 1.6s ease-in-out infinite; }
+.q-sway { animation: q-sway 2.8s ease-in-out infinite; }
+.q-float { animation: q-float 3s ease-in-out infinite; }
+
+@keyframes q-wave { from { transform: rotate(-22deg); } to { transform: rotate(24deg); } }
+@keyframes q-pump { from { transform: rotate(-16deg); } to { transform: rotate(16deg); } }
+@keyframes q-jump {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  15% { transform: translateY(0) scale(1.06, 0.92); }
+  45% { transform: translateY(-22px) scale(0.97, 1.04); }
+  75% { transform: translateY(0) scale(1.05, 0.95); }
+}
+@keyframes q-tilt { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-7deg); } 75% { transform: rotate(7deg); } }
+@keyframes q-nod { 0%, 100% { transform: translateY(0) rotate(0); } 40% { transform: translateY(5px) rotate(2deg); } 70% { transform: translateY(0) rotate(-1deg); } }
+@keyframes q-sway { 0%, 100% { transform: translateX(0) rotate(-3deg); } 50% { transform: translateX(6px) rotate(3deg); } }
+@keyframes q-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+/* A notification bell that rings, and confetti that bursts outwards. */
+.bell-ring { transform-origin: 50% 0; animation: bell-ring 1.6s ease-in-out infinite; }
+@keyframes bell-ring {
+  0%, 60%, 100% { transform: rotate(0); }
+  10% { transform: rotate(20deg); } 20% { transform: rotate(-18deg); } 30% { transform: rotate(14deg); }
+  40% { transform: rotate(-10deg); } 50% { transform: rotate(5deg); }
+}
+.confetti { position: absolute; left: 50%; top: 42%; width: 10px; height: 10px; animation: confetti-burst 1.4s ease-out both; }
+.confetti.loop { animation-duration: 2.6s; animation-iteration-count: infinite; }
+@keyframes confetti-burst {
+  0% { transform: translate(-50%, -50%) scale(0.3) rotate(0deg); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--rot)); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }

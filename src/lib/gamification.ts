@@ -11,7 +11,16 @@ export const XP = {
   duelPlay: 10,
 } as const
 
-export const DAILY_GOALS = [20, 50, 100, 150] as const
+export const GOAL_PRESETS = [
+  { xp: 20, label: 'Casual', time: 'about 5 minutes a day' },
+  { xp: 50, label: 'Regular', time: 'about 10 minutes a day' },
+  { xp: 100, label: 'Serious', time: 'about 20 minutes a day' },
+  { xp: 150, label: 'Intense', time: 'about 30 minutes a day' },
+] as const
+
+/** Bounds for a custom daily goal, in XP. */
+export const MIN_GOAL = 10
+export const MAX_GOAL = 500
 
 /** Gems are earned with XP: one gem for every four XP. */
 export const gemsForXp = (xp: number): number => Math.round(xp / 4)
@@ -208,6 +217,8 @@ export const totals = (s: UserState) => {
 export const newUserState = (username: string): UserState => ({
   username,
   avatar: 'curious',
+  onboarded: false,
+  profile: { language: null, reason: null, level: null, reminders: false },
   xp: 0,
   streak: 0,
   longestStreak: 0,
