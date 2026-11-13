@@ -12,6 +12,14 @@ export const XP = {
 } as const
 
 export const DAILY_GOALS = [20, 50, 100, 150] as const
+
+/** Gems are earned with XP: one gem for every four XP. */
+export const gemsForXp = (xp: number): number => Math.round(xp / 4)
+
+export const SHOP = {
+  freeze: { cost: 200, max: 2 },
+  wager: { cost: 50, days: 7, payout: 100 },
+} as const
 const HISTORY_LIMIT = 60
 
 // ── Levels ────────────────────────────────────────────────────────────────
@@ -130,6 +138,7 @@ export const applyActivity = (state: UserState, a: Activity, today: string = day
   const next: UserState = {
     ...rolled,
     xp: rolled.xp + a.xp,
+    gems: rolled.gems + gemsForXp(a.xp),
     weeklyXp: rolled.weeklyXp + a.xp,
     days: { ...rolled.days, [today]: day },
     history: [{ at: new Date().toISOString(), kind: a.kind, title: a.title, xp: a.xp }, ...rolled.history].slice(
@@ -137,7 +146,34 @@ export const applyActivity = (state: UserState, a: Activity, today: string = day
       HISTORY_LIMIT,
     ),
   }
-  return grantStreakRewards(next)
+  return settleWager(grantStreakRewards(next), state.lastActive !== today)
+}
+
+// ── Shop ──────────────────────────────────────────────────────────────────
+const note = (s: UserState, title: string): UserState => ({
+  ...s,
+  history: [{ at: new Date().toISOString(), kind: 'reward' as const, title, xp: 0 }, ...s.history].slice(0, HISTORY_LIMIT),
+})
+
+/** Pays out a won wager, or clears one whose streak was broken. */
+const settleWager = (s: UserState, newDay: boolean): UserState => {
+  if (!s.wager) return s
+  if (s.streak >= s.wager.target) return note({ ...s, gems: s.gems + SHOP.wager.payout, wager: null }, `Double or Nothing won: +${SHOP.wager.payout} gems`)
+  if (newDay && s.streak <= s.wager.base) return note({ ...s, wager: null }, 'Double or Nothing lost: streak broken')
+  return s
+}
+
+export const canBuyFreeze = (s: UserState): boolean => s.gems >= SHOP.freeze.cost && s.freezes < SHOP.freeze.max
+
+export const buyFreeze = (s: UserState): UserState =>
+  canBuyFreeze(s) ? note({ ...s, gems: s.gems - SHOP.freeze.cost, freezes: s.freezes + 1 }, 'Bought a Streak Freeze') : s
+
+export const canPlaceWager = (s: UserState): boolean => s.gems >= SHOP.wager.cost && s.wager === null
+
+export const placeWager = (s: UserState, today: string = dayKey()): UserState => {
+  if (!canPlaceWager(s)) return s
+  const base = liveStreak(s, today)
+  return note({ ...s, gems: s.gems - SHOP.wager.cost, wager: { base, target: base + SHOP.wager.days } }, 'Placed a Double or Nothing wager')
 }
 
 /** Consecutive days, ending today or yesterday, on which the daily goal was met. */
@@ -186,6 +222,9 @@ export const newUserState = (username: string): UserState => ({
   daily: {},
   streakRewards: [],
   duels: { played: 0, won: 0 },
+  gems: 0,
+  questClaims: {},
+  wager: null,
   history: [],
   createdAt: new Date().toISOString(),
 })

@@ -6,30 +6,33 @@ const MONACO_LANG: Record<LangId, string> = {
   python: 'python', javascript: 'javascript', cpp: 'cpp', java: 'java', html: 'html', css: 'css', sql: 'sql',
 }
 
+/** A light editor theme built from the kit's palette. */
 const defineTheme: BeforeMount = (monaco) => {
   monaco.editor.defineTheme('pyquest', {
-    base: 'vs-dark',
+    base: 'vs',
     inherit: true,
     rules: [
-      { token: 'comment', foreground: '5B6B88', fontStyle: 'italic' },
-      { token: 'keyword', foreground: '67E8F9' },
-      { token: 'string', foreground: 'FBBF24' },
-      { token: 'number', foreground: 'F97316' },
-      { token: 'type', foreground: '7DD3FC' },
-      { token: 'tag', foreground: '67E8F9' },
-      { token: 'attribute.name', foreground: '7DD3FC' },
+      { token: 'comment', foreground: 'AFAFAF', fontStyle: 'italic' },
+      { token: 'keyword', foreground: '1899D6', fontStyle: 'bold' },
+      { token: 'string', foreground: '58A700' },
+      { token: 'number', foreground: 'FF9600' },
+      { token: 'type', foreground: 'A568CC' },
+      { token: 'tag', foreground: '1899D6' },
+      { token: 'attribute.name', foreground: 'A568CC' },
+      { token: 'attribute.value', foreground: '58A700' },
     ],
     colors: {
-      'editor.background': '#0B1120',
-      'editor.foreground': '#E2E8F0',
-      'editorLineNumber.foreground': '#3A4A6B',
-      'editorLineNumber.activeForeground': '#94A3B8',
-      'editor.lineHighlightBackground': '#111A2E',
-      'editor.selectionBackground': '#2563EB55',
-      'editorCursor.foreground': '#67E8F9',
-      'editorIndentGuide.background1': '#1B2942',
-      'editorGutter.background': '#0B1120',
-      'scrollbarSlider.background': '#23335480',
+      'editor.background': '#FFFFFF',
+      'editor.foreground': '#3C3C3C',
+      'editorLineNumber.foreground': '#CFCFCF',
+      'editorLineNumber.activeForeground': '#777777',
+      'editor.lineHighlightBackground': '#F7F7F7',
+      'editor.lineHighlightBorder': '#00000000',
+      'editor.selectionBackground': '#DDF4FF',
+      'editorCursor.foreground': '#1CB0F6',
+      'editorIndentGuide.background1': '#EFEFEF',
+      'editorGutter.background': '#FFFFFF',
+      'scrollbarSlider.background': '#E5E5E599',
     },
   })
 }
@@ -38,7 +41,7 @@ interface Props { lang: LangId; value: string; onChange: (code: string) => void;
 
 export function CodeEditor({ lang, value, onChange, height = 320, readOnly = false }: Props) {
   return (
-    <div className="overflow-hidden rounded-xl border border-line bg-[#0B1120]">
+    <div className="overflow-hidden rounded-2xl border-2 border-line bg-white">
       <Editor
         height={height}
         language={MONACO_LANG[lang]}
@@ -46,12 +49,12 @@ export function CodeEditor({ lang, value, onChange, height = 320, readOnly = fal
         value={value}
         beforeMount={defineTheme}
         onChange={(next) => onChange(next ?? '')}
-        loading={<div className="flex h-full items-center justify-center text-sm text-faint">Loading editor…</div>}
+        loading={<div className="label flex h-full items-center justify-center text-[13px] text-faint">Loading editor…</div>}
         options={{
           readOnly,
           fontFamily: "'JetBrains Mono Variable', Consolas, monospace",
-          fontSize: 14,
-          lineHeight: 22,
+          fontSize: 15,
+          lineHeight: 24,
           lineNumbers: 'on',
           minimap: { enabled: false },
           scrollBeyondLastLine: false,

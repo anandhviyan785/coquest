@@ -34,6 +34,8 @@ interface AppValue {
   /** Adds study time without awarding XP or touching the streak. */
   logTime: (seconds: number, lang?: LangId) => void
   patch: (change: Partial<UserState>) => void
+  /** Applies a pure state transition, such as a shop purchase or a quest claim. */
+  update: (change: (s: UserState) => UserState) => void
   resetProgress: () => void
 }
 
@@ -173,6 +175,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const patch = useCallback((change: Partial<UserState>) => commit({ ...stateRef.current, ...change }), [commit])
 
+  const update = useCallback((change: (s: UserState) => UserState) => commit(change(stateRef.current)), [commit])
+
   const resetProgress = useCallback(() => {
     const fresh = { ...newUserState(stateRef.current.username), avatar: stateRef.current.avatar }
     if (!isCloud) clearLocal()
@@ -196,8 +200,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     earn,
     logTime,
     patch,
+    update,
     resetProgress,
-  }), [status, userId, state, syncError, toasts, dismissToast, notify, startLocal, signIn, signUp, signOut, earn, logTime, patch, resetProgress])
+  }), [update, status, userId, state, syncError, toasts, dismissToast, notify, startLocal, signIn, signUp, signOut, earn, logTime, patch, resetProgress])
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
 }

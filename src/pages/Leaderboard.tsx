@@ -1,25 +1,66 @@
-import { Flame, Zap } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Avatar } from '../components/Avatar'
-import { Mascot } from '../components/Mascot'
-import { Bar, PageHeader, Panel, PanelTitle, cx } from '../components/ui'
-import { LEAGUES, leagueFromXp, liveStreak, nextLeague } from '../lib/gamification'
+import { LeagueIcon } from '../components/icons'
+import { LinkButton, Tabs, cx } from '../components/ui'
+import { COURSES, nextStep, stepPath } from '../content'
+import { LEAGUES, leagueFromXp, liveStreak, nextLeague, totals } from '../lib/gamification'
 import { fetchAllTimeBoard, fetchWeeklyBoard } from '../lib/repo'
 import type { BoardRow } from '../lib/repo'
 import { useApp } from '../state/AppContext'
 
 type Tab = 'weekly' | 'all'
 
+/** Leaderboards open once a learner has finished this many lessons, as in the kit. */
+const LESSONS_TO_UNLOCK = 3
+
+function Shields({ current }: { current?: string }) {
+  return (
+    <div className="flex items-end justify-center gap-1">
+      {LEAGUES.map((l) => {
+        const active = l.id === current
+        return <LeagueIcon key={l.id} size={active ? 84 : 44} color={current === undefined || active ? l.color : '#E5E5E5'} />
+      })}
+    </div>
+  )
+}
+
+function LockedBoard({ remaining, startPath }: { remaining: number; startPath: string }) {
+  return (
+    <div className="pt-4 text-center">
+      <div className="flex items-end justify-center">
+        <LeagueIcon size={88} color="#D9A57C" className="-mr-5 -rotate-12" />
+        <LeagueIcon size={112} color="#FFC800" className="relative z-10" />
+        <LeagueIcon size={88} color="#C9D6E4" className="-ml-5 rotate-12" />
+      </div>
+      <h1 className="mt-6 text-2xl font-bold text-ink">Unlock Leaderboards!</h1>
+      <p className="mx-auto mt-3 max-w-xs text-[17px] text-mute">Complete {remaining} more lesson{remaining === 1 ? '' : 's'} to start competing</p>
+      <LinkButton to={startPath} variant="secondary" size="lg" className="mt-5 w-full max-w-[280px]">Start a lesson</LinkButton>
+      <ul className="mx-auto mt-10 max-w-md space-y-7" aria-hidden="true">
+        {[56, 90, 46, 122, 68, 144].map((width, i) => (
+          <li key={i} className="flex items-center gap-5 px-4">
+            <span className="h-4 w-4 rounded-full bg-line" />
+            <span className="h-[52px] w-[52px] rounded-full bg-line" />
+            <span className="h-3.5 rounded-full bg-line" style={{ width }} />
+            <span className="ml-auto h-3.5 w-[52px] rounded-full bg-line" />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export function Leaderboard() {
   const { state, weeklyXp, cloud, userId } = useApp()
   const league = leagueFromXp(state.xp)
   const upcoming = nextLeague(state.xp)
+  const lessons = totals(state).lessons
   const [tab, setTab] = useState<Tab>('weekly')
   const [rows, setRows] = useState<BoardRow[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const unlocked = lessons >= LESSONS_TO_UNLOCK
 
   useEffect(() => {
-    if (!cloud) return
+    if (!cloud || !unlocked) return
     let cancelled = false
     setRows(null)
     setError(null)
@@ -31,84 +72,59 @@ export function Leaderboard() {
     return () => {
       cancelled = true
     }
-  }, [cloud, tab, league.id])
+  }, [cloud, unlocked, tab, league.id])
 
-  // In local mode the only real player is you, so that is all the board shows.
-  const self: BoardRow = { id: userId ?? 'local', username: state.username, avatar: state.avatar, xp: state.xp, weekly_xp: weeklyXp, streak: liveStreak(state), league: league.id }
-  const shown = cloud ? rows : [self]
+  if (!unlocked) {
+    const course = COURSES.find((c) => nextStep(c, state.lessons)) ?? COURSES[0]
+    const next = nextStep(course, state.lessons)
+    return <LockedBoard remaining={LESSONS_TO_UNLOCK - lessons} startPath={next ? stepPath(next) : '/'} />
+  }
+
+  // On a local profile the only real player is you, so that is all the board shows.
   const myId = userId ?? 'local'
+  const self: BoardRow = { id: myId, username: state.username, avatar: state.avatar, xp: state.xp, weekly_xp: weeklyXp, streak: liveStreak(state), league: league.id }
+  const shown = cloud ? rows : [self]
 
   return (
     <div>
-      <PageHeader title="Leaderboard" subtitle="Earn XP to climb your league. Weekly boards reset every Monday." />
-
-      <div className="grid gap-5 lg:grid-cols-[1fr_300px]">
-        <Panel className="overflow-hidden">
-          <div className="flex items-center justify-between border-b border-line px-5 py-3">
-            <div className="flex gap-1 rounded-lg bg-surface p-1" role="tablist">
-              {([['weekly', `${league.name} league · this week`], ['all', 'All time']] as Array<[Tab, string]>).map(([id, label]) => (
-                <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={cx('h-8 rounded-md px-3 text-[13px] font-semibold transition-colors', tab === id ? 'bg-raised text-ink' : 'text-mute hover:text-ink')}>{label}</button>
-              ))}
-            </div>
-          </div>
-
-          {error ? (
-            <p className="p-6 text-sm text-bad" role="alert">{error}</p>
-          ) : shown === null ? (
-            <p className="p-6 text-sm text-mute">Loading…</p>
-          ) : shown.length === 0 ? (
-            <p className="p-6 text-sm text-mute">Nobody in this league has earned XP this week yet. Finish a lesson to take first place.</p>
-          ) : (
-            <ol>
-              {shown.map((row, i) => {
-                const mine = row.id === myId
-                const value = tab === 'weekly' ? row.weekly_xp : row.xp
-                return (
-                  <li key={row.id} className={cx('flex items-center gap-4 border-b border-line px-5 py-3 last:border-b-0', mine && 'bg-blue/10')}>
-                    <span className={cx('tnum w-7 text-center text-sm font-bold', i === 0 ? 'text-gold' : i === 1 ? 'text-[#B6C2D2]' : i === 2 ? 'text-[#C98A5A]' : 'text-mute')}>{i + 1}</span>
-                    <Avatar avatar={row.avatar} size={38} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold">{row.username}{mine && <span className="ml-2 text-xs font-normal text-ice">you</span>}</span>
-                      <span className="tnum flex items-center gap-1 text-xs text-mute"><Flame size={12} className={row.streak > 0 ? 'text-flame' : ''} />{row.streak}-day streak</span>
-                    </span>
-                    <span className="tnum flex items-center gap-1 text-sm font-semibold"><Zap size={14} className="text-gold" fill="currentColor" />{value.toLocaleString()}</span>
-                  </li>
-                )
-              })}
-            </ol>
-          )}
-
-          {!cloud && (
-            <div className="flex items-center gap-4 border-t border-line bg-surface p-5">
-              <Mascot expression="thinking" size={64} className="shrink-0" />
-              <p className="text-sm leading-relaxed text-mute">You are playing on a local profile, so this board only has you on it. Connect a Supabase project (see the README) and everyone who signs up competes here for real.</p>
-            </div>
-          )}
-        </Panel>
-
-        <Panel className="p-5">
-          <PanelTitle>Leagues</PanelTitle>
-          <ol className="space-y-1">
-            {[...LEAGUES].reverse().map((l) => {
-              const current = l.id === league.id
-              const reached = state.xp >= l.minXp
-              return (
-                <li key={l.id} className={cx('flex items-center gap-3 rounded-lg px-3 py-2', current && 'bg-raised')}>
-                  <span className="h-3 w-3 rotate-45 rounded-[3px]" style={{ background: reached ? l.color : 'var(--color-line)' }} />
-                  <span className={cx('flex-1 text-sm font-semibold', !reached && 'text-mute')}>{l.name}</span>
-                  <span className="tnum text-xs text-mute">{l.minXp.toLocaleString()} XP</span>
-                </li>
-              )
-            })}
-          </ol>
-          {upcoming && (
-            <div className="mt-4 border-t border-line pt-4">
-              <p className="tnum mb-2 text-xs text-mute">{(upcoming.minXp - state.xp).toLocaleString()} XP to {upcoming.name}</p>
-              <Bar value={state.xp - league.minXp} max={upcoming.minXp - league.minXp} className="h-1.5" color={upcoming.color} />
-            </div>
-          )}
-        </Panel>
+      <div className="pt-2 text-center">
+        <Shields current={league.id} />
+        <h1 className="mt-4 text-2xl font-bold text-ink">{league.name} League</h1>
+        <p className="mt-1 text-[17px] text-mute">
+          {upcoming ? <>Earn <span className="tnum font-bold text-body">{(upcoming.minXp - state.xp).toLocaleString()} XP</span> to reach {upcoming.name}</> : 'You are in the top league'}
+        </p>
       </div>
+
+      <Tabs tabs={[{ id: 'weekly', label: 'This week' }, { id: 'all', label: 'All time' }]} value={tab} onChange={setTab} className="mt-6" />
+
+      {error ? (
+        <p className="py-8 text-center text-[15px] font-bold text-bad-dark" role="alert">{error}</p>
+      ) : shown === null ? (
+        <p className="py-8 text-center text-[15px] text-mute">Loading…</p>
+      ) : shown.length === 0 ? (
+        <p className="py-8 text-center text-[15px] text-mute">Nobody in this league has earned XP this week yet. Finish a lesson to take first place.</p>
+      ) : (
+        <ol className="py-2">
+          {shown.map((row, i) => {
+            const mine = row.id === myId
+            const value = tab === 'weekly' ? row.weekly_xp : row.xp
+            return (
+              <li key={row.id} className={cx('flex items-center gap-5 rounded-xl px-4 py-3', mine && 'bg-green-soft/50')}>
+                <span className={cx('tnum w-6 text-center text-[17px] font-bold', i === 0 ? 'text-gold-dark' : i === 1 ? 'text-faint' : i === 2 ? 'text-[#C98A5A]' : 'text-ok')}>{i + 1}</span>
+                <Avatar avatar={row.avatar} size={52} />
+                <span className="min-w-0 flex-1 truncate text-[17px] font-bold text-body">{row.username}</span>
+                <span className="tnum text-[17px] text-mute">{value.toLocaleString()} XP</span>
+              </li>
+            )
+          })}
+        </ol>
+      )}
+
+      {!cloud && (
+        <p className="mt-2 rounded-2xl border-2 border-line p-5 text-[15px] leading-relaxed text-mute">
+          You are on a local profile, so this board only has you on it. Connect a Supabase project (see the README) and everyone who signs up competes here.
+        </p>
+      )}
     </div>
   )
 }

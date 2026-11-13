@@ -94,8 +94,8 @@ export function BossBattle() {
   const upNext = nextStep(course, { ...state.lessons, [boss.id]: true })
 
   return (
-    <div className="flex h-full flex-col bg-bg">
-      <header className="flex h-16 shrink-0 items-center gap-4 border-b border-line px-5">
+    <div className="flex h-full flex-col bg-surface">
+      <header className="flex h-16 shrink-0 items-center gap-4 border-b-2 border-line px-5">
         <Link to="/bosses" aria-label="Leave battle" className="rounded-lg p-2 text-mute hover:bg-card hover:text-ink"><X size={20} /></Link>
         <span className="truncate text-sm font-semibold">{boss.title}</span>
         {phase === 'fight' && (
@@ -124,7 +124,7 @@ export function BossBattle() {
 
       {phase === 'fight' && (
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <div className="border-b border-line bg-surface">
+          <div className="border-b-2 border-line bg-surface">
             <div className="mx-auto flex max-w-4xl items-center gap-5 px-5 py-4">
               <Monster id={boss.id} size={72} hurt={hurt} />
               <div className="flex-1">
@@ -162,7 +162,7 @@ export function BossBattle() {
             </div>
             <h1 className="mt-5 text-3xl font-semibold tracking-tight">Boss defeated</h1>
             <p className="mt-1.5 text-mute">{boss.monster} is no match for you.</p>
-            <p className="tnum mx-auto mt-6 flex w-fit items-center gap-1.5 rounded-xl border border-gold/30 bg-gold/10 px-4 py-2 text-lg font-semibold text-gold"><Zap size={18} fill="currentColor" />+{earned} XP</p>
+            <p className="tnum mx-auto mt-6 flex w-fit items-center gap-1.5 rounded-xl border border-gold/30 bg-gold/10 px-4 py-2 text-lg font-semibold text-gold-dark"><Zap size={18} fill="currentColor" />+{earned} XP</p>
             <div className="mt-7 flex flex-col gap-2.5">
               {upNext && <LinkButton to={stepPath(upNext)} size="lg">Next: {stepTitle(upNext)}<ArrowRight size={17} /></LinkButton>}
               <LinkButton to={`/learn/${course.id}`} variant="secondary" size="lg">Back to the path</LinkButton>

@@ -2,31 +2,54 @@
 @import '@fontsource-variable/inter';
 @import '@fontsource-variable/jetbrains-mono';
 
+/*
+ * Design tokens, taken from the Figma kit: white surfaces, #E5E5E5 two-pixel borders,
+ * Inter Bold / Medium, and flat "pressable" bottom edges on buttons and cards.
+ * To re-tint the app, change --color-green (primary action) and --color-blue (accent).
+ */
 @theme {
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, Consolas, monospace;
 
-  --color-bg: #090d1a;
-  --color-surface: #101729;
-  --color-card: #151e32;
-  --color-raised: #1b2942;
-  --color-line: #233354;
-  --color-ink: #f8fafc;
-  --color-mute: #94a3b8;
-  --color-faint: #64748b;
+  /* Surfaces and text */
+  --color-bg: #ffffff;
+  --color-surface: #f7f7f7;
+  --color-card: #ffffff;
+  --color-raised: #f7f7f7;
+  --color-line: #e5e5e5;
+  --color-ink: #3c3c3c;
+  --color-body: #4b4b4b;
+  --color-mute: #777777;
+  --color-faint: #afafaf;
 
-  --color-blue: #2563eb;
-  --color-sky: #3b82f6;
-  --color-cyan: #06b6d4;
-  --color-ice: #67e8f9;
+  /* Primary action */
+  --color-green: #58cc02;
+  --color-green-dark: #58a700;
+  --color-green-soft: #d7ffb8;
 
-  --color-ok: #22c55e;
-  --color-gold: #fbbf24;
-  --color-flame: #f97316;
-  --color-bad: #ef4444;
+  /* Accent and selection */
+  --color-blue: #1cb0f6;
+  --color-blue-dark: #1899d6;
+  --color-blue-soft: #ddf4ff;
+  --color-blue-line: #84d8ff;
+  --color-sky: #1cb0f6;
+  --color-cyan: #1cb0f6;
+  --color-ice: #1899d6;
+
+  /* Status */
+  --color-ok: #58a700;
+  --color-gold: #ffc800;
+  --color-gold-dark: #e5a400;
+  --color-flame: #ff9600;
+  --color-bad: #ff4b4b;
+  --color-bad-dark: #ea2b2b;
+  --color-bad-soft: #ffdfe0;
+  --color-purple: #ce82ff;
+  --color-purple-dark: #a568cc;
+  --color-violet: #9069cd;
 
   --animate-pop: pop 0.35s cubic-bezier(0.2, 1.4, 0.4, 1);
-  --animate-rise: rise 0.3s ease-out;
+  --animate-rise: rise 0.25s ease-out;
   --animate-bob: bob 3.2s ease-in-out infinite;
   --animate-shake: shake 0.35s ease-in-out;
 
@@ -55,20 +78,23 @@ body {
   background: var(--color-bg);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-feature-settings: 'cv11', 'ss01';
+  font-weight: 500;
   -webkit-font-smoothing: antialiased;
-  letter-spacing: -0.006em;
 }
 
-::selection { background: rgb(37 99 235 / 0.45); }
+::selection { background: var(--color-blue-soft); }
 
-* { scrollbar-width: thin; scrollbar-color: #233354 transparent; }
+* { scrollbar-width: thin; scrollbar-color: #d6d6d6 transparent; }
 
-:focus-visible { outline: 2px solid var(--color-ice); outline-offset: 2px; border-radius: 6px; }
+:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 2px; border-radius: 8px; }
 
-.grad-primary { background: linear-gradient(135deg, #2563eb, #06b6d4); }
-.grad-secondary { background: linear-gradient(135deg, #1d4ed8, #38bdf8); }
-.grad-premium { background: linear-gradient(135deg, #0f172a, #2563eb); }
+/* Uppercase label style used by buttons, tabs and navigation throughout the kit. */
+.label { font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+
+/* Solid fills kept under their old utility names so existing markup keeps working. */
+.grad-primary { background: var(--color-gold); }
+.grad-secondary { background: var(--color-blue); }
+.grad-premium { background: var(--color-blue-soft); }
 
 .tnum { font-variant-numeric: tabular-nums; }
 

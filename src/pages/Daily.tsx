@@ -13,7 +13,7 @@ import { fetchDailyBoard, submitDailyResult } from '../lib/repo'
 import type { DailyRow } from '../lib/repo'
 import { useApp } from '../state/AppContext'
 
-const DIFFICULTY_COLOR = { Easy: '#22C55E', Medium: '#FBBF24', Hard: '#F97316' } as const
+const DIFFICULTY_COLOR = { Easy: '#58A700', Medium: '#E5A400', Hard: '#FF9600' } as const
 
 const useTick = (active: boolean): number => {
   const [now, setNow] = useState(Date.now())
@@ -78,7 +78,7 @@ export function Daily() {
           <div className="flex flex-wrap items-center gap-2.5">
             <Tag color={DIFFICULTY_COLOR[challenge.difficulty]}>{challenge.difficulty}</Tag>
             <Tag color="var(--color-ice)">{LANG_LABEL[challenge.lang]}</Tag>
-            <span className="tnum ml-auto flex items-center gap-1.5 text-sm font-semibold text-gold"><Zap size={15} fill="currentColor" />{XP.daily[challenge.difficulty]} XP</span>
+            <span className="tnum ml-auto flex items-center gap-1.5 text-sm font-semibold text-gold-dark"><Zap size={15} fill="currentColor" />{XP.daily[challenge.difficulty]} XP</span>
           </div>
           <h2 className="mt-3 text-2xl font-semibold tracking-tight">{challenge.title}</h2>
 
@@ -90,14 +90,14 @@ export function Daily() {
               <Button variant="secondary" className="mt-5" onClick={() => setPractising(true)}>Practise it again</Button>
             </div>
           ) : startedAt === null && !practising ? (
-            <div className="mt-6 flex flex-col items-center rounded-2xl border border-line bg-surface p-8 text-center">
+            <div className="mt-6 flex flex-col items-center rounded-2xl border-2 border-line bg-surface p-8 text-center">
               <Mascot expression="determined" size={120} />
               <p className="mt-3 max-w-sm text-sm text-mute">The clock starts when you do. Your time is recorded when every test passes — hints are available, and there is no penalty for failed checks.</p>
               <Button size="lg" className="mt-5" onClick={() => setStartedAt(Date.now())}><Play size={16} fill="currentColor" />Start the clock</Button>
             </div>
           ) : (
             <div className="mt-5">
-              {working && <p className="tnum mb-4 flex w-fit items-center gap-2 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm font-semibold"><Clock size={15} className="text-cyan" />{formatClock(now - (startedAt ?? now))}</p>}
+              {working && <p className="tnum mb-4 flex w-fit items-center gap-2 rounded-lg border-2 border-line bg-surface px-3 py-1.5 text-sm font-semibold"><Clock size={15} className="text-cyan" />{formatClock(now - (startedAt ?? now))}</p>}
               {practising && <p className="mb-4 text-sm text-mute">Practice mode — no XP or time is recorded.</p>}
               <Workbench lang={challenge.lang} exercise={challenge.exercise} onCheck={onCheck} />
             </div>
@@ -108,7 +108,7 @@ export function Daily() {
           <Panel className="p-5">
             <PanelTitle>Next challenge</PanelTitle>
             <p className="tnum text-3xl font-semibold tracking-tight">{formatClock(msUntilTomorrow())}</p>
-            <ol className="mt-5 flex justify-between border-t border-line pt-4">
+            <ol className="mt-5 flex justify-between border-t-2 border-line pt-4">
               {week.map((key) => (
                 <li key={key} className="flex flex-col items-center gap-1.5">
                   <span className={cx('flex h-7 w-7 items-center justify-center rounded-full border', state.daily[key] ? 'border-ok bg-ok/15 text-ok' : key === today ? 'border-sky' : 'border-line')}>{state.daily[key] && <Check size={14} strokeWidth={3} />}</span>

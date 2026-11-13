@@ -4,27 +4,41 @@ import { Link } from 'react-router-dom'
 export const cx = (...parts: Array<string | false | null | undefined>): string => parts.filter(Boolean).join(' ')
 
 // ── Button ────────────────────────────────────────────────────────────────
-type Variant = 'primary' | 'secondary' | 'ghost' | 'success' | 'danger'
+// The kit's buttons are flat blocks with a darker bottom edge that collapses when pressed.
+type Variant = 'primary' | 'blue' | 'secondary' | 'ghost' | 'success' | 'danger' | 'gold'
 type Size = 'sm' | 'md' | 'lg'
 
 const VARIANT: Record<Variant, string> = {
-  primary: 'bg-blue text-white hover:bg-sky active:bg-blue shadow-[inset_0_1px_0_rgb(255_255_255/0.14)]',
-  secondary: 'bg-raised text-ink border border-line hover:border-sky/60 hover:bg-[#213251]',
-  ghost: 'text-mute hover:text-ink hover:bg-raised',
-  success: 'bg-ok text-[#04210f] hover:brightness-110',
-  danger: 'bg-transparent text-bad border border-bad/40 hover:bg-bad/10',
+  primary: 'bg-green text-white border-green-dark hover:brightness-105',
+  success: 'bg-green text-white border-green-dark hover:brightness-105',
+  blue: 'bg-blue text-white border-blue-dark hover:brightness-105',
+  danger: 'bg-bad text-white border-bad-dark hover:brightness-105',
+  gold: 'bg-gold text-white border-gold-dark hover:brightness-105',
+  secondary: 'bg-white text-blue border-2 border-line hover:bg-surface',
+  ghost: 'bg-transparent text-mute border-transparent hover:bg-surface hover:text-body',
 }
 const SIZE: Record<Size, string> = {
-  sm: 'h-8 px-3 text-[13px] gap-1.5 rounded-lg',
-  md: 'h-10 px-4 text-sm gap-2 rounded-[10px]',
-  lg: 'h-12 px-6 text-[15px] gap-2 rounded-xl',
+  sm: 'h-9 px-3.5 text-[12px] gap-1.5 rounded-xl',
+  md: 'h-11 px-4 text-[13px] gap-2 rounded-xl',
+  lg: 'h-[50px] px-6 text-[15px] gap-2 rounded-2xl',
+}
+const SOLID_EDGE = 'border-b-4 active:border-b-0 active:translate-y-1'
+const EDGE: Record<Variant, string> = {
+  primary: SOLID_EDGE,
+  success: SOLID_EDGE,
+  blue: SOLID_EDGE,
+  danger: SOLID_EDGE,
+  gold: SOLID_EDGE,
+  secondary: 'border-b-4 active:border-b-2 active:translate-y-0.5',
+  ghost: '',
 }
 
 const buttonClass = (variant: Variant, size: Size, extra?: string) =>
   cx(
-    'inline-flex items-center justify-center font-semibold transition-colors select-none whitespace-nowrap',
-    'disabled:opacity-45 disabled:pointer-events-none',
+    'label inline-flex shrink-0 items-center justify-center select-none whitespace-nowrap transition-[filter,background-color]',
+    'disabled:pointer-events-none disabled:border-line disabled:bg-line disabled:text-faint',
     VARIANT[variant],
+    EDGE[variant],
     SIZE[size],
     extra,
   )
@@ -41,13 +55,13 @@ export function LinkButton({ to, variant = 'primary', size = 'md', className, ch
 
 // ── Surfaces ──────────────────────────────────────────────────────────────
 export function Panel({ className, children }: { className?: string; children: ReactNode }) {
-  return <section className={cx('rounded-2xl border border-line bg-card', className)}>{children}</section>
+  return <section className={cx('rounded-2xl border-2 border-line bg-card', className)}>{children}</section>
 }
 
 export function PanelTitle({ children, action }: { children: ReactNode; action?: ReactNode }) {
   return (
     <div className="mb-4 flex items-center justify-between gap-3">
-      <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-mute">{children}</h2>
+      <h2 className="text-lg font-bold text-ink">{children}</h2>
       {action}
     </div>
   )
@@ -55,34 +69,49 @@ export function PanelTitle({ children, action }: { children: ReactNode; action?:
 
 export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) {
   return (
-    <header className="mb-7 flex flex-wrap items-end justify-between gap-4">
+    <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-mute">{subtitle}</p>}
+        <h1 className="text-2xl font-bold text-ink">{title}</h1>
+        {subtitle && <p className="mt-1 text-[15px] text-mute">{subtitle}</p>}
       </div>
       {action}
     </header>
   )
 }
 
-// ── Progress ──────────────────────────────────────────────────────────────
-export function Bar({ value, max, color = 'var(--color-sky)', className }: { value: number; max: number; color?: string; className?: string }) {
-  const pct = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0
+/** Underlined tab strip, as on the kit's Quests / Badges and Following / Followers screens. */
+export function Tabs<T extends string>({ tabs, value, onChange, className }: { tabs: Array<{ id: T; label: string }>; value: T; onChange: (id: T) => void; className?: string }) {
   return (
-    <div className={cx('h-2 overflow-hidden rounded-full bg-bg', className)} role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
-      <div className="h-full rounded-full transition-[width] duration-500 ease-out" style={{ width: `${pct}%`, background: color }} />
+    <div className={cx('flex border-b-2 border-line', className)} role="tablist">
+      {tabs.map((tab) => (
+        <button key={tab.id} role="tab" aria-selected={value === tab.id} onClick={() => onChange(tab.id)} className={cx('label -mb-0.5 flex-1 border-b-2 px-4 py-3.5 text-[13px] transition-colors', value === tab.id ? 'border-blue text-blue' : 'border-transparent text-faint hover:text-mute')}>
+          {tab.label}
+        </button>
+      ))}
     </div>
   )
 }
 
-export function Ring({ value, max, size = 96, stroke = 8, color = 'var(--color-cyan)', children }: { value: number; max: number; size?: number; stroke?: number; color?: string; children?: ReactNode }) {
+// ── Progress ──────────────────────────────────────────────────────────────
+export function Bar({ value, max, color = 'var(--color-gold)', className }: { value: number; max: number; color?: string; className?: string }) {
+  const pct = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0
+  return (
+    <div className={cx('h-4 overflow-hidden rounded-full bg-line', className)} role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
+      <div className="relative h-full rounded-full transition-[width] duration-500 ease-out" style={{ width: `${pct}%`, background: color }}>
+        {pct > 12 && <span className="absolute inset-x-2 top-[22%] h-[22%] rounded-full bg-white/30" />}
+      </div>
+    </div>
+  )
+}
+
+export function Ring({ value, max, size = 96, stroke = 10, color = 'var(--color-green)', children }: { value: number; max: number; size?: number; stroke?: number; color?: string; children?: ReactNode }) {
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
   const pct = max > 0 ? Math.min(1, Math.max(0, value / max)) : 0
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--color-bg)" strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--color-line)" strokeWidth={stroke} />
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - pct)} className="transition-[stroke-dashoffset] duration-700 ease-out" />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">{children}</div>
@@ -93,18 +122,22 @@ export function Ring({ value, max, size = 96, stroke = 8, color = 'var(--color-c
 // ── Small pieces ──────────────────────────────────────────────────────────
 export function Tag({ children, color = 'var(--color-mute)' }: { children: ReactNode; color?: string }) {
   return (
-    <span className="inline-flex h-6 items-center gap-1 rounded-md border px-2 text-[11px] font-semibold uppercase tracking-wide" style={{ color, borderColor: `color-mix(in srgb, ${color} 35%, transparent)`, background: `color-mix(in srgb, ${color} 10%, transparent)` }}>
+    <span className="label inline-flex h-6 items-center gap-1 rounded-lg px-2 text-[11px]" style={{ color, background: `color-mix(in srgb, ${color} 14%, white)` }}>
       {children}
     </span>
   )
 }
 
+/** A stat tile: icon, bold value and a quiet label, as in the kit's profile Statistics grid. */
 export function Stat({ label, value, hint, icon }: { label: string; value: ReactNode; hint?: ReactNode; icon?: ReactNode }) {
   return (
-    <div>
-      <div className="flex items-center gap-1.5 text-xs text-mute">{icon}{label}</div>
-      <div className="tnum mt-1 text-2xl font-semibold tracking-tight">{value}</div>
-      {hint && <div className="mt-0.5 text-xs text-faint">{hint}</div>}
+    <div className="flex items-start gap-3">
+      {icon && <span className="mt-0.5 shrink-0">{icon}</span>}
+      <div className="min-w-0">
+        <div className="tnum text-xl font-bold leading-tight text-ink">{value}</div>
+        <div className="text-[15px] text-mute">{label}</div>
+        {hint && <div className="mt-0.5 text-[13px] text-faint">{hint}</div>}
+      </div>
     </div>
   )
 }
@@ -112,16 +145,16 @@ export function Stat({ label, value, hint, icon }: { label: string; value: React
 export function Empty({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) {
   return (
     <div className="flex flex-col items-center px-6 py-10 text-center">
-      <p className="font-medium">{title}</p>
-      {children && <p className="mt-1 max-w-sm text-sm text-mute">{children}</p>}
-      {action && <div className="mt-4">{action}</div>}
+      <p className="text-lg font-bold text-ink">{title}</p>
+      {children && <p className="mt-1 max-w-sm text-[15px] text-mute">{children}</p>}
+      {action && <div className="mt-5">{action}</div>}
     </div>
   )
 }
 
 export function Code({ code, className }: { code: string; className?: string }) {
   return (
-    <pre className={cx('overflow-x-auto rounded-xl border border-line bg-bg px-4 py-3 font-mono text-[13px] leading-relaxed text-[#cfe3ff]', className)}>
+    <pre className={cx('overflow-x-auto rounded-xl border-2 border-line bg-surface px-4 py-3 font-mono text-[13px] leading-relaxed text-ink', className)}>
       <code>{code}</code>
     </pre>
   )
@@ -131,12 +164,12 @@ export function Code({ code, className }: { code: string; className?: string }) 
 export function Prose({ text, className }: { text: string; className?: string }) {
   const parts = text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g)
   return (
-    <p className={cx('leading-relaxed text-[15px] text-[#d5deeb]', className)}>
+    <p className={cx('text-[17px] leading-relaxed text-body', className)}>
       {parts.map((part, i) => {
         if (part.startsWith('`') && part.endsWith('`')) {
-          return <code key={i} className="rounded-md border border-line bg-bg px-1.5 py-0.5 font-mono text-[13px] text-ice">{part.slice(1, -1)}</code>
+          return <code key={i} className="rounded-md bg-blue-soft px-1.5 py-0.5 font-mono text-[0.85em] font-semibold text-blue-dark">{part.slice(1, -1)}</code>
         }
-        if (part.startsWith('**') && part.endsWith('**')) return <strong key={i} className="font-semibold text-ink">{part.slice(2, -2)}</strong>
+        if (part.startsWith('**') && part.endsWith('**')) return <strong key={i} className="font-bold text-ink">{part.slice(2, -2)}</strong>
         return <span key={i}>{part}</span>
       })}
     </p>
@@ -147,8 +180,8 @@ export function Modal({ open, onClose, children }: { open: boolean; onClose: () 
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-      <button aria-label="Close" className="absolute inset-0 cursor-default bg-black/60" onClick={onClose} />
-      <div className="animate-pop relative w-full max-w-md rounded-2xl border border-line bg-card p-6 shadow-2xl shadow-black/50">{children}</div>
+      <button aria-label="Close" className="absolute inset-0 cursor-default bg-black/50" onClick={onClose} />
+      <div className="animate-pop relative w-full max-w-md rounded-2xl bg-white p-6">{children}</div>
     </div>
   )
 }

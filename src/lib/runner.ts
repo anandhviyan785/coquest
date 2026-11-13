@@ -5,7 +5,7 @@ import type { CssTest, DomTest, Exercise, LangId, Test } from './types'
  *  - Python, JavaScript and SQL run in dedicated Web Workers (WebAssembly runtimes for Python and SQL),
  *    which are terminated if they exceed the time limit.
  *  - HTML and CSS render in a sandboxed iframe (see Preview) and are checked by parsing, not executing.
- *  - C++ and Java compile on a Piston sandbox service, configured with VITE_PISTON_URL.
+ *  - C++ and Java compile on a Piston sandbox service you host, configured with VITE_PISTON_URL.
  */
 
 export interface RunResult { stdout: string; stderr: string; error: string | null; timedOut: boolean; ms: number }
@@ -114,7 +114,16 @@ export const warmRuntime = (lang: LangId): void => {
 }
 
 // ── Compiled languages (remote sandbox) ───────────────────────────────────
-const PISTON_URL = ((import.meta.env.VITE_PISTON_URL as string | undefined) ?? 'https://emkc.org/api/v2/piston').replace(/\/$/, '')
+// The public Piston API became whitelist-only in February 2026, so there is no default endpoint:
+// C++ and Java run only when VITE_PISTON_URL points at a Piston instance you host.
+const PISTON_URL = ((import.meta.env.VITE_PISTON_URL as string | undefined) ?? '').replace(/\/$/, '')
+
+/** True when a compile server is configured for C++ and Java. */
+export const compilerConfigured = PISTON_URL !== ''
+
+export const needsCompiler = (lang: LangId): boolean => lang === 'cpp' || lang === 'java'
+
+export const COMPILER_HELP = 'C++ and Java need a compile server. Run your own Piston instance and set VITE_PISTON_URL in .env — the README explains how.'
 const PISTON_LANG: Partial<Record<LangId, { language: string; file: string }>> = {
   cpp: { language: 'c++', file: 'main.cpp' },
   java: { language: 'java', file: 'Main.java' },
@@ -125,6 +134,7 @@ const runRemote = async (lang: LangId, code: string, opts: RunOptions): Promise<
   const started = performance.now()
   const fail = (error: string): RunResult => ({ stdout: '', stderr: '', error, timedOut: false, ms: Math.round(performance.now() - started) })
   if (!target) return fail(`${lang} cannot be executed.`)
+  if (!compilerConfigured) return fail(COMPILER_HELP)
   try {
     const res = await fetch(`${PISTON_URL}/execute`, {
       method: 'POST',
@@ -149,7 +159,7 @@ const runRemote = async (lang: LangId, code: string, opts: RunOptions): Promise<
     }
   } catch (err) {
     console.error('Remote execution failed', err)
-    return fail('Could not reach the compile service. Check your connection, or set VITE_PISTON_URL to your own Piston instance.')
+    return fail('Could not reach the compile server at VITE_PISTON_URL. Check that it is running and allows requests from this site.')
   }
 }
 

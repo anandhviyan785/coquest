@@ -102,7 +102,7 @@ export function Tutor() {
         action={messages.length > 0 ? <Button variant="ghost" size="sm" onClick={() => { setMessages([]); setError(null) }}><Trash2 size={14} />Clear chat</Button> : undefined}
       />
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-line bg-card">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border-2 border-line bg-card">
         <div className="flex-1 overflow-y-auto p-5" aria-live="polite">
           {messages.length === 0 ? (
             <div className="mx-auto flex h-full max-w-xl flex-col items-center justify-center text-center">
@@ -113,7 +113,7 @@ export function Tutor() {
                   <p className="mt-1.5 text-sm text-mute">I can explain ideas, help you debug, set practice questions and nudge you with hints.</p>
                   <div className="mt-6 grid w-full gap-2.5 sm:grid-cols-2">
                     {STARTERS.map((s) => (
-                      <button key={s.label} onClick={() => pickStarter(s)} className="flex items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-left text-sm font-medium transition-colors hover:border-sky/60">
+                      <button key={s.label} onClick={() => pickStarter(s)} className="flex items-center gap-3 rounded-xl border-2 border-line bg-surface px-4 py-3 text-left text-sm font-medium transition-colors hover:border-sky/60">
                         <s.icon size={17} className="shrink-0 text-cyan" />{s.label}
                       </button>
                     ))}
@@ -130,7 +130,7 @@ export function Tutor() {
               {messages.map((m, i) => (
                 <li key={i} className={cx('flex gap-3', m.role === 'user' && 'flex-row-reverse')}>
                   {m.role === 'assistant' ? <MascotAvatar expression="happy" size={34} /> : <Avatar avatar={state.avatar} size={34} />}
-                  <div className={cx('min-w-0 max-w-[85%] rounded-2xl px-4 py-3', m.role === 'user' ? 'rounded-tr-sm bg-blue/25' : 'rounded-tl-sm border border-line bg-surface')}>
+                  <div className={cx('min-w-0 max-w-[85%] rounded-2xl px-4 py-3', m.role === 'user' ? 'rounded-tr-sm bg-blue/25' : 'rounded-tl-sm border-2 border-line bg-surface')}>
                     <Markdown text={m.content} />
                   </div>
                 </li>
@@ -138,7 +138,7 @@ export function Tutor() {
               {busy && (
                 <li className="flex gap-3">
                   <MascotAvatar expression="thinking" size={34} />
-                  <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-sm border border-line bg-surface px-4 py-4" aria-label="The tutor is thinking">
+                  <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-sm border-2 border-line bg-surface px-4 py-4" aria-label="The tutor is thinking">
                     {[0, 1, 2].map((n) => <span key={n} className="h-1.5 w-1.5 animate-pulse rounded-full bg-mute" style={{ animationDelay: `${n * 180}ms` }} />)}
                   </div>
                 </li>
@@ -150,13 +150,13 @@ export function Tutor() {
 
         {error && <p className="border-t border-bad/40 bg-bad/10 px-5 py-2.5 text-sm text-bad" role="alert">{error}</p>}
 
-        <form onSubmit={submit} className="border-t border-line bg-surface p-3">
+        <form onSubmit={submit} className="border-t-2 border-line bg-surface p-3">
           <div className="mx-auto max-w-3xl">
             {showCode && (
-              <div className="mb-2 rounded-xl border border-line bg-bg">
-                <div className="flex items-center gap-2 border-b border-line px-3 py-1.5">
+              <div className="mb-2 rounded-xl border-2 border-line bg-surface">
+                <div className="flex items-center gap-2 border-b-2 border-line px-3 py-1.5">
                   <span className="text-xs font-medium text-mute">Attached code</span>
-                  <select value={lang} onChange={(e) => setLang(e.target.value as LangId)} aria-label="Code language" className="ml-auto rounded-md border border-line bg-card px-2 py-1 text-xs outline-none">
+                  <select value={lang} onChange={(e) => setLang(e.target.value as LangId)} aria-label="Code language" className="ml-auto rounded-md border-2 border-line bg-card px-2 py-1 text-xs outline-none">
                     {COURSES.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                   <button type="button" onClick={() => { setShowCode(false); setCode('') }} aria-label="Remove attached code" className="text-faint hover:text-ink"><X size={15} /></button>
@@ -166,7 +166,7 @@ export function Tutor() {
             )}
             <div className="flex items-end gap-2">
               <button type="button" onClick={() => setShowCode((v) => !v)} aria-pressed={showCode} aria-label="Attach code" disabled={!cloud} className={cx('flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors disabled:opacity-40', showCode ? 'border-sky bg-raised text-ice' : 'border-line text-mute hover:text-ink')}><Code2 size={18} /></button>
-              <textarea value={draft} onChange={(e) => setDraft(e.target.value.slice(0, MAX_MESSAGE_CHARS))} onKeyDown={onKeyDown} rows={1} disabled={!cloud} placeholder={cloud ? 'Ask the tutor…  (Enter to send, Shift+Enter for a new line)' : 'Connect Supabase to chat with the tutor'} aria-label="Message" className="max-h-40 min-h-11 flex-1 resize-none rounded-xl border border-line bg-bg px-3.5 py-2.5 text-sm outline-none placeholder:text-faint focus:border-sky disabled:opacity-50" />
+              <textarea value={draft} onChange={(e) => setDraft(e.target.value.slice(0, MAX_MESSAGE_CHARS))} onKeyDown={onKeyDown} rows={1} disabled={!cloud} placeholder={cloud ? 'Ask the tutor…  (Enter to send, Shift+Enter for a new line)' : 'Connect Supabase to chat with the tutor'} aria-label="Message" className="max-h-40 min-h-11 flex-1 resize-none rounded-xl border-2 border-line bg-surface px-3.5 py-2.5 text-sm outline-none placeholder:text-faint focus:border-sky disabled:opacity-50" />
               <Button type="submit" className="h-11 w-11 !px-0" disabled={!cloud || busy || !draft.trim()} aria-label="Send"><Send size={17} /></Button>
             </div>
           </div>

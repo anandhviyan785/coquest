@@ -10,7 +10,7 @@ const GOAL_LABEL: Record<number, string> = { 20: 'Casual', 50: 'Regular', 100: '
 
 function Row({ title, hint, children }: { title: string; hint: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line px-6 py-5 last:border-b-0">
+    <div className="flex flex-wrap items-center justify-between gap-4 border-b-2 border-line px-6 py-5 last:border-b-0">
       <div className="min-w-0 max-w-md"><p className="text-sm font-semibold">{title}</p><p className="mt-0.5 text-[13px] text-mute">{hint}</p></div>
       {children}
     </div>
@@ -63,7 +63,7 @@ export function Settings() {
         <Row title="Username" hint="Shown on leaderboards and in duels.">
           <form onSubmit={saveName} className="flex items-start gap-2">
             <div>
-              <input value={name} onChange={(e) => setName(e.target.value)} maxLength={20} aria-label="Username" aria-invalid={nameError !== null} className="h-10 w-48 rounded-[10px] border border-line bg-bg px-3 text-sm outline-none focus:border-sky" />
+              <input value={name} onChange={(e) => setName(e.target.value)} maxLength={20} aria-label="Username" aria-invalid={nameError !== null} className="h-10 w-48 rounded-[10px] border-2 border-line bg-surface px-3 text-sm outline-none focus:border-sky" />
               {nameError && <p className="mt-1 text-xs text-bad" role="alert">{nameError}</p>}
             </div>
             <Button type="submit" variant="secondary" disabled={name.trim() === state.username}>Save</Button>

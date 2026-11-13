@@ -12,9 +12,9 @@ export function Bosses() {
 
   return (
     <div>
-      <PageHeader title="Boss Battles" subtitle="Every unit ends with a boss. Clear each stage without running out of hearts." action={<span className="tnum rounded-lg border border-line bg-card px-3 py-1.5 text-sm font-semibold">{defeated} / {bosses.length} defeated</span>} />
+      <PageHeader title="Boss Battles" subtitle="Every unit ends with a boss. Clear each stage without running out of hearts." action={<span className="tnum rounded-lg border-2 border-line bg-card px-3 py-1.5 text-sm font-semibold">{defeated} / {bosses.length} defeated</span>} />
 
-      <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-card">
+      <ul className="divide-y-2 divide-line overflow-hidden rounded-2xl border-2 border-line bg-card">
         {bosses.map(({ course, unit, boss }) => {
           const done = Boolean(state.lessons[boss.id])
           const open = isUnlocked(course, boss.id, state.lessons)
@@ -33,13 +33,13 @@ export function Bosses() {
               </div>
               <div className="flex items-center gap-5">
                 <div className="text-right text-sm">
-                  <p className="tnum flex items-center justify-end gap-1 font-semibold"><Zap size={14} className="text-gold" fill="currentColor" />{reward} XP</p>
+                  <p className="tnum flex items-center justify-end gap-1 font-semibold"><Zap size={14} className="text-gold-dark" fill="currentColor" />{reward} XP</p>
                   <p className="text-xs text-mute">{boss.stages.length} stages</p>
                 </div>
                 {open ? (
                   <LinkButton to={stepPath(boss.id)} variant={done ? 'secondary' : 'primary'}><Swords size={16} />{done ? 'Rematch' : 'Fight'}</LinkButton>
                 ) : (
-                  <span className="flex h-10 items-center gap-2 rounded-[10px] border border-line px-4 text-sm text-mute"><Lock size={15} />Finish the unit</span>
+                  <span className="flex h-10 items-center gap-2 rounded-[10px] border-2 border-line px-4 text-sm text-mute"><Lock size={15} />Finish the unit</span>
                 )}
               </div>
             </li>

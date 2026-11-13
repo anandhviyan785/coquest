@@ -8,10 +8,10 @@ import { totals } from '../lib/gamification'
 import type { LangId } from '../lib/types'
 import { useApp } from '../state/AppContext'
 
-const TOOLTIP = { contentStyle: { background: '#1B2942', border: '1px solid #233354', borderRadius: 10, fontSize: 13 }, labelStyle: { color: '#94A3B8' }, cursor: { fill: 'rgba(148,163,184,0.08)' } }
-const AXIS = { tickLine: false, axisLine: false, tick: { fill: '#64748B', fontSize: 12 } }
+const TOOLTIP = { contentStyle: { background: '#FFFFFF', border: '2px solid #E5E5E5', borderRadius: 10, fontSize: 13 }, labelStyle: { color: '#777777' }, cursor: { fill: 'rgba(148,163,184,0.08)' } }
+const AXIS = { tickLine: false, axisLine: false, tick: { fill: '#AFAFAF', fontSize: 12 } }
 const HEAT_WEEKS = 18
-const HEAT = ['#151E32', '#173A7A', '#2563EB', '#06B6D4', '#67E8F9']
+const HEAT = ['#E5E5E5', '#D7FFB8', '#A5ED6E', '#58CC02', '#58A700']
 
 const minutes = (seconds: number): string => (seconds >= 3600 ? `${(seconds / 3600).toFixed(1)} h` : `${Math.round(seconds / 60)} min`)
 
@@ -29,7 +29,7 @@ function Heatmap({ xpByDay, goal }: { xpByDay: (key: string) => number; goal: nu
             {week.map((key) => {
               const xp = xpByDay(key)
               const future = key > today
-              return <span key={key} title={future ? undefined : `${shortDate(key)}: ${xp} XP`} className="h-[15px] w-[15px] rounded-[4px]" style={{ background: future ? 'transparent' : HEAT[shade(xp)], outline: key === today ? '1px solid #67E8F9' : undefined }} />
+              return <span key={key} title={future ? undefined : `${shortDate(key)}: ${xp} XP`} className="h-[15px] w-[15px] rounded-[4px]" style={{ background: future ? 'transparent' : HEAT[shade(xp)], outline: key === today ? '2px solid #1CB0F6' : undefined }} />
             })}
           </div>
         ))}
@@ -92,12 +92,12 @@ export function Stats() {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={month} margin={{ top: 6, right: 6, bottom: 0, left: -18 }}>
-                <defs><linearGradient id="xpFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#06B6D4" stopOpacity={0.35} /><stop offset="100%" stopColor="#06B6D4" stopOpacity={0} /></linearGradient></defs>
-                <CartesianGrid stroke="#1B2942" vertical={false} />
+                <defs><linearGradient id="xpFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1CB0F6" stopOpacity={0.35} /><stop offset="100%" stopColor="#1CB0F6" stopOpacity={0} /></linearGradient></defs>
+                <CartesianGrid stroke="#E5E5E5" vertical={false} />
                 <XAxis dataKey="date" {...AXIS} interval={6} />
                 <YAxis {...AXIS} allowDecimals={false} />
-                <Tooltip {...TOOLTIP} cursor={{ stroke: '#233354' }} formatter={(v) => [`${v} XP`, 'Earned']} />
-                <Area type="monotone" dataKey="xp" stroke="#06B6D4" strokeWidth={2} fill="url(#xpFill)" />
+                <Tooltip {...TOOLTIP} cursor={{ stroke: '#E5E5E5' }} formatter={(v) => [`${v} XP`, 'Earned']} />
+                <Area type="monotone" dataKey="xp" stroke="#1CB0F6" strokeWidth={2} fill="url(#xpFill)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -108,11 +108,11 @@ export function Stats() {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={week} margin={{ top: 6, right: 6, bottom: 0, left: -18 }}>
-                <CartesianGrid stroke="#1B2942" vertical={false} />
+                <CartesianGrid stroke="#E5E5E5" vertical={false} />
                 <XAxis dataKey="day" {...AXIS} />
                 <YAxis {...AXIS} allowDecimals={false} />
                 <Tooltip {...TOOLTIP} formatter={(v) => [`${v} min`, 'Time']} />
-                <RBar dataKey="minutes" fill="#3B82F6" radius={[6, 6, 2, 2]} maxBarSize={34} />
+                <RBar dataKey="minutes" fill="#1CB0F6" radius={[6, 6, 2, 2]} maxBarSize={34} />
               </BarChart>
             </ResponsiveContainer>
           </div>

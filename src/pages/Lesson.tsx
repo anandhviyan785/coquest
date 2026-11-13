@@ -1,13 +1,15 @@
-import { ArrowRight, Check, X, Zap } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { BoltIcon, GemIcon } from '../components/icons'
 import { Toasts, useRewardToasts } from '../components/Layout'
 import { Mascot } from '../components/Mascot'
 import { Button, Code, LinkButton, Prose, cx } from '../components/ui'
 import { Workbench } from '../components/Workbench'
 import type { CheckSummary } from '../components/Workbench'
 import { findLesson, isUnlocked, nextStep, stepPath, stepTitle } from '../content'
-import { XP } from '../lib/gamification'
+import { XP, gemsForXp } from '../lib/gamification'
 import type { Question } from '../lib/types'
 import { useApp } from '../state/AppContext'
 
@@ -15,6 +17,15 @@ const MAX_TRACKED_SECONDS = 30 * 60
 const REPLAY_XP = 5
 
 interface Tally { correct: number; attempts: number }
+
+/** The kit's lesson footer: a neutral bar with the action, or a green / red result panel. */
+export function LessonFooter({ tone = 'neutral', children }: { tone?: 'neutral' | 'good' | 'bad'; children: ReactNode }) {
+  return (
+    <footer className={cx('shrink-0 px-4 py-5', tone === 'good' ? 'bg-green-soft' : tone === 'bad' ? 'bg-bad-soft' : 'border-t-2 border-line bg-white')}>
+      <div className="mx-auto flex w-full max-w-[1008px] flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">{children}</div>
+    </footer>
+  )
+}
 
 function QuestionStep({ question, onAnswered, onNext }: { question: Question; onAnswered: (correct: boolean) => void; onNext: () => void }) {
   const [picked, setPicked] = useState<number | null>(null)
@@ -31,78 +42,81 @@ function QuestionStep({ question, onAnswered, onNext }: { question: Question; on
   }
 
   const [before, after] = question.type === 'fill' ? question.code.split('___') : ['', '']
+  const answerText = question.type === 'choice' ? question.options[question.answer] : question.answers[0]
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="mx-auto w-full max-w-2xl flex-1 px-5 py-8">
-        <h1 className="text-xl font-semibold tracking-tight">{question.prompt}</h1>
+    <>
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-[600px] px-4 py-8">
+          <div className="flex items-end gap-3">
+            <Mascot expression={verdict === null ? 'thinking' : verdict ? 'happy' : 'disappointed'} size={96} className="shrink-0" />
+            <h1 className="relative mb-3 rounded-2xl border-2 border-line px-4 py-3 text-[19px] font-bold leading-snug text-ink">{question.prompt}</h1>
+          </div>
 
-        {question.type === 'choice' ? (
-          <>
-            {question.code && <Code code={question.code} className="mt-5" />}
-            <div className="mt-6 grid gap-2.5" role="radiogroup">
-              {question.options.map((option, i) => {
-                const isAnswer = verdict !== null && i === question.answer
-                const isWrongPick = verdict === false && i === picked
-                return (
-                  <button
-                    key={option}
-                    role="radio"
-                    aria-checked={picked === i}
-                    disabled={verdict !== null}
-                    onClick={() => setPicked(i)}
-                    className={cx(
-                      'flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left font-mono text-sm transition-colors',
-                      isAnswer ? 'border-ok bg-ok/10' : isWrongPick ? 'border-bad bg-bad/10' : picked === i ? 'border-sky bg-raised' : 'border-line bg-card hover:border-sky/50',
-                    )}
-                  >
-                    <span className={cx('tnum flex h-6 w-6 shrink-0 items-center justify-center rounded-md border font-sans text-xs font-semibold', picked === i && verdict === null ? 'border-sky text-ice' : 'border-line text-mute')}>{i + 1}</span>
-                    <span className="whitespace-pre-wrap">{option}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </>
-        ) : (
-          <pre className="mt-5 overflow-x-auto rounded-xl border border-line bg-bg px-4 py-4 font-mono text-[14px] leading-loose text-[#cfe3ff]">
-            {before}
-            <input
-              value={typed}
-              onChange={(e) => setTyped(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submit() } }}
-              disabled={verdict !== null}
-              autoFocus
-              aria-label="Your answer"
-              spellCheck={false}
-              autoCapitalize="off"
-              size={Math.max(6, typed.length + 1)}
-              className={cx('mx-0.5 rounded-md border bg-card px-2 py-0.5 text-center font-mono text-ice outline-none', verdict === true ? 'border-ok' : verdict === false ? 'border-bad' : 'border-sky')}
-            />
-            {after}
-          </pre>
-        )}
-      </div>
-
-      <footer className={cx('border-t px-5 py-4', verdict === null ? 'border-line bg-surface' : verdict ? 'border-ok/40 bg-ok/[0.08]' : 'border-bad/40 bg-bad/[0.08]')}>
-        <div className="mx-auto flex w-full max-w-2xl items-center gap-4">
-          {verdict === null ? (
-            <Button size="lg" className="ml-auto" onClick={submit} disabled={!ready}>Check</Button>
-          ) : (
+          {question.type === 'choice' ? (
             <>
-              <Mascot expression={verdict ? 'happy' : 'disappointed'} size={64} className="hidden shrink-0 sm:block" />
-              <div className="min-w-0 flex-1 animate-rise">
-                <p className={cx('flex items-center gap-1.5 font-semibold', verdict ? 'text-ok' : 'text-bad')}>
-                  {verdict ? <Check size={18} strokeWidth={3} /> : <X size={18} strokeWidth={3} />}
-                  {verdict ? 'Correct' : question.type === 'fill' ? `Not quite — the answer is ${question.answers[0]}` : 'Not quite'}
-                </p>
-                <p className="mt-0.5 text-sm text-[#d5deeb]">{question.explain}</p>
+              {question.code && <Code code={question.code} className="mt-6" />}
+              <div className="mt-6 grid gap-3" role="radiogroup">
+                {question.options.map((option, i) => {
+                  const isAnswer = verdict !== null && i === question.answer
+                  const isWrongPick = verdict === false && i === picked
+                  const selected = picked === i
+                  return (
+                    <button
+                      key={option}
+                      role="radio"
+                      aria-checked={selected}
+                      disabled={verdict !== null}
+                      onClick={() => setPicked(i)}
+                      className={cx(
+                        'flex min-h-[60px] items-center gap-4 rounded-xl border-2 border-b-4 px-4 py-3 text-left transition-colors enabled:active:translate-y-0.5 enabled:active:border-b-2',
+                        isAnswer ? 'border-green bg-green-soft text-ok' : isWrongPick ? 'border-bad bg-bad-soft text-bad-dark' : selected ? 'border-blue-line bg-blue-soft text-blue' : 'border-line bg-white text-body enabled:hover:bg-surface',
+                      )}
+                    >
+                      <span className={cx('tnum flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border-2 text-[15px] font-bold', isAnswer ? 'border-green' : isWrongPick ? 'border-bad' : selected ? 'border-blue-line' : 'border-line text-faint')}>{i + 1}</span>
+                      <span className="whitespace-pre-wrap font-mono text-[15px] font-semibold">{option}</span>
+                    </button>
+                  )
+                })}
               </div>
-              <Button size="lg" variant={verdict ? 'success' : 'primary'} onClick={onNext} autoFocus>Continue</Button>
             </>
+          ) : (
+            <pre className="mt-6 overflow-x-auto rounded-xl border-2 border-line bg-surface px-4 py-4 font-mono text-[15px] leading-loose text-ink">
+              {before}
+              <input
+                value={typed}
+                onChange={(e) => setTyped(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submit() } }}
+                disabled={verdict !== null}
+                autoFocus
+                aria-label="Your answer"
+                spellCheck={false}
+                autoCapitalize="off"
+                size={Math.max(6, typed.length + 1)}
+                className={cx('mx-0.5 rounded-lg border-2 bg-white px-2 py-0.5 text-center font-mono font-bold outline-none', verdict === true ? 'border-green text-ok' : verdict === false ? 'border-bad text-bad-dark' : 'border-blue-line text-blue')}
+              />
+              {after}
+            </pre>
           )}
         </div>
-      </footer>
-    </div>
+      </div>
+
+      {verdict === null ? (
+        <LessonFooter>
+          <span />
+          <Button size="lg" className="w-full sm:w-[150px]" onClick={submit} disabled={!ready}>Check</Button>
+        </LessonFooter>
+      ) : (
+        <LessonFooter tone={verdict ? 'good' : 'bad'}>
+          <div className="animate-rise min-w-0" role="status">
+            <p className={cx('text-2xl font-bold', verdict ? 'text-ok' : 'text-bad-dark')}>{verdict ? 'Nice!' : 'Correct solution:'}</p>
+            {!verdict && <p className="mt-1 font-mono text-[15px] font-semibold text-bad-dark">{answerText}</p>}
+            <p className={cx('mt-1 text-[15px]', verdict ? 'text-ok' : 'text-bad-dark')}>{question.explain}</p>
+          </div>
+          <Button size="lg" variant={verdict ? 'primary' : 'danger'} className="w-full sm:w-[150px]" onClick={onNext}>Continue</Button>
+        </LessonFooter>
+      )}
+    </>
   )
 }
 
@@ -117,7 +131,7 @@ export function LessonPage() {
   const [tally, setTally] = useState<Tally>({ correct: 0, attempts: 0 })
   const [solved, setSolved] = useState(false)
   const [summary, setSummary] = useState<{ xp: number; accuracy: number; perfect: boolean; first: boolean } | null>(null)
-  const startedAt = useRef(Date.now())
+  const startedAt = useRef(0)
   const credited = useRef(false)
 
   // Time spent on a lesson that is abandoned still counts as study time.
@@ -134,7 +148,7 @@ export function LessonPage() {
     }
   }, [lessonId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!ref) return <Navigate to="/learn" replace />
+  if (!ref) return <Navigate to="/" replace />
   const { course, lesson } = ref
   if (!isUnlocked(course, lesson.id, state.lessons)) return <Navigate to={`/learn/${course.id}`} replace />
 
@@ -169,86 +183,95 @@ export function LessonPage() {
   }
 
   const upNext = nextStep(course, { ...state.lessons, [lesson.id]: true })
+  const finished = step === totalSteps
 
   return (
-    <div className="flex h-full flex-col bg-bg">
-      <header className="flex h-16 shrink-0 items-center gap-4 border-b border-line px-5">
-        <Link to={`/learn/${course.id}`} aria-label="Leave lesson" className="rounded-lg p-2 text-mute hover:bg-card hover:text-ink"><X size={20} /></Link>
-        <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-card" role="progressbar" aria-valuenow={step} aria-valuemin={0} aria-valuemax={totalSteps}>
-          <div className="grad-primary h-full rounded-full transition-[width] duration-500" style={{ width: `${(Math.min(step, totalSteps) / totalSteps) * 100}%` }} />
-        </div>
-        <span className="tnum hidden text-sm text-mute sm:block">{lesson.title}</span>
-      </header>
+    <div className="flex h-full flex-col bg-white">
+      {!finished && (
+        <header className="mx-auto flex w-full max-w-[1008px] shrink-0 items-center gap-4 px-4 pb-2 pt-6">
+          <Link to={`/learn/${course.id}`} aria-label="Leave lesson" className="text-faint hover:text-mute"><X size={26} strokeWidth={3} /></Link>
+          <div className="h-4 flex-1 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow={step} aria-valuemin={0} aria-valuemax={totalSteps}>
+            <div className="relative h-full rounded-full bg-gold transition-[width] duration-500" style={{ width: `${Math.max(4, (step / totalSteps) * 100)}%` }}>
+              <span className="absolute inset-x-2 top-[22%] h-[22%] rounded-full bg-white/30" />
+            </div>
+          </div>
+        </header>
+      )}
 
       {step === 0 && (
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <div className="mx-auto w-full max-w-2xl flex-1 px-5 py-8">
-            <div className="flex items-end gap-4">
-              <Mascot expression="curious" size={84} className="shrink-0" />
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-cyan">{course.name} · {ref.unit.title}</p>
-                <h1 className="mt-1 text-2xl font-semibold tracking-tight">{lesson.title}</h1>
+        <>
+          <div className="flex-1 overflow-y-auto">
+            <div className="mx-auto w-full max-w-[600px] px-4 py-8">
+              <div className="flex items-end gap-3">
+                <Mascot expression="curious" size={96} className="shrink-0" />
+                <div className="mb-3">
+                  <p className="label text-[13px] text-blue">{course.name} · {ref.unit.title}</p>
+                  <h1 className="mt-1 text-2xl font-bold text-ink">{lesson.title}</h1>
+                </div>
               </div>
+              <div className="mt-6 space-y-4">{lesson.explain.map((p) => <Prose key={p} text={p} />)}</div>
+              <p className="label mb-2 mt-7 text-[13px] text-faint">Example</p>
+              <Code code={lesson.example.code} />
+              {lesson.example.output && (
+                <>
+                  <p className="label mb-2 mt-5 text-[13px] text-faint">Output</p>
+                  <Code code={lesson.example.output} className="!border-green-soft !bg-green-soft/40 !text-ok" />
+                </>
+              )}
             </div>
-            <div className="mt-7 space-y-4">{lesson.explain.map((p) => <Prose key={p} text={p} />)}</div>
-            <p className="mb-2 mt-7 text-xs font-semibold uppercase tracking-[0.08em] text-mute">Example</p>
-            <Code code={lesson.example.code} />
-            {lesson.example.output && (
-              <>
-                <p className="mb-2 mt-4 text-xs font-semibold uppercase tracking-[0.08em] text-mute">Output</p>
-                <Code code={lesson.example.output} className="!text-ok/90" />
-              </>
-            )}
           </div>
-          <footer className="border-t border-line bg-surface px-5 py-4">
-            <div className="mx-auto flex max-w-2xl justify-end"><Button size="lg" onClick={() => setStep(1)}>Got it<ArrowRight size={17} /></Button></div>
-          </footer>
-        </div>
+          <LessonFooter>
+            <span />
+            <Button size="lg" className="w-full sm:w-[150px]" onClick={() => setStep(1)}>Continue</Button>
+          </LessonFooter>
+        </>
       )}
 
-      {step >= 1 && step < exerciseStep && (
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <QuestionStep key={step} question={lesson.questions[step - 1]} onAnswered={record} onNext={() => setStep(step + 1)} />
-        </div>
-      )}
+      {step >= 1 && step < exerciseStep && <QuestionStep key={step} question={lesson.questions[step - 1]} onAnswered={record} onNext={() => setStep(step + 1)} />}
 
       {step === exerciseStep && (
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <div className="mx-auto w-full max-w-4xl flex-1 px-5 py-8">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-cyan">Your turn — coding exercise</p>
-            <Workbench lang={course.id} exercise={lesson.exercise} onCheck={onCheck} />
-          </div>
-          {solved && (
-            <footer className="border-t border-ok/40 bg-ok/[0.08] px-5 py-4">
-              <div className="mx-auto flex max-w-4xl items-center gap-4">
-                <Mascot expression="happy" size={60} className="hidden shrink-0 sm:block" />
-                <p className="flex-1 font-semibold text-ok">Every test passed. Nicely done.</p>
-                <Button size="lg" variant="success" onClick={() => setStep(totalSteps)}>Continue</Button>
-              </div>
-            </footer>
-          )}
-        </div>
-      )}
-
-      {step === totalSteps && summary && (
-        <div className="flex flex-1 items-center justify-center overflow-y-auto px-5 py-10">
-          <div className="animate-pop w-full max-w-md text-center">
-            <Mascot expression={summary.perfect ? 'excited' : 'happy'} size={170} float className="mx-auto" />
-            <h1 className="mt-4 text-2xl font-semibold tracking-tight">{summary.first ? 'Lesson complete' : 'Practice complete'}</h1>
-            <p className="mt-1 text-sm text-mute">{lesson.title}</p>
-            <dl className="mt-7 grid grid-cols-3 overflow-hidden rounded-2xl border border-line bg-card text-left">
-              <div className="border-r border-line p-4"><dt className="text-xs text-mute">XP earned</dt><dd className="tnum mt-1 flex items-center gap-1 text-xl font-semibold text-gold"><Zap size={16} fill="currentColor" />+{summary.xp}</dd></div>
-              <div className="border-r border-line p-4"><dt className="text-xs text-mute">Accuracy</dt><dd className="tnum mt-1 text-xl font-semibold">{summary.accuracy}%</dd></div>
-              <div className="p-4"><dt className="text-xs text-mute">Bonus</dt><dd className="mt-1 text-xl font-semibold">{summary.perfect && summary.first ? <span className="text-ok">Perfect</span> : <span className="text-faint">—</span>}</dd></div>
-            </dl>
-            <div className="mt-7 flex flex-col gap-2.5">
-              {upNext ? (
-                <Button size="lg" onClick={() => navigate(stepPath(upNext))}>Next: {stepTitle(upNext)}<ArrowRight size={17} /></Button>
-              ) : null}
-              <LinkButton to={`/learn/${course.id}`} variant="secondary" size="lg">Back to the path</LinkButton>
+        <>
+          <div className="flex-1 overflow-y-auto">
+            <div className="mx-auto w-full max-w-[860px] px-4 py-8">
+              <p className="label mb-3 text-[13px] text-purple-dark">Your turn · coding exercise</p>
+              <Workbench lang={course.id} exercise={lesson.exercise} onCheck={onCheck} />
             </div>
           </div>
-        </div>
+          {solved && (
+            <LessonFooter tone="good">
+              <p className="animate-rise text-2xl font-bold text-ok" role="status">Excellent! Every test passed.</p>
+              <Button size="lg" className="w-full sm:w-[150px]" onClick={() => setStep(totalSteps)}>Continue</Button>
+            </LessonFooter>
+          )}
+        </>
+      )}
+
+      {finished && summary && (
+        <>
+          <div className="flex flex-1 items-center justify-center overflow-y-auto px-4 py-10">
+            <div className="animate-pop w-full max-w-[420px] text-center">
+              <Mascot expression={summary.perfect ? 'excited' : 'happy'} size={190} float className="mx-auto" />
+              <h1 className="mt-4 text-[28px] font-bold text-gold-dark">{summary.first ? 'Lesson complete!' : 'Practice complete!'}</h1>
+              <p className="mt-1 text-[17px] text-mute">{lesson.title}</p>
+              <dl className="mt-7 grid grid-cols-3 gap-3">
+                {[
+                  { label: 'Total XP', value: <><BoltIcon size={22} />{summary.xp}</>, color: '#FFC800' },
+                  { label: 'Gems', value: <><GemIcon size={22} />{gemsForXp(summary.xp)}</>, color: '#1CB0F6' },
+                  { label: summary.perfect ? 'Perfect' : 'Accuracy', value: `${summary.accuracy}%`, color: '#58CC02' },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-2xl border-2 p-0.5" style={{ borderColor: item.color, background: item.color }}>
+                    <dt className="label py-1 text-[11px] text-white">{item.label}</dt>
+                    <dd className="tnum flex h-14 items-center justify-center gap-1.5 rounded-[13px] bg-white text-xl font-bold" style={{ color: item.color }}>{item.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+          <LessonFooter>
+            <LinkButton to={`/learn/${course.id}`} variant="secondary" size="lg" className="w-full sm:w-auto">Back to the path</LinkButton>
+            {upNext ? <Button size="lg" className="w-full sm:w-auto" onClick={() => navigate(stepPath(upNext))}>Next: {stepTitle(upNext)}</Button> : <span />}
+          </LessonFooter>
+        </>
       )}
       <Toasts />
     </div>

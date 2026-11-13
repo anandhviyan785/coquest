@@ -95,16 +95,16 @@ export function Workbench({ lang, exercise, onCheck, onCodeChange, editorHeight 
       <Prose text={exercise.prompt} />
 
       {lang === 'sql' && exercise.setup && (
-        <details className="rounded-xl border border-line bg-surface px-4 py-2.5 text-sm">
+        <details className="rounded-xl border-2 border-line bg-surface px-4 py-2.5 text-sm">
           <summary className="cursor-pointer text-mute">Show the tables this query runs against</summary>
-          <pre className="mt-2 overflow-x-auto font-mono text-xs leading-relaxed text-[#cfe3ff]">{exercise.setup}</pre>
+          <pre className="mt-2 overflow-x-auto font-mono text-xs leading-relaxed text-ink">{exercise.setup}</pre>
         </details>
       )}
 
       <div className={cx('grid gap-4', isMarkup && 'lg:grid-cols-2')}>
         <CodeEditor lang={lang} value={code} onChange={update} height={editorHeight} readOnly={disabled} />
         {isMarkup && (
-          <div className="overflow-hidden rounded-xl border border-line bg-white" style={{ height: editorHeight }}>
+          <div className="overflow-hidden rounded-xl border-2 border-line bg-white" style={{ height: editorHeight }}>
             <iframe title="Preview" sandbox="" srcDoc={previewDocument(lang, preview, exercise.markup)} className="h-full w-full" />
           </div>
         )}
@@ -132,7 +132,7 @@ export function Workbench({ lang, exercise, onCheck, onCodeChange, editorHeight 
         <ol className="space-y-2">
           {exercise.hints.slice(0, hints).map((hint, i) => (
             <li key={i} className="animate-rise flex gap-3 rounded-xl border border-gold/25 bg-gold/[0.06] px-4 py-3 text-sm">
-              <span className="tnum font-semibold text-gold">{i + 1}</span>
+              <span className="tnum font-semibold text-gold-dark">{i + 1}</span>
               <Prose text={hint} className="!text-sm" />
             </li>
           ))}
@@ -142,12 +142,12 @@ export function Workbench({ lang, exercise, onCheck, onCodeChange, editorHeight 
       {usesStdin && !isMarkup && (
         <label className="block">
           <span className="mb-1.5 block text-xs font-medium text-mute">Input — one line per input() call, used when you press Run</span>
-          <textarea value={stdin} onChange={(e) => setStdin(e.target.value)} rows={2} spellCheck={false} className="w-full resize-y rounded-xl border border-line bg-bg px-3 py-2 font-mono text-[13px] outline-none focus:border-sky" />
+          <textarea value={stdin} onChange={(e) => setStdin(e.target.value)} rows={2} spellCheck={false} className="w-full resize-y rounded-xl border-2 border-line bg-surface px-3 py-2 font-mono text-[13px] outline-none focus:border-sky" />
         </label>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-line bg-bg">
-        <div className="flex border-b border-line text-[13px]" role="tablist">
+      <div className="overflow-hidden rounded-xl border-2 border-line bg-surface">
+        <div className="flex border-b-2 border-line text-[13px]" role="tablist">
           {(isMarkup ? (['tests'] as Tab[]) : (['output', 'tests'] as Tab[])).map((t) => (
             <button key={t} role="tab" aria-selected={tab === t || isMarkup} onClick={() => setTab(t)} className={cx('px-4 py-2 font-medium capitalize', tab === t || isMarkup ? 'text-ink shadow-[inset_0_-2px_0_var(--color-cyan)]' : 'text-mute hover:text-ink')}>
               {t === 'tests' && outcomes ? `Tests ${outcomes.filter((o) => o.passed).length}/${outcomes.length}` : t}
@@ -162,12 +162,12 @@ export function Workbench({ lang, exercise, onCheck, onCodeChange, editorHeight 
             {!busy && !result && <p className="text-faint">Press Run to see your program&apos;s output here.</p>}
             {result && busy !== 'run' && (
               <>
-                {result.stdout && <pre className="whitespace-pre-wrap text-[#d5e4ff]">{result.stdout}</pre>}
-                {result.stderr && <pre className="whitespace-pre-wrap text-gold">{result.stderr}</pre>}
+                {result.stdout && <pre className="whitespace-pre-wrap text-ink">{result.stdout}</pre>}
+                {result.stderr && <pre className="whitespace-pre-wrap text-gold-dark">{result.stderr}</pre>}
                 {result.error && <pre className="whitespace-pre-wrap text-bad">{result.error}</pre>}
                 {!result.stdout && !result.stderr && !result.error && <p className="text-faint">The program finished without printing anything.</p>}
                 {errorHelp && (
-                  <p className="mt-3 flex gap-2 rounded-lg border border-line bg-card p-3 font-sans text-[13px] text-[#d5deeb]">
+                  <p className="mt-3 flex gap-2 rounded-lg border-2 border-line bg-card p-3 font-sans text-[13px] text-body">
                     <CircleAlert size={16} className="mt-0.5 shrink-0 text-ice" />
                     {errorHelp}
                   </p>
@@ -193,8 +193,8 @@ export function Workbench({ lang, exercise, onCheck, onCodeChange, editorHeight 
                           <><dt className="text-faint">Error</dt><dd className="whitespace-pre-wrap text-bad">{o.error}</dd></>
                         ) : (
                           <>
-                            <dt className="text-faint">Expected</dt><dd className="whitespace-pre-wrap text-[#d5e4ff]">{o.expected || '(nothing)'}</dd>
-                            <dt className="text-faint">Got</dt><dd className="whitespace-pre-wrap text-gold">{o.actual || '(nothing)'}</dd>
+                            <dt className="text-faint">Expected</dt><dd className="whitespace-pre-wrap text-ink">{o.expected || '(nothing)'}</dd>
+                            <dt className="text-faint">Got</dt><dd className="whitespace-pre-wrap text-gold-dark">{o.actual || '(nothing)'}</dd>
                           </>
                         )}
                       </dl>

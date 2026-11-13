@@ -1,24 +1,20 @@
-import { Flame, Swords, TerminalSquare } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Wordmark } from '../components/Layout'
 import { Mascot } from '../components/Mascot'
-import { Button, cx } from '../components/ui'
+import { Button } from '../components/ui'
 import { useApp } from '../state/AppContext'
 
 const USERNAME = /^[A-Za-z0-9_]{3,20}$/
 
-const inputClass = 'h-11 w-full rounded-[10px] border border-line bg-bg px-3.5 text-sm outline-none transition-colors placeholder:text-faint focus:border-sky'
+type Step = 'welcome' | 'signup' | 'signin'
 
-const POINTS = [
-  { icon: TerminalSquare, text: 'Write and run real code in your browser from the first lesson.' },
-  { icon: Flame, text: 'Build a daily streak, earn XP and climb six leagues.' },
-  { icon: Swords, text: 'Beat unit bosses and race a friend in live coding duels.' },
-]
+const fieldClass = 'h-[50px] w-full rounded-xl border-2 border-line bg-surface px-4 text-[17px] text-ink outline-none placeholder:text-faint focus:border-blue-line'
 
 export function Auth() {
   const { cloud, startLocal, signIn, signUp, syncError } = useApp()
-  const [mode, setMode] = useState<'signup' | 'signin'>('signup')
+  const [step, setStep] = useState<Step>('welcome')
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -26,14 +22,18 @@ export function Auth() {
   const [notice, setNotice] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
-  const needsUsername = !cloud || mode === 'signup'
+  const go = (next: Step) => {
+    setStep(next)
+    setError(null)
+    setNotice(null)
+  }
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
     setError(null)
     setNotice(null)
     const name = username.trim()
-    if (needsUsername && !USERNAME.test(name)) {
+    if (step === 'signup' && !USERNAME.test(name)) {
       setError('Usernames are 3–20 characters: letters, numbers and underscores.')
       return
     }
@@ -47,11 +47,11 @@ export function Auth() {
     }
     setBusy(true)
     try {
-      if (mode === 'signin') {
+      if (step === 'signin') {
         await signIn(email.trim(), password)
       } else {
         const outcome = await signUp(email.trim(), password, name)
-        if (outcome === 'confirm') setNotice('Almost there — check your email for a confirmation link, then sign in.')
+        if (outcome === 'confirm') setNotice('Almost there — check your email for a confirmation link, then log in.')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Try again.')
@@ -60,73 +60,51 @@ export function Auth() {
     }
   }
 
+  if (step === 'welcome') {
+    return (
+      <div className="mx-auto flex min-h-full w-full max-w-[420px] flex-col px-4 pb-6 pt-8">
+        <div className="flex justify-center"><Wordmark size={32} /></div>
+        <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
+          <Mascot expression="excited" size={210} float />
+          <h1 className="mt-6 text-[26px] font-bold leading-snug text-ink">The free, fun, and effective way to learn to code!</h1>
+        </div>
+        <div className="flex flex-col gap-3">
+          <Button size="lg" className="w-full" onClick={() => go('signup')}>Get started</Button>
+          {cloud && <Button size="lg" variant="secondary" className="w-full" onClick={() => go('signin')}>I already have an account</Button>}
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="grid min-h-full lg:grid-cols-[1.05fr_1fr]">
-      <section className="grad-premium relative hidden flex-col justify-between overflow-hidden p-12 lg:flex">
-        <Wordmark />
-        <div>
-          <Mascot expression="curious" size={210} float />
-          <h1 className="mt-6 max-w-md text-4xl font-semibold leading-[1.1] tracking-tight">Learn to code like it&apos;s a game you can&apos;t put down.</h1>
-          <ul className="mt-8 space-y-4">
-            {POINTS.map(({ icon: Icon, text }) => (
-              <li key={text} className="flex max-w-md items-start gap-3 text-[15px] text-[#cfe0ff]">
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/10"><Icon size={15} /></span>
-                {text}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <p className="text-sm text-[#9fb6e6]">Python, JavaScript, C++, Java, HTML, CSS and SQL.</p>
-      </section>
+    <div className="mx-auto flex min-h-full w-full max-w-[420px] flex-col px-4 pb-6 pt-6">
+      <button onClick={() => go('welcome')} aria-label="Back" className="-ml-2 flex h-10 w-10 items-center justify-center rounded-xl text-faint hover:bg-surface hover:text-mute"><ArrowLeft size={24} strokeWidth={3} /></button>
+      <h1 className="mt-2 text-center text-2xl font-bold text-ink">{step === 'signin' ? 'Log in' : 'Create your profile'}</h1>
 
-      <section className="flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-sm">
-          <div className="mb-8 lg:hidden"><Wordmark /></div>
-          <h2 className="text-2xl font-semibold tracking-tight">{!cloud ? 'Pick a name to begin' : mode === 'signup' ? 'Create your account' : 'Welcome back'}</h2>
-          <p className="mt-1.5 text-sm text-mute">
-            {!cloud ? 'Your progress is saved in this browser.' : mode === 'signup' ? 'Free, and your progress syncs everywhere.' : 'Sign in to pick up where you left off.'}
-          </p>
+      <form onSubmit={submit} className="mt-7 flex flex-col gap-3" noValidate>
+        {step === 'signup' && (
+          <input className={fieldClass} value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" aria-label="Username" autoComplete="username" autoFocus maxLength={20} />
+        )}
+        {step === 'signup' && !cloud && <p className="px-1 text-[13px] leading-relaxed text-mute">Your username is shown on your profile. Progress is saved in this browser.</p>}
+        {cloud && (
+          <>
+            <input className={fieldClass} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" aria-label="Email" autoComplete="email" required />
+            <input className={fieldClass} type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" aria-label="Password" autoComplete={step === 'signup' ? 'new-password' : 'current-password'} required />
+          </>
+        )}
+        {(error ?? syncError) && <p className="rounded-xl bg-bad-soft px-4 py-3 text-[15px] font-bold text-bad-dark" role="alert">{error ?? syncError}</p>}
+        {notice && <p className="rounded-xl bg-green-soft px-4 py-3 text-[15px] font-bold text-ok" role="status">{notice}</p>}
+        <Button type="submit" variant="blue" size="lg" className="mt-2 w-full" disabled={busy}>
+          {busy ? 'One moment…' : step === 'signin' ? 'Log in' : cloud ? 'Create account' : 'Start learning'}
+        </Button>
+      </form>
 
-          <form onSubmit={submit} className="mt-7 space-y-4" noValidate>
-            {needsUsername && (
-              <label className="block">
-                <span className="mb-1.5 block text-[13px] font-medium text-mute">Username</span>
-                <input className={inputClass} value={username} onChange={(e) => setUsername(e.target.value)} placeholder="explorer_ada" autoComplete="username" autoFocus maxLength={20} />
-              </label>
-            )}
-            {cloud && (
-              <>
-                <label className="block">
-                  <span className="mb-1.5 block text-[13px] font-medium text-mute">Email</span>
-                  <input className={inputClass} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" required />
-                </label>
-                <label className="block">
-                  <span className="mb-1.5 block text-[13px] font-medium text-mute">Password</span>
-                  <input className={inputClass} type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} required />
-                </label>
-              </>
-            )}
-            {(error ?? syncError) && <p className="rounded-lg border border-bad/40 bg-bad/10 px-3 py-2 text-[13px] text-bad" role="alert">{error ?? syncError}</p>}
-            {notice && <p className="rounded-lg border border-ok/40 bg-ok/10 px-3 py-2 text-[13px] text-ok" role="status">{notice}</p>}
-            <Button type="submit" size="lg" className="w-full" disabled={busy}>
-              {!cloud ? 'Start learning' : busy ? 'One moment…' : mode === 'signup' ? 'Create account' : 'Sign in'}
-            </Button>
-          </form>
-
-          {cloud ? (
-            <p className="mt-6 text-center text-sm text-mute">
-              {mode === 'signup' ? 'Already have an account?' : 'New here?'}{' '}
-              <button className={cx('font-semibold text-ice hover:underline')} onClick={() => { setMode(mode === 'signup' ? 'signin' : 'signup'); setError(null); setNotice(null) }}>
-                {mode === 'signup' ? 'Sign in' : 'Create one'}
-              </button>
-            </p>
-          ) : (
-            <p className="mt-6 rounded-xl border border-line bg-surface p-3.5 text-[13px] leading-relaxed text-mute">
-              Running in local mode. To add accounts, cloud sync, leaderboards and online duels, add your Supabase keys to <code className="font-mono text-ice">.env</code> — see the README.
-            </p>
-          )}
-        </div>
-      </section>
+      {cloud && (
+        <p className="mt-8 text-center text-[15px] font-bold text-body">
+          {step === 'signup' ? 'Have an account?' : 'New to PyQuest?'}{' '}
+          <button className="label text-[13px] text-blue hover:brightness-90" onClick={() => go(step === 'signup' ? 'signin' : 'signup')}>{step === 'signup' ? 'Log in' : 'Sign up'}</button>
+        </p>
+      )}
     </div>
   )
 }

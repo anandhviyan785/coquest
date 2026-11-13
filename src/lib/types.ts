@@ -90,6 +90,12 @@ export interface UserState {
   daily: Record<string, { ms: number }>
   streakRewards: number[]
   duels: { played: number; won: number }
+  /** Currency earned alongside XP and spent in the shop. */
+  gems: number
+  /** Daily quest ids already claimed, keyed by day. */
+  questClaims: Record<string, string[]>
+  /** An open Double or Nothing wager: the streak it was placed at and the streak that wins it. */
+  wager: { base: number; target: number } | null
   history: HistoryItem[]
   createdAt: string
 }

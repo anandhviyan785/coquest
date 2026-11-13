@@ -59,7 +59,7 @@ Learner code never runs on an application server.
 | JavaScript | A Web Worker with network and storage APIs removed |
 | SQL | sql.js (SQLite on WebAssembly) in a Web Worker, fresh database per run |
 | HTML, CSS | A sandboxed iframe with scripts disabled; tests parse the code rather than run it |
-| C++, Java | A Piston sandbox service (`VITE_PISTON_URL`) |
+| C++, Java | A Piston sandbox server you host (`VITE_PISTON_URL`). Not available until you set one: the public Piston API has been whitelist-only since February 2026 |
 
 Workers are terminated after 8 seconds or 20,000 characters of output, so infinite loops cannot hang the page.
 
