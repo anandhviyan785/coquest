@@ -109,8 +109,8 @@ export function Leaderboard() {
             const mine = row.id === myId
             const value = tab === 'weekly' ? row.weekly_xp : row.xp
             return (
-              <li key={row.id} className={cx('flex items-center gap-5 rounded-xl px-4 py-3', mine && 'bg-green-soft/50')}>
-                <span className={cx('tnum w-6 text-center text-[17px] font-bold', i === 0 ? 'text-gold-dark' : i === 1 ? 'text-faint' : i === 2 ? 'text-[#C98A5A]' : 'text-ok')}>{i + 1}</span>
+              <li key={row.id} className={cx('flex items-center gap-5 rounded-xl px-4 py-3', mine && 'bg-blue-soft')}>
+                <span className={cx('tnum w-6 text-center text-[17px] font-bold', i === 0 ? 'text-gold-dark' : i === 1 ? 'text-faint' : i === 2 ? 'text-[#C98A5A]' : 'text-blue')}>{i + 1}</span>
                 <Avatar avatar={row.avatar} size={52} />
                 <span className="min-w-0 flex-1 truncate text-[17px] font-bold text-body">{row.username}</span>
                 <span className="tnum text-[17px] text-mute">{value.toLocaleString()} XP</span>

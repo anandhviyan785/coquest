@@ -11,7 +11,7 @@ import { useApp } from '../state/AppContext'
 const TOOLTIP = { contentStyle: { background: '#FFFFFF', border: '2px solid #E5E5E5', borderRadius: 10, fontSize: 13 }, labelStyle: { color: '#777777' }, cursor: { fill: 'rgba(148,163,184,0.08)' } }
 const AXIS = { tickLine: false, axisLine: false, tick: { fill: '#AFAFAF', fontSize: 12 } }
 const HEAT_WEEKS = 18
-const HEAT = ['#E5E5E5', '#D7FFB8', '#A5ED6E', '#58CC02', '#58A700']
+const HEAT = ['#E5E5E5', '#DDF4FF', '#84D8FF', '#1CB0F6', '#1899D6']
 
 const minutes = (seconds: number): string => (seconds >= 3600 ? `${(seconds / 3600).toFixed(1)} h` : `${Math.round(seconds / 60)} min`)
 

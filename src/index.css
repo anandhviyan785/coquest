@@ -5,7 +5,7 @@
 /*
  * Design tokens, taken from the Figma kit: white surfaces, #E5E5E5 two-pixel borders,
  * Inter Bold / Medium, and flat "pressable" bottom edges on buttons and cards.
- * To re-tint the app, change --color-green (primary action) and --color-blue (accent).
+ * Blue is the theme colour (logo, buttons, path, highlights). Green is kept for correct answers only.
  */
 @theme {
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;

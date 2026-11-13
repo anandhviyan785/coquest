@@ -15,14 +15,14 @@ const NODE_H = 58
 const OFFSETS = [0, -44, -70, -44, 0, 44, 70, 44]
 const LAST_COURSE_KEY = 'pyquest:v1:course'
 
-/** Banner and node colours, one per unit, cycling. */
+/** Banner and node colours, one per unit, cycling through the blue theme. */
 const UNIT_COLORS = [
-  { fill: '#58CC02', edge: '#58A700' },
-  { fill: '#CE82FF', edge: '#A568CC' },
   { fill: '#1CB0F6', edge: '#1899D6' },
-  { fill: '#FF9600', edge: '#CD7900' },
-  { fill: '#FF4B4B', edge: '#EA2B2B' },
-  { fill: '#00CD9C', edge: '#00A77E' },
+  { fill: '#2B70C9', edge: '#1F5AA6' },
+  { fill: '#00B8D4', edge: '#0097AE' },
+  { fill: '#4A62D8', edge: '#3A4EB4' },
+  { fill: '#1CB0F6', edge: '#1899D6' },
+  { fill: '#2B70C9', edge: '#1F5AA6' },
 ]
 
 type NodeState = 'done' | 'current' | 'open' | 'locked'

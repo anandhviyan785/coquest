@@ -41,7 +41,7 @@ const navClass = (active: boolean) =>
   )
 
 export function Wordmark({ size = 30 }: { size?: number }) {
-  return <span className="font-extrabold lowercase leading-none tracking-tight text-green" style={{ fontSize: size }}>pyquest</span>
+  return <span className="font-extrabold lowercase leading-none tracking-tight text-blue" style={{ fontSize: size }}>pyquest</span>
 }
 
 function useDismiss(open: boolean, close: () => void) {

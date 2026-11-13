@@ -257,7 +257,7 @@ export function LessonPage() {
                 {[
                   { label: 'Total XP', value: <><BoltIcon size={22} />{summary.xp}</>, color: '#FFC800' },
                   { label: 'Gems', value: <><GemIcon size={22} />{gemsForXp(summary.xp)}</>, color: '#1CB0F6' },
-                  { label: summary.perfect ? 'Perfect' : 'Accuracy', value: `${summary.accuracy}%`, color: '#58CC02' },
+                  { label: summary.perfect ? 'Perfect' : 'Accuracy', value: `${summary.accuracy}%`, color: '#2B70C9' },
                 ].map((item) => (
                   <div key={item.label} className="rounded-2xl border-2 p-0.5" style={{ borderColor: item.color, background: item.color }}>
                     <dt className="label py-1 text-[11px] text-white">{item.label}</dt>

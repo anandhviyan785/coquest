@@ -233,7 +233,7 @@ export function Duels() {
             <PanelTitle>Your record</PanelTitle>
             <dl className="grid grid-cols-3 gap-3 text-center">
               <div><dd className="tnum text-2xl font-semibold">{state.duels.played}</dd><dt className="text-xs text-mute">Played</dt></div>
-              <div><dd className="tnum text-2xl font-semibold text-ok">{state.duels.won}</dd><dt className="text-xs text-mute">Won</dt></div>
+              <div><dd className="tnum text-2xl font-semibold text-blue">{state.duels.won}</dd><dt className="text-xs text-mute">Won</dt></div>
               <div><dd className="tnum text-2xl font-semibold">{winRate === null ? '—' : `${winRate}%`}</dd><dt className="text-xs text-mute">Win rate</dt></div>
             </dl>
             <p className="mt-4 flex items-center gap-1.5 border-t-2 border-line pt-4 text-xs text-mute"><Zap size={13} className="text-gold-dark" fill="currentColor" />{XP.duelWin} XP for a win, {XP.duelPlay} XP for taking part</p>

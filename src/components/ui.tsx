@@ -104,7 +104,7 @@ export function Bar({ value, max, color = 'var(--color-gold)', className }: { va
   )
 }
 
-export function Ring({ value, max, size = 96, stroke = 10, color = 'var(--color-green)', children }: { value: number; max: number; size?: number; stroke?: number; color?: string; children?: ReactNode }) {
+export function Ring({ value, max, size = 96, stroke = 10, color = 'var(--color-blue)', children }: { value: number; max: number; size?: number; stroke?: number; color?: string; children?: ReactNode }) {
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
   const pct = max > 0 ? Math.min(1, Math.max(0, value / max)) : 0
