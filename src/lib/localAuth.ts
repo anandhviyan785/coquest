@@ -17,9 +17,13 @@ const stateKey = (id: string) => `pyquest:v1:state:${id}`
 
 const ITERATIONS = 210_000
 export const MIN_PASSWORD = 8
-const LOGIN_ERROR = 'Incorrect username or password.'
+const LOGIN_ERROR = 'That email, username or password is not right.'
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-interface Account { id: string; username: string; salt: string; hash: string; iterations: number; createdAt: string }
+export const isEmail = (text: string): boolean => EMAIL.test(text.trim())
+
+/** `email` is missing on accounts made before sign-up asked for one. */
+interface Account { id: string; username: string; email?: string; salt: string; hash: string; iterations: number; createdAt: string }
 
 // ── Storage helpers ───────────────────────────────────────────────────────
 const read = <T>(key: string, fallback: T): T => {
@@ -66,13 +70,18 @@ const equal = (a: string, b: string): boolean => {
 export const usernameTaken = (username: string, exceptId?: string): boolean =>
   accounts().some((a) => a.id !== exceptId && sameName(a.username, username))
 
-export const createAccount = async (username: string, password: string): Promise<string> => {
+export const emailTaken = (email: string): boolean => accounts().some((a) => a.email !== undefined && sameName(a.email, email))
+
+export const createAccount = async (username: string, email: string, password: string): Promise<string> => {
+  if (!isEmail(email)) throw new Error('Enter a valid email address.')
   if (password.length < MIN_PASSWORD) throw new Error(`Passwords need at least ${MIN_PASSWORD} characters.`)
-  if (usernameTaken(username)) throw new Error('That username is already taken in this browser. Log in instead, or pick another.')
+  if (usernameTaken(username)) throw new Error('That username is already taken on this device. Log in instead, or pick another.')
+  if (emailTaken(email)) throw new Error('An account with that email already exists on this device. Log in instead.')
   const salt = crypto.getRandomValues(new Uint8Array(16))
   const account: Account = {
     id: crypto.randomUUID(),
     username: username.trim(),
+    email: email.trim().toLowerCase(),
     salt: toBase64(salt),
     hash: await derive(password, salt, ITERATIONS),
     iterations: ITERATIONS,
@@ -82,9 +91,9 @@ export const createAccount = async (username: string, password: string): Promise
   return account.id
 }
 
-/** Returns the account id when the username and password match. */
-export const verifyLogin = async (username: string, password: string): Promise<string> => {
-  const account = accounts().find((a) => sameName(a.username, username))
+/** Returns the account id when the email or username and the password match. */
+export const verifyLogin = async (login: string, password: string): Promise<string> => {
+  const account = accounts().find((a) => sameName(a.username, login) || (a.email !== undefined && sameName(a.email, login)))
   // Hash even when the user does not exist, so both failures take the same time.
   const salt = account ? fromBase64(account.salt) : crypto.getRandomValues(new Uint8Array(16))
   const hash = await derive(password, salt, account?.iterations ?? ITERATIONS)

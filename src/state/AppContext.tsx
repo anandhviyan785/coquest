@@ -26,9 +26,9 @@ interface AppValue {
   toasts: Toast[]
   dismissToast: (id: number) => void
   notify: (toast: Omit<Toast, 'id'>) => void
-  /** Logs in with an email (cloud mode) or a username (local mode) and a password. */
+  /** Logs in with an email (or, on this device only, a username) and a password. */
   signIn: (login: string, password: string) => Promise<void>
-  /** Creates an account. `email` is ignored in local mode. */
+  /** Creates an account with a username, email and password. */
   signUp: (email: string, password: string, username: string) => Promise<'ready' | 'confirm'>
   signOut: () => Promise<void>
   /** Cloud mode only: sends the browser to Google to sign in with a Gmail account. */
@@ -181,7 +181,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const signUp = useCallback(async (email: string, password: string, username: string) => {
     if (!supabase) {
-      const id = await createAccount(username, password)
+      const id = await createAccount(username, email, password)
       // Progress from before log-in existed carries over when the same username signs up.
       const legacy = legacyProfile()
       const keep = legacy && legacy.username.toLowerCase() === username.trim().toLowerCase()

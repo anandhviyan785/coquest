@@ -1,19 +1,67 @@
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import type { FormEvent, InputHTMLAttributes } from 'react'
+import { Code2, Eye, EyeOff, Flame, Lock, Mail, TerminalSquare, User } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { useId, useMemo, useState } from 'react'
+import type { ChangeEvent, FormEvent, InputHTMLAttributes, ReactNode } from 'react'
+import { LangLogo } from '../components/LangLogo'
 import { Wordmark } from '../components/Layout'
 import { Mascot } from '../components/Mascot'
-import { Button } from '../components/ui'
-import { MIN_PASSWORD, legacyProfile } from '../lib/localAuth'
+import { Button, cx } from '../components/ui'
+import { COURSES } from '../content'
+import { MIN_PASSWORD, isEmail, legacyProfile } from '../lib/localAuth'
 import { useApp } from '../state/AppContext'
 
 const USERNAME = /^[A-Za-z0-9_]{3,20}$/
+const RETURNING_KEY = 'pyquest:v1:returning'
 
-type Step = 'welcome' | 'signup' | 'login'
+type Mode = 'signup' | 'login'
+interface Errors { username?: string; email?: string; login?: string; password?: string }
 
-const fieldClass = 'h-[50px] w-full rounded-xl border-2 border-line bg-surface px-4 text-[17px] text-ink outline-none placeholder:text-faint focus:border-blue-line'
+const wasHereBefore = (): boolean => {
+  try {
+    return localStorage.getItem(RETURNING_KEY) === '1'
+  } catch {
+    return false
+  }
+}
 
-/** The multicolour Google "G", drawn from Google's sign-in button guidelines. */
+const rememberVisit = (): void => {
+  try {
+    localStorage.setItem(RETURNING_KEY, '1')
+  } catch (err) {
+    console.error('Could not remember this visit', err)
+  }
+}
+
+/** Password strength for the sign-up meter: how many of four simple habits it has. */
+const strength = (password: string): { filled: number; label: string; color: string } => {
+  if (password.length < MIN_PASSWORD) return { filled: 1, label: 'Too short', color: 'var(--color-bad)' }
+  const habits = [/[a-z]/.test(password) && /[A-Z]/.test(password), /\d/.test(password), /[^A-Za-z0-9]/.test(password) || password.length >= 14].filter(Boolean).length
+  return [
+    { filled: 1, label: 'Weak', color: 'var(--color-bad)' },
+    { filled: 2, label: 'Okay', color: 'var(--color-flame)' },
+    { filled: 3, label: 'Good', color: 'var(--color-gold)' },
+    { filled: 4, label: 'Strong', color: 'var(--color-green)' },
+  ][habits]
+}
+
+// ── Pieces ────────────────────────────────────────────────────────────────
+interface FieldProps extends InputHTMLAttributes<HTMLInputElement> { label: string; icon: LucideIcon; error?: string; trailing?: ReactNode }
+
+function Field({ label, icon: Icon, error, trailing, ...input }: FieldProps) {
+  const id = useId()
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1.5 block text-[13px] font-bold text-mute">{label}</label>
+      <div className={cx('flex h-[52px] items-center gap-3 rounded-xl border-2 px-4 transition-colors focus-within:border-blue-line focus-within:bg-white', error ? 'border-bad bg-bad-soft/40' : 'border-line bg-surface')}>
+        <Icon size={19} strokeWidth={2.4} className="shrink-0 text-faint" aria-hidden="true" />
+        <input id={id} aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined} className="bare-focus h-full min-w-0 flex-1 bg-transparent text-[16px] font-semibold text-ink outline-none placeholder:font-medium placeholder:text-faint" {...input} />
+        {trailing}
+      </div>
+      {error && <p id={`${id}-error`} className="mt-1.5 text-[13px] font-bold text-bad-dark" role="alert">{error}</p>}
+    </div>
+  )
+}
+
 function GoogleMark() {
   return (
     <svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true">
@@ -25,72 +73,103 @@ function GoogleMark() {
   )
 }
 
-function Field(props: InputHTMLAttributes<HTMLInputElement>) {
-  return <input className={fieldClass} {...props} />
-}
+const POINTS: Array<{ icon: LucideIcon; text: string }> = [
+  { icon: TerminalSquare, text: 'Write and run real code in your browser from the very first lesson.' },
+  { icon: Flame, text: 'Build streaks, earn XP and beat bosses that keep you coming back.' },
+  { icon: Code2, text: 'Seven languages, one friendly guide to take you through them.' },
+]
 
-function PasswordField({ value, onChange, autoComplete }: { value: string; onChange: (v: string) => void; autoComplete: string }) {
-  const [shown, setShown] = useState(false)
+/** The brand half of the page, shown beside the form on wide screens. */
+function BrandPanel() {
   return (
-    <div className="relative">
-      <input className={`${fieldClass} pr-12`} type={shown ? 'text' : 'password'} value={value} onChange={(e) => onChange(e.target.value)} placeholder="Password" aria-label="Password" autoComplete={autoComplete} required />
-      <button type="button" onClick={() => setShown((v) => !v)} aria-label={shown ? 'Hide password' : 'Show password'} aria-pressed={shown} className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-blue hover:bg-blue-soft">
-        {shown ? <EyeOff size={20} strokeWidth={2.4} /> : <Eye size={20} strokeWidth={2.4} />}
-      </button>
-    </div>
+    <aside className="relative hidden flex-col justify-between overflow-hidden bg-blue-soft p-12 lg:flex">
+      <span className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/60" aria-hidden="true" />
+      <span className="absolute -bottom-16 -left-20 h-64 w-64 rounded-full bg-white/50" aria-hidden="true" />
+      <div className="relative"><Wordmark size={32} /></div>
+      <div className="relative">
+        <Mascot expression="happy" motion="wave" size={220} />
+        <h1 className="mt-6 max-w-md text-[34px] font-extrabold leading-[1.15] tracking-tight text-ink">The free, fun and effective way to learn to code.</h1>
+        <ul className="mt-8 max-w-md space-y-4">
+          {POINTS.map(({ icon: Icon, text }) => (
+            <li key={text} className="flex items-start gap-3.5 text-[16px] font-medium leading-snug text-body">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-blue"><Icon size={19} strokeWidth={2.4} /></span>
+              <span className="pt-1.5">{text}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="relative flex items-center gap-3">
+        {COURSES.map((c) => <span key={c.id} className="flex h-11 w-11 items-center justify-center rounded-xl bg-white"><LangLogo lang={c.id} size={26} /></span>)}
+      </div>
+    </aside>
   )
 }
 
+// ── The page ──────────────────────────────────────────────────────────────
 export function Auth() {
   const { cloud, signIn, signUp, signInWithGoogle, syncError } = useApp()
   const legacy = useMemo(() => (cloud ? null : legacyProfile()), [cloud])
-  const [step, setStep] = useState<Step>('welcome')
-  const [username, setUsername] = useState('')
+  const [mode, setMode] = useState<Mode>(() => (wasHereBefore() ? 'login' : 'signup'))
+  const [username, setUsername] = useState(() => legacy?.username ?? '')
   const [email, setEmail] = useState('')
+  const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [shown, setShown] = useState(false)
+  const [errors, setErrors] = useState<Errors>({})
+  const [formError, setFormError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
-  const go = (next: Step) => {
-    setStep(next)
+  const signingUp = mode === 'signup'
+
+  /** Updates a field and clears its error straight away, so a fixed mistake stops being flagged. */
+  const edit = (key: keyof Errors, set: (value: string) => void) => (event: ChangeEvent<HTMLInputElement>) => {
+    set(event.target.value)
+    setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev))
+  }
+  const meter = signingUp && password ? strength(password) : null
+
+  const go = (next: Mode) => {
+    setMode(next)
     setPassword('')
-    setError(null)
+    setShown(false)
+    setErrors({})
+    setFormError(null)
     setNotice(null)
-    if (next === 'signup' && legacy && !username) setUsername(legacy.username)
+  }
+
+  const validate = (): Errors => {
+    const found: Errors = {}
+    if (signingUp) {
+      if (!USERNAME.test(username.trim())) found.username = 'Use 3–20 letters, numbers or underscores.'
+      if (!isEmail(email)) found.email = 'Enter a valid email address.'
+      if (password.length < MIN_PASSWORD) found.password = `Use at least ${MIN_PASSWORD} characters.`
+    } else {
+      if (!login.trim()) found.login = cloud ? 'Enter your email.' : 'Enter your email or username.'
+      else if (cloud && !isEmail(login)) found.login = 'Enter the email you signed up with.'
+      if (!password) found.password = 'Enter your password.'
+    }
+    return found
   }
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
-    setError(null)
+    setFormError(null)
     setNotice(null)
-    const name = username.trim()
-    if (step === 'signup' && !USERNAME.test(name)) {
-      setError('Usernames are 3–20 characters: letters, numbers and underscores.')
-      return
-    }
-    if (step === 'login' && !cloud && !name) {
-      setError('Enter your username.')
-      return
-    }
-    if (step === 'signup' && password.length < MIN_PASSWORD) {
-      setError(`Passwords need at least ${MIN_PASSWORD} characters.`)
-      return
-    }
-    if (!password) {
-      setError('Enter your password.')
-      return
-    }
+    const found = validate()
+    setErrors(found)
+    if (Object.keys(found).length > 0) return
     setBusy(true)
     try {
-      if (step === 'login') {
-        await signIn(cloud ? email.trim() : name, password)
+      rememberVisit()
+      if (signingUp) {
+        const outcome = await signUp(email.trim(), password, username.trim())
+        if (outcome === 'confirm') setNotice('Almost there. Check your email for a confirmation link, then log in.')
       } else {
-        const outcome = await signUp(email.trim(), password, name)
-        if (outcome === 'confirm') setNotice('Almost there — check your email for a confirmation link, then log in.')
+        await signIn(login.trim(), password)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Try again.')
+      setFormError(err instanceof Error ? err.message : 'Something went wrong. Try again.')
       setPassword('')
     } finally {
       setBusy(false)
@@ -98,82 +177,88 @@ export function Auth() {
   }
 
   const google = async () => {
-    setError(null)
+    setFormError(null)
     setBusy(true)
     try {
+      rememberVisit()
       await signInWithGoogle()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not reach Google. Try again.')
+      setFormError(err instanceof Error ? err.message : 'Could not reach Google. Try again.')
       setBusy(false)
     }
   }
 
-  const googleButton = cloud && (
-    <Button size="lg" variant="secondary" className="w-full !text-body" onClick={() => void google()} disabled={busy}>
-      <GoogleMark />Continue with Google
-    </Button>
+  const passwordToggle = (
+    <button type="button" onClick={() => setShown((v) => !v)} aria-label={shown ? 'Hide password' : 'Show password'} aria-pressed={shown} className="-mr-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-blue hover:bg-blue-soft">
+      {shown ? <EyeOff size={19} strokeWidth={2.4} /> : <Eye size={19} strokeWidth={2.4} />}
+    </button>
   )
 
-  if (step === 'welcome') {
-    return (
-      <div className="mx-auto flex min-h-full w-full max-w-[420px] flex-col px-4 pb-6 pt-8">
-        <div className="flex justify-center"><Wordmark size={32} /></div>
-        <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
-          <Mascot expression="excited" size={210} float />
-          <h1 className="mt-6 text-[26px] font-bold leading-snug text-ink">The free, fun, and effective way to learn to code!</h1>
-        </div>
-        <div className="flex flex-col gap-3">
-          <Button size="lg" className="w-full" onClick={() => go('signup')}>Get started</Button>
-          <Button size="lg" variant="secondary" className="w-full" onClick={() => go('login')}>I already have an account</Button>
-          {googleButton}
-          {error && <p className="rounded-xl bg-bad-soft px-4 py-3 text-[15px] font-bold text-bad-dark" role="alert">{error}</p>}
-        </div>
-      </div>
-    )
-  }
-
-  const signingUp = step === 'signup'
-
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-[420px] flex-col px-4 pb-6 pt-6">
-      <button onClick={() => go('welcome')} aria-label="Back" className="-ml-2 flex h-10 w-10 items-center justify-center rounded-xl text-faint hover:bg-surface hover:text-mute"><ArrowLeft size={24} strokeWidth={3} /></button>
-      <h1 className="mt-2 text-center text-2xl font-bold text-ink">{signingUp ? 'Create your profile' : 'Log in'}</h1>
+    <div className="grid min-h-full bg-white lg:grid-cols-[minmax(0,1fr)_minmax(480px,580px)]">
+      <BrandPanel />
 
-      <form onSubmit={submit} className="mt-7 flex flex-col gap-3" noValidate>
-        {(signingUp || !cloud) && (
-          <Field value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" aria-label="Username" autoComplete="username" autoFocus maxLength={20} />
-        )}
-        {cloud && <Field type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" aria-label="Email" autoComplete="email" autoFocus={!signingUp} required />}
-        <PasswordField value={password} onChange={setPassword} autoComplete={signingUp ? 'new-password' : 'current-password'} />
+      <main className="flex flex-col justify-center px-5 py-8 sm:px-10">
+        <div className="mx-auto w-full max-w-[400px]">
+          <div className="mb-6 flex flex-col items-center lg:hidden">
+            <Wordmark size={30} />
+            <Mascot expression="happy" motion="wave" size={104} className="mt-3" />
+          </div>
 
-        {signingUp && (
-          <p className="px-1 text-[13px] leading-relaxed text-mute">
+          <h2 className="text-[28px] font-extrabold tracking-tight text-ink">{signingUp ? 'Create your account' : 'Welcome back'}</h2>
+          <p className="mb-6 mt-1 text-[16px] text-mute">{signingUp ? 'It is free, and takes under a minute.' : 'Log in to keep your streak going.'}</p>
+
+          <div role="tablist" aria-label="Sign up or log in" className="mb-6 grid grid-cols-2 rounded-xl bg-surface p-1">
+            {(['signup', 'login'] as const).map((m) => (
+              <button key={m} role="tab" aria-selected={mode === m} onClick={() => go(m)} className={cx('h-10 rounded-lg text-[14px] font-bold transition-colors', mode === m ? 'bg-white text-blue ring-2 ring-line' : 'text-mute hover:text-body')}>
+                {m === 'signup' ? 'Sign up' : 'Log in'}
+              </button>
+            ))}
+          </div>
+
+          {cloud && (
+            <>
+              <Button size="lg" variant="secondary" className="w-full !text-body" onClick={() => void google()} disabled={busy}><GoogleMark />Continue with Google</Button>
+              <div className="my-5 flex items-center gap-3 text-[12px] font-bold uppercase tracking-wider text-faint"><span className="h-0.5 flex-1 bg-line" />or with email<span className="h-0.5 flex-1 bg-line" /></div>
+            </>
+          )}
+
+          <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
+            {signingUp ? (
+              <>
+                <Field label="Username" icon={User} value={username} onChange={edit('username', setUsername)} placeholder="explorer_ada" autoComplete="username" maxLength={20} error={errors.username} autoFocus />
+                <Field label="Email" icon={Mail} type="email" value={email} onChange={edit('email', setEmail)} placeholder="you@example.com" autoComplete="email" inputMode="email" error={errors.email} />
+              </>
+            ) : (
+              <Field label={cloud ? 'Email' : 'Email or username'} icon={cloud ? Mail : User} value={login} onChange={edit('login', setLogin)} placeholder={cloud ? 'you@example.com' : 'Email or username'} autoComplete="username" error={errors.login} autoFocus />
+            )}
+
+            <div>
+              <Field label="Password" icon={Lock} type={shown ? 'text' : 'password'} value={password} onChange={edit('password', setPassword)} placeholder={signingUp ? `At least ${MIN_PASSWORD} characters` : 'Your password'} autoComplete={signingUp ? 'new-password' : 'current-password'} error={errors.password} trailing={passwordToggle} />
+              {meter && (
+                <div className="mt-2.5 flex items-center gap-3" aria-live="polite">
+                  <div className="flex flex-1 gap-1.5" aria-hidden="true">
+                    {[1, 2, 3, 4].map((n) => <span key={n} className="h-1.5 flex-1 rounded-full transition-colors" style={{ background: n <= meter.filled ? meter.color : 'var(--color-line)' }} />)}
+                  </div>
+                  <span className="w-16 text-right text-[12px] font-bold" style={{ color: meter.color }}>{meter.label}</span>
+                </div>
+              )}
+            </div>
+
+            {formError ?? syncError ? <p className="rounded-xl bg-bad-soft px-4 py-3 text-[15px] font-bold text-bad-dark" role="alert">{formError ?? syncError}</p> : null}
+            {notice && <p className="rounded-xl bg-green-soft px-4 py-3 text-[15px] font-bold text-ok" role="status">{notice}</p>}
+
+            <Button type="submit" size="lg" className="mt-1 w-full" disabled={busy}>{busy ? 'One moment…' : signingUp ? 'Create account' : 'Log in'}</Button>
+          </form>
+
+          <p className="mt-6 text-center text-[13px] leading-relaxed text-faint">
             {cloud
-              ? `Use at least ${MIN_PASSWORD} characters. Your progress syncs to your account.`
-              : `Use at least ${MIN_PASSWORD} characters. Your account and progress are saved in this browser only.`}
-            {legacy && !cloud && <> Signing up as <span className="font-bold text-body">{legacy.username}</span> keeps the progress already saved here.</>}
+              ? signingUp ? 'Your progress is saved to your account and follows you to any device.' : 'Your progress is saved to your account.'
+              : 'Your account and progress are saved on this device only.'}
+            {signingUp && legacy && <> Signing up as <span className="font-bold text-mute">{legacy.username}</span> keeps the progress already saved here.</>}
           </p>
-        )}
-
-        {(error ?? syncError) && <p className="rounded-xl bg-bad-soft px-4 py-3 text-[15px] font-bold text-bad-dark" role="alert">{error ?? syncError}</p>}
-        {notice && <p className="rounded-xl bg-green-soft px-4 py-3 text-[15px] font-bold text-ok" role="status">{notice}</p>}
-
-        <Button type="submit" size="lg" className="mt-2 w-full" disabled={busy}>
-          {busy ? 'One moment…' : signingUp ? 'Create account' : 'Log in'}
-        </Button>
-      </form>
-
-      {cloud && (
-        <>
-          <div className="my-5 flex items-center gap-3 text-[13px] font-bold uppercase text-faint"><span className="h-0.5 flex-1 bg-line" />or<span className="h-0.5 flex-1 bg-line" /></div>
-          {googleButton}
-        </>
-      )}
-
-      <p className="mt-8 text-center text-[15px] font-bold text-body">
-        {signingUp ? 'Have an account?' : 'New to CoQuest?'}{' '}
-        <button className="label text-[13px] text-blue hover:brightness-90" onClick={() => go(signingUp ? 'login' : 'signup')}>{signingUp ? 'Log in' : 'Sign up'}</button>
-      </p>
+        </div>
+      </main>
     </div>
   )
 }

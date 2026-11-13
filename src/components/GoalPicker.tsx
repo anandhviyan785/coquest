@@ -66,7 +66,7 @@ export function GoalPicker({ value, onChange }: Props) {
               }}
               aria-label="Custom daily goal in XP"
               aria-invalid={invalid}
-              className="w-full min-w-0 bg-transparent text-right text-[19px] font-bold text-ink outline-none focus-visible:outline-none"
+              className="w-full min-w-0 bg-transparent text-right text-[19px] font-bold text-ink outline-none bare-focus"
             />
             <span className="text-[15px] font-bold text-mute">XP</span>
           </label>
