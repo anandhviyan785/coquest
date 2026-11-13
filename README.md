@@ -24,6 +24,7 @@ Open http://localhost:5183. With no configuration CoQuest runs in **local mode**
 ## Deployment
 
 CoQuest is hosted on Vercel and built straight from this GitHub repo (`anandhviyan785/coquest`).
+The Vercel project is `coquest` in the `pyquest1` team (Hobby plan).
 
 - **Every push to `main` goes live.** Vercel runs `npm run build` and publishes the result to production. `vercel.json` sends deep links such as `/learn/python` to the app.
 - **Fixes made on this machine deploy themselves.** Two git hooks in `.git/hooks` do it: *pre-commit* typechecks (a commit that does not compile is refused, so it can never go live) and *post-commit* pushes `main` to GitHub. Hooks are local and not stored in the repo, so after a fresh clone push by hand with `git push`.
