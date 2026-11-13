@@ -9,6 +9,7 @@ import { questStatus } from '../lib/quests'
 import { useApp } from '../state/AppContext'
 import type { Toast } from '../state/AppContext'
 import { Avatar } from './Avatar'
+import { Wordmark } from './Wordmark'
 import { BoltIcon, ChestIcon, DuelIcon, FlameIcon, GemIcon, LeagueIcon, LearnIcon, MoreIcon, PracticeIcon, QuestsIcon, ShopIcon } from './icons'
 import { Bar, cx } from './ui'
 
@@ -40,9 +41,7 @@ const navClass = (active: boolean) =>
     active ? 'border-blue-line bg-blue-soft text-blue' : 'border-transparent text-mute hover:bg-surface',
   )
 
-export function Wordmark({ size = 30 }: { size?: number }) {
-  return <span className="font-extrabold lowercase leading-none tracking-tight text-blue" style={{ fontSize: size }}>coquest</span>
-}
+export { Wordmark }
 
 function useDismiss(open: boolean, close: () => void) {
   const ref = useRef<HTMLDivElement>(null)

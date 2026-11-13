@@ -1,13 +1,15 @@
 import { Code2, Eye, EyeOff, Flame, Lock, Mail, TerminalSquare, User } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import type { ChangeEvent, FormEvent, InputHTMLAttributes, ReactNode } from 'react'
 import { LangLogo } from '../components/LangLogo'
-import { Wordmark } from '../components/Layout'
+import { Wordmark } from '../components/Wordmark'
 import { Mascot } from '../components/Mascot'
 import { Button, cx } from '../components/ui'
 import { COURSES } from '../content'
 import { googleConfigured } from '../lib/googleSignIn'
+import { useSeo } from '../lib/useSeo'
 import { MIN_PASSWORD, isEmail, legacyProfile } from '../lib/localAuth'
 import { useApp } from '../state/AppContext'
 
@@ -109,8 +111,10 @@ function BrandPanel() {
 // ── The page ──────────────────────────────────────────────────────────────
 export function Auth() {
   const { cloud, signIn, signUp, signInWithGoogle, syncError } = useApp()
+  const { search, pathname } = useLocation()
+  useSeo({ title: 'Log in to CoQuest', description: 'Log in or create a free CoQuest account.', path: pathname, noindex: true })
   const legacy = useMemo(() => (cloud ? null : legacyProfile()), [cloud])
-  const [mode, setMode] = useState<Mode>(() => (wasHereBefore() ? 'login' : 'signup'))
+  const [mode, setMode] = useState<Mode>(() => (new URLSearchParams(search).has('signup') || !wasHereBefore() ? 'signup' : 'login'))
   const [username, setUsername] = useState(() => legacy?.username ?? '')
   const [email, setEmail] = useState('')
   const [login, setLogin] = useState('')

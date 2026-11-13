@@ -16,11 +16,32 @@
       } catch (e) {}
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="CoQuest — learn to code through lessons, boss battles and duels." />
-    <title>CoQuest — Learn to code</title>
+    <!-- The block below is rewritten for every public page by scripts/prerender.ts at build time. -->
+    <!--seo:head-->
+    <title>CoQuest | Learn Coding Through Play</title>
+    <meta name="description" content="Learn Python, JavaScript, and programming fundamentals through interactive lessons, coding quests, XP, streaks, and fun gamified learning with CoQuest." />
+    <link rel="canonical" href="https://www.coquest.website" />
+    <!--/seo:head-->
+    <style>
+      /* Shown only until the app loads (and to crawlers that do not run scripts). */
+      #seo-static { max-width: 720px; margin: 0 auto; padding: 24px 20px; font: 16px/1.6 system-ui, sans-serif; color: #3c3c3c; }
+      #seo-static header { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; color: #1cb0f6; }
+      #seo-static a { color: #1899d6; }
+      #seo-static h1 { font-size: 30px; line-height: 1.2; margin: 0 0 12px; }
+      html[data-theme="dark"] #seo-static { color: #f1f7fb; }
+      html[data-theme="dark"] body { background: #131f24; }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><!--seo:body-->
+      <div id="seo-static">
+        <header><strong>CoQuest</strong></header>
+        <main>
+          <h1>Your coding adventure starts here.</h1>
+          <p>Learn to code. Level up. Build anything.</p>
+        </main>
+      </div>
+    <!--/seo:body--></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

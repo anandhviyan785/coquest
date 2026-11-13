@@ -3,9 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": { "node": ">=22.18" },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/prerender.ts",
     "lint": "oxlint",
     "verify": "node scripts/verify-content.ts",
     "test:reminders": "node scripts/test-reminders.ts",
