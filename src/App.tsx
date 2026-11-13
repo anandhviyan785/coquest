@@ -1,11 +1,12 @@
 import { Suspense, lazy, useEffect } from 'react'
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import { Mascot } from './components/Mascot'
-import { pageByPath } from './content/seo'
+import { isAppPath, pageByPath } from './content/seo'
 import { applySeo } from './lib/useSeo'
 import { useDailyReminder } from './lib/useDailyReminder'
 import { Auth } from './pages/Auth'
 import { Landing } from './pages/public/Landing'
+import { NotFound, NotFoundBody } from './pages/public/NotFound'
 import { SeoPage } from './pages/public/SeoPage'
 import { useApp } from './state/AppContext'
 
@@ -49,12 +50,15 @@ export default function App() {
   const { pathname } = useLocation()
   useDailyReminder()
   const publicPage = pageByPath(pathname)
-  usePrivateSeo(!publicPage && pathname !== '/' && status !== 'loading', pathname)
+  usePrivateSeo(isAppPath(pathname) && status !== 'loading', pathname)
 
   // Public landing pages are open to everyone, signed in or not.
   if (publicPage) return <SeoPage page={publicPage} />
   if (status === 'loading') return <Loading />
-  if (status === 'signedOut') return pathname === '/' ? <Landing /> : <Auth />
+  if (status === 'signedOut') {
+    if (pathname === '/') return <Landing />
+    return isAppPath(pathname) ? <Auth /> : <NotFound />
+  }
   // New players meet QUEST first; everyone who already has progress skips this.
   if (!state.onboarded) return <Suspense fallback={<Loading />}><Onboarding /></Suspense>
 
@@ -86,7 +90,7 @@ export default function App() {
           <Route path="/duels" element={<Duels />} />
           <Route path="/tutor" element={<Tutor />} />
           <Route path="/stats" element={<Stats />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundBody />} />
         </Route>
       </Routes>
     </Suspense>

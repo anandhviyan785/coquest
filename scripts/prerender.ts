@@ -110,6 +110,24 @@ const build = (title: string, description: string, path: string, page: PublicPag
 write(join(DIST, 'index.html'), build(HOME_TITLE, HOME_DESCRIPTION, '/', null, homeBody()))
 for (const page of PUBLIC_PAGES) write(join(DIST, page.path, 'index.html'), build(page.title, page.description, page.path, page, pageBody(page)))
 
+// 404.html: Vercel serves it, with a real 404 status, for any address that is not a page or an app route.
+const notFoundHead = `<!--seo:head-->
+    <title>Page not found | ${SITE.name}</title>
+    <meta name="description" content="This page does not exist." />
+    <meta name="robots" content="noindex, nofollow" />
+    <!--/seo:head-->`
+const notFoundBody = `<!--seo:body-->
+    <div id="seo-static">
+      <header><a href="/"><img src="/favicon.svg" alt="" width="40" height="40" /> <strong>${SITE.name}</strong></a></header>
+      <main>
+        <h1>This quest path does not exist</h1>
+        <p>The page you wanted is not here. It may have moved, or the address may have a typo.</p>
+        <p><a href="/">Back to the start</a></p>
+      </main>
+    </div>
+    <!--/seo:body-->`
+write(join(DIST, '404.html'), template.replace(HEAD_MARK, () => notFoundHead).replace(BODY_MARK, () => notFoundBody))
+
 // sitemap.xml: public pages only. The date is when the page copy last changed.
 const lastmod = statSync('src/content/seo.ts').mtime.toISOString().slice(0, 10)
 const entries = [{ path: '/', priority: '1.0' }, ...PUBLIC_PAGES.map((p) => ({ path: p.path, priority: '0.8' }))]

@@ -296,6 +296,11 @@ export const PUBLIC_PAGES: PublicPage[] = [
   },
 ]
 
+/** First path segment of every address that belongs to the signed-in app (and its sign-in page). */
+const APP_ROOTS = ['login', 'learn', 'lesson', 'boss', 'leaderboard', 'quests', 'shop', 'profile', 'bosses', 'settings', 'playground', 'daily', 'duels', 'tutor', 'stats']
+
+export const isAppPath = (path: string): boolean => APP_ROOTS.includes(path.split('/')[1] ?? '')
+
 export const pageByPath = (path: string): PublicPage | undefined => PUBLIC_PAGES.find((p) => p.path === path)
 
 /** Pages that must stay out of search results: sign-in and everything behind it. */
