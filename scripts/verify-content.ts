@@ -19,7 +19,11 @@ const HAS_JAVA = has('java', ['-version'])
 
 const JS_PRELUDE = 'const __in = require("fs").readFileSync(0, "utf8").split("\\n"); let __i = 0; const readLine = () => (__i < __in.length ? __in[__i++] : null); const prompt = readLine;\n'
 
-const execute = (lang: LangId, code: string, stdin: string): { stdout: string; error: string } | null => {
+const execute = (lang: LangId, code: string, stdin: string, setup = ''): { stdout: string; error: string } | null => {
+  if (lang === 'sql' && HAS_PYTHON) {
+    const res = spawnSync('python', ['scripts/sql-run.py'], { input: JSON.stringify({ setup, code }), encoding: 'utf8', timeout: 20_000 })
+    return { stdout: res.stdout ?? '', error: res.status === 0 ? '' : (res.stderr ?? '') || `exit ${res.status}` }
+  }
   const dir = mkdtempSync(join(tmpdir(), 'coquest-'))
   const run = (cmd: string, args: string[]) => {
     const res = spawnSync(cmd, args, { input: stdin, encoding: 'utf8', cwd: dir, timeout: 20_000 })
@@ -55,7 +59,7 @@ const check = (label: string, lang: LangId, exercise: Exercise): void => {
       continue
     }
     const source = test.append ? `${exercise.solution}\n${test.append}` : exercise.solution
-    const result = execute(lang, source, test.stdin ?? '')
+    const result = execute(lang, source, test.stdin ?? '', exercise.setup ?? '')
     if (!result) {
       skipped += 1
       continue

@@ -1,5 +1,6 @@
 import type { Course } from '../lib/types.ts'
 import { choice, fill, out } from './helpers.ts'
+import { JS_MORE_UNITS } from './more/javascript.ts'
 
 export const javascript: Course = {
   id: 'javascript',
@@ -124,5 +125,6 @@ export const javascript: Course = {
         ],
       },
     },
+    ...JS_MORE_UNITS,
   ],
 }

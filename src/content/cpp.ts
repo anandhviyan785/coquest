@@ -1,5 +1,6 @@
 import type { Course } from '../lib/types.ts'
 import { choice, fill, out } from './helpers.ts'
+import { CPP_MORE_UNITS } from './more/cpp.ts'
 
 const MAIN_OPEN = '#include <iostream>\nusing namespace std;\n\nint main() {\n'
 const MAIN_CLOSE = '    return 0;\n}'
@@ -99,5 +100,6 @@ export const cpp: Course = {
         },
       ],
     },
+    ...CPP_MORE_UNITS,
   ],
 }

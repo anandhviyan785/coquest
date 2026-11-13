@@ -1,5 +1,6 @@
 import type { Course } from '../lib/types.ts'
 import { choice, dom, fill } from './helpers.ts'
+import { HTML_MORE_UNITS } from './more/html.ts'
 
 export const html: Course = {
   id: 'html',
@@ -108,5 +109,6 @@ export const html: Course = {
         },
       ],
     },
+    ...HTML_MORE_UNITS,
   ],
 }

@@ -1,5 +1,6 @@
 import type { Course } from '../lib/types.ts'
 import { choice, fill, out } from './helpers.ts'
+import { JAVA_MORE_UNITS } from './more/java.ts'
 
 const OPEN = 'public class Main {\n    public static void main(String[] args) {\n'
 const OPEN_SCANNER = 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n'
@@ -100,5 +101,6 @@ export const java: Course = {
         },
       ],
     },
+    ...JAVA_MORE_UNITS,
   ],
 }

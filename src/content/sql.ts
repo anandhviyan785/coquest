@@ -1,5 +1,6 @@
 import type { Course } from '../lib/types.ts'
 import { choice, fill, out } from './helpers.ts'
+import { SQL_MORE_UNITS } from './more/sql.ts'
 
 const EXPLORERS = `CREATE TABLE explorers (id INTEGER PRIMARY KEY, name TEXT, league TEXT, xp INTEGER);
 INSERT INTO explorers (name, league, xp) VALUES
@@ -105,5 +106,6 @@ export const sql: Course = {
         },
       ],
     },
+    ...SQL_MORE_UNITS,
   ],
 }
