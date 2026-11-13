@@ -226,8 +226,8 @@ export function Auth() {
           <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
             {signingUp ? (
               <>
-                <Field label="Username" icon={User} value={username} onChange={edit('username', setUsername)} placeholder="explorer_ada" autoComplete="username" maxLength={20} error={errors.username} autoFocus />
-                <Field label="Email" icon={Mail} type="email" value={email} onChange={edit('email', setEmail)} placeholder="you@example.com" autoComplete="email" inputMode="email" error={errors.email} />
+                <Field label="Email" icon={Mail} type="email" value={email} onChange={edit('email', setEmail)} placeholder="you@example.com" autoComplete="email" inputMode="email" error={errors.email} autoFocus />
+                <Field label="Username" icon={User} value={username} onChange={edit('username', setUsername)} placeholder="explorer_ada" autoComplete="username" maxLength={20} error={errors.username} />
               </>
             ) : (
               <Field label={cloud ? 'Email' : 'Email or username'} icon={cloud ? Mail : User} value={login} onChange={edit('login', setLogin)} placeholder={cloud ? 'you@example.com' : 'Email or username'} autoComplete="username" error={errors.login} autoFocus />

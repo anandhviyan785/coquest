@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { LangLogo } from '../components/LangLogo'
 import { Mascot } from '../components/Mascot'
+import { QuestCheer } from '../components/QuestCheer'
 import { LinkButton, cx } from '../components/ui'
 import { CODING_BASICS, DEV_TERMS, GLOSSARIES } from '../content/glossary'
 import { COURSES, courseById, courseProgress, findBoss, findLesson, isUnlocked, nextStep, stepPath } from '../content'
@@ -178,6 +179,8 @@ export function Learn() {
           )
         })}
       </div>
+
+      <QuestCheer />
 
       <Link to={`/learn/${course.id}/glossary`} className="mb-6 flex items-center gap-4 rounded-2xl border-2 border-b-4 border-line px-5 py-4 transition-colors hover:bg-surface active:translate-y-0.5 active:border-b-2">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-soft text-blue"><BookOpen size={22} strokeWidth={2.4} /></span>
