@@ -3,36 +3,12 @@ import { leagueFromXp, liveStreak, newUserState } from './gamification'
 import { supabase } from './supabase'
 import type { UserState } from './types'
 
-const LOCAL_KEY = 'pyquest:v1:state'
-
 /** Fills in any fields missing from older saved states. */
-const hydrate = (raw: unknown, fallbackName: string): UserState => {
+export const hydrate = (raw: unknown, fallbackName: string): UserState => {
   const base = newUserState(fallbackName)
   if (!raw || typeof raw !== 'object') return base
   return { ...base, ...(raw as Partial<UserState>) }
 }
-
-// ── Local mode ────────────────────────────────────────────────────────────
-export const loadLocal = (): UserState | null => {
-  try {
-    const raw = localStorage.getItem(LOCAL_KEY)
-    return raw ? hydrate(JSON.parse(raw), 'Explorer') : null
-  } catch (err) {
-    console.error('Could not read saved progress', err)
-    return null
-  }
-}
-
-export const saveLocal = (state: UserState): void => {
-  try {
-    localStorage.setItem(LOCAL_KEY, JSON.stringify(state))
-  } catch (err) {
-    console.error('Could not save progress', err)
-    throw new Error('Your browser blocked saving progress. Check storage settings.')
-  }
-}
-
-export const clearLocal = (): void => localStorage.removeItem(LOCAL_KEY)
 
 // ── Cloud mode ────────────────────────────────────────────────────────────
 export const loadCloud = async (userId: string, fallbackName: string): Promise<UserState> => {
@@ -110,4 +86,24 @@ export const submitDailyResult = async (userId: string, username: string, ms: nu
   if (!supabase) return
   const { error } = await supabase.from('daily_results').upsert({ user_id: userId, day, username, ms }, { onConflict: 'user_id,day', ignoreDuplicates: true })
   if (error) throw new Error(error.message)
+}
+
+// ── Reminder emails (cloud only) ──────────────────────────────────────────
+export const fetchReminderPref = async (userId: string): Promise<boolean> => {
+  if (!supabase) return false
+  const { data, error } = await supabase.from('profiles').select('email_reminders').eq('id', userId).maybeSingle()
+  if (error) throw new Error(error.message)
+  return data?.email_reminders ?? true
+}
+
+export const setReminderPref = async (userId: string, on: boolean): Promise<void> => {
+  if (!supabase) throw new Error('Supabase is not configured')
+  const { error } = await supabase.from('profiles').update({ email_reminders: on }).eq('id', userId)
+  if (error) throw new Error(error.message)
+}
+
+export const signedInEmail = async (): Promise<string | null> => {
+  if (!supabase) return null
+  const { data } = await supabase.auth.getUser()
+  return data.user?.email ?? null
 }

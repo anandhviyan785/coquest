@@ -1,8 +1,9 @@
 import { Download, LogOut, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Button, Modal, PageHeader, Panel, cx } from '../components/ui'
 import { DAILY_GOALS } from '../lib/gamification'
+import { fetchReminderPref, setReminderPref, signedInEmail } from '../lib/repo'
 import { useApp } from '../state/AppContext'
 
 const USERNAME = /^[A-Za-z0-9_]{3,20}$/
@@ -18,10 +19,40 @@ function Row({ title, hint, children }: { title: string; hint: string; children:
 }
 
 export function Settings() {
-  const { state, patch, cloud, signOut, resetProgress, notify, syncError } = useApp()
+  const { state, patch, rename, cloud, userId, signOut, deleteLocalAccount, resetProgress, notify, syncError } = useApp()
   const [name, setName] = useState(state.username)
   const [nameError, setNameError] = useState<string | null>(null)
   const [confirm, setConfirm] = useState<'reset' | 'leave' | null>(null)
+  const [reminders, setReminders] = useState<boolean | null>(null)
+  const [email, setEmail] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!cloud || !userId) return
+    let cancelled = false
+    Promise.all([fetchReminderPref(userId), signedInEmail()]).then(
+      ([on, address]) => {
+        if (cancelled) return
+        setReminders(on)
+        setEmail(address)
+      },
+      (err: unknown) => notify({ kind: 'error', title: 'Could not load reminder settings', body: err instanceof Error ? err.message : undefined }),
+    )
+    return () => {
+      cancelled = true
+    }
+  }, [cloud, userId, notify])
+
+  const toggleReminders = async () => {
+    if (!userId || reminders === null) return
+    const next = !reminders
+    setReminders(next)
+    try {
+      await setReminderPref(userId, next)
+    } catch (err) {
+      setReminders(!next)
+      notify({ kind: 'error', title: 'Could not change reminders', body: err instanceof Error ? err.message : undefined })
+    }
+  }
 
   const saveName = (event: FormEvent) => {
     event.preventDefault()
@@ -30,9 +61,13 @@ export function Settings() {
       setNameError('Use 3–20 letters, numbers or underscores.')
       return
     }
-    setNameError(null)
-    patch({ username: next })
-    notify({ kind: 'info', title: 'Username updated' })
+    try {
+      rename(next)
+      setNameError(null)
+      notify({ kind: 'info', title: 'Username updated', body: cloud ? undefined : 'Use the new name next time you log in.' })
+    } catch (err) {
+      setNameError(err instanceof Error ? err.message : 'Could not change the username.')
+    }
   }
 
   const exportData = () => {
@@ -86,6 +121,18 @@ export function Settings() {
             ))}
           </div>
         </Row>
+        <Row
+          title="Email reminders"
+          hint={cloud ? `A nudge about every 3 days, sent through Gmail${email ? ` to ${email}` : ''}.` : 'Reminder emails need the Supabase project connected and a Google or email account.'}
+        >
+          {cloud ? (
+            <button role="switch" aria-checked={reminders === true} aria-label="Email reminders" disabled={reminders === null} onClick={() => void toggleReminders()} className={cx('relative h-8 w-14 shrink-0 rounded-full transition-colors disabled:opacity-50', reminders ? 'bg-blue' : 'bg-line')}>
+              <span className={cx('absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-[left]', reminders ? 'left-7' : 'left-1')} />
+            </button>
+          ) : (
+            <span className="rounded-md border-2 border-line px-2.5 py-1 text-xs font-semibold text-mute">Not available</span>
+          )}
+        </Row>
         <Row title="Streak freezes" hint="A freeze is used automatically to protect your streak when you miss a day. Earn more at 7, 30 and 100-day streaks.">
           <span className="tnum text-xl font-semibold">{state.freezes}</span>
         </Row>
@@ -99,21 +146,26 @@ export function Settings() {
         <Row title="Reset progress" hint="Erase all XP, lessons, streaks and achievements and start again. This cannot be undone.">
           <Button variant="danger" onClick={() => setConfirm('reset')}><Trash2 size={15} />Reset</Button>
         </Row>
-        <Row title={cloud ? 'Sign out' : 'Delete local profile'} hint={cloud ? 'Your progress stays saved in your account.' : 'Removes this profile and all of its progress from this browser.'}>
-          <Button variant={cloud ? 'secondary' : 'danger'} onClick={() => (cloud ? void leave() : setConfirm('leave'))}><LogOut size={15} />{cloud ? 'Sign out' : 'Delete profile'}</Button>
+        <Row title="Sign out" hint={cloud ? 'Your progress stays saved in your account.' : 'Your progress stays saved in this browser. Log in again with your username and password.'}>
+          <Button variant="secondary" onClick={() => void leave()}><LogOut size={15} />Sign out</Button>
         </Row>
+        {!cloud && (
+          <Row title="Delete account" hint="Removes this account, its password and all of its progress from this browser.">
+            <Button variant="danger" onClick={() => setConfirm('leave')}><Trash2 size={15} />Delete</Button>
+          </Row>
+        )}
       </Panel>
 
       <Modal open={confirm !== null} onClose={() => setConfirm(null)}>
-        <h2 className="text-lg font-semibold">{confirm === 'reset' ? 'Reset all progress?' : 'Delete this profile?'}</h2>
+        <h2 className="text-lg font-semibold">{confirm === 'reset' ? 'Reset all progress?' : 'Delete this account?'}</h2>
         <p className="mt-2 text-sm leading-relaxed text-mute">
           {confirm === 'reset'
             ? `This erases ${state.xp.toLocaleString()} XP, every completed lesson, your streak and your achievements. It cannot be undone.`
-            : 'This removes the profile and all of its progress from this browser. It cannot be undone — export first if you want a copy.'}
+            : `This removes ${state.username}, its password and all of its progress from this browser. It cannot be undone — export first if you want a copy.`}
         </p>
         <div className="mt-6 flex justify-end gap-2">
           <Button variant="ghost" onClick={() => setConfirm(null)}>Cancel</Button>
-          <Button variant="danger" onClick={() => { if (confirm === 'reset') { resetProgress(); setConfirm(null) } else void leave() }}>{confirm === 'reset' ? 'Yes, reset' : 'Yes, delete'}</Button>
+          <Button variant="danger" onClick={() => { if (confirm === 'reset') { resetProgress(); setConfirm(null) } else { setConfirm(null); deleteLocalAccount() } }}>{confirm === 'reset' ? 'Yes, reset' : 'Yes, delete'}</Button>
         </div>
       </Modal>
     </div>

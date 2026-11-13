@@ -1,4 +1,4 @@
-import { BarChart3, Bot, CalendarCheck, Settings as SettingsIcon, Skull, X } from 'lucide-react'
+import { BarChart3, Bot, CalendarCheck, LogOut, Settings as SettingsIcon, Skull, X } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
@@ -63,6 +63,7 @@ function useDismiss(open: boolean, close: () => void) {
 }
 
 function MoreMenu({ placement }: { placement: 'side' | 'top' }) {
+  const { signOut, notify } = useApp()
   const [open, setOpen] = useState(false)
   const location = useLocation()
   const ref = useDismiss(open, () => setOpen(false))
@@ -87,6 +88,9 @@ function MoreMenu({ placement }: { placement: 'side' | 'top' }) {
               <Icon size={18} strokeWidth={2.4} />{label}
             </NavLink>
           ))}
+          <button role="menuitem" onClick={() => signOut().catch((err: unknown) => notify({ kind: 'error', title: 'Could not sign out', body: err instanceof Error ? err.message : undefined }))} className="label flex w-full items-center gap-3 border-t-2 border-line px-5 py-3 text-[13px] text-mute hover:bg-surface">
+            <LogOut size={18} strokeWidth={2.4} />Sign out
+          </button>
         </div>
       )}
     </div>

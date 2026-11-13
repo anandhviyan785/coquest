@@ -84,3 +84,31 @@ $$;
 
 revoke all on function public.count_tutor_message(uuid, integer) from public, anon, authenticated;
 grant execute on function public.count_tutor_message(uuid, integer) to service_role;
+
+-- ── Reminder emails ────────────────────────────────────────────────────────
+-- Players get a reminder email about every 3 days unless they turn it off.
+alter table public.profiles add column if not exists email_reminders boolean not null default true;
+alter table public.profiles add column if not exists last_reminder_at timestamptz;
+
+-- Players due a reminder: reminders on, a confirmed email, and none sent in p_every_days days.
+-- The hour of slack stops a daily job that runs a few seconds early from skipping a day.
+create or replace function public.reminder_candidates(p_every_days integer, p_limit integer)
+returns table (user_id uuid, email text, username text, streak integer, xp integer, last_active text)
+language sql
+security definer
+set search_path = public
+as $$
+  select p.id, u.email::text, p.username, p.streak, p.xp, pr.state->>'lastActive'
+  from public.profiles p
+  join auth.users u on u.id = p.id
+  left join public.progress pr on pr.user_id = p.id
+  where p.email_reminders
+    and u.email is not null
+    and u.email_confirmed_at is not null
+    and (p.last_reminder_at is null or p.last_reminder_at <= now() - make_interval(days => p_every_days) + interval '1 hour')
+  order by p.last_reminder_at nulls first
+  limit p_limit;
+$$;
+
+revoke all on function public.reminder_candidates(integer, integer) from public, anon, authenticated;
+grant execute on function public.reminder_candidates(integer, integer) to service_role;

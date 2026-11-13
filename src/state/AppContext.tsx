@@ -4,7 +4,8 @@ import { awardAchievements } from '../lib/achievements'
 import { dayKey, weekStartOf } from '../lib/dates'
 import { applyActivity, levelFromXp, newUserState } from '../lib/gamification'
 import type { Activity } from '../lib/gamification'
-import { clearLocal, loadCloud, loadLocal, saveCloud, saveLocal } from '../lib/repo'
+import { clearLegacyProfile, createAccount, deleteAccount, getSession, legacyProfile, loadAccountState, renameAccount, saveAccountState, setSession, usernameTaken, verifyLogin } from '../lib/localAuth'
+import { loadCloud, saveCloud } from '../lib/repo'
 import { isCloud, supabase } from '../lib/supabase'
 import type { LangId, UserState } from '../lib/types'
 
@@ -25,10 +26,17 @@ interface AppValue {
   toasts: Toast[]
   dismissToast: (id: number) => void
   notify: (toast: Omit<Toast, 'id'>) => void
-  startLocal: (username: string) => void
-  signIn: (email: string, password: string) => Promise<void>
+  /** Logs in with an email (cloud mode) or a username (local mode) and a password. */
+  signIn: (login: string, password: string) => Promise<void>
+  /** Creates an account. `email` is ignored in local mode. */
   signUp: (email: string, password: string, username: string) => Promise<'ready' | 'confirm'>
   signOut: () => Promise<void>
+  /** Cloud mode only: sends the browser to Google to sign in with a Gmail account. */
+  signInWithGoogle: () => Promise<void>
+  /** Local mode only: permanently removes the signed-in account and its progress from this browser. */
+  deleteLocalAccount: () => void
+  /** Changes the username, refusing one another account in this browser already uses. */
+  rename: (username: string) => void
   /** Records an XP-earning activity, with an optional extra state change applied first. */
   earn: (activity: Activity, also?: (s: UserState) => UserState) => EarnResult
   /** Adds study time without awarding XP or touching the streak. */
@@ -42,6 +50,17 @@ interface AppValue {
 const AppContext = createContext<AppValue | null>(null)
 const SAVE_DELAY_MS = 700
 const EMPTY = newUserState('Explorer')
+
+/**
+ * The starting username for a new cloud player: the one they chose at sign-up, or for Google
+ * sign-ins (which have none) the start of their email address plus a short, stable suffix.
+ */
+const nameOf = (user: { id: string; email?: string; user_metadata?: Record<string, unknown> } | undefined): string => {
+  const chosen = user?.user_metadata?.username
+  if (typeof chosen === 'string' && chosen) return chosen
+  const base = (user?.email ?? '').split('@')[0].replace(/[^A-Za-z0-9_]/g, '').slice(0, 14) || 'explorer'
+  return `${base.length >= 3 ? base : 'explorer'}_${(user?.id ?? '0000').replace(/-/g, '').slice(0, 4)}`
+}
 
 const messageOf = (err: unknown): string => (err instanceof Error ? err.message : 'Something went wrong')
 
@@ -69,9 +88,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Boot: restore a local profile, or follow the Supabase session.
   useEffect(() => {
     if (!supabase) {
-      const saved = loadLocal()
-      if (saved) commit(saved)
-      setStatus(saved ? 'ready' : 'signedOut')
+      const id = getSession()
+      const saved = id ? loadAccountState(id) : null
+      if (id && saved) {
+        commit(saved)
+        setUserId(id)
+        setStatus('ready')
+      } else {
+        setStatus('signedOut')
+      }
       return
     }
     let cancelled = false
@@ -93,10 +118,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setStatus('signedOut')
       }
     }
-    const nameOf = (meta: Record<string, unknown> | undefined) => (typeof meta?.username === 'string' ? meta.username : 'Explorer')
-    supabase.auth.getSession().then(({ data }) => adopt(data.session?.user.id ?? null, nameOf(data.session?.user.user_metadata)))
+    supabase.auth.getSession().then(({ data }) => adopt(data.session?.user.id ?? null, nameOf(data.session?.user)))
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') void adopt(session?.user.id ?? null, nameOf(session?.user.user_metadata))
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') void adopt(session?.user.id ?? null, nameOf(session?.user))
     })
     return () => {
       cancelled = true
@@ -108,8 +132,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (status !== 'ready') return
     if (!isCloud) {
+      if (!userId) return
       try {
-        saveLocal(state)
+        saveAccountState(userId, state)
+        renameAccount(userId, state.username)
         setSyncError(null)
       } catch (err) {
         setSyncError(messageOf(err))
@@ -126,33 +152,73 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(timer)
   }, [state, status, userId])
 
-  const startLocal = useCallback((username: string) => {
-    commit(newUserState(username))
+  /** Local mode: make an account the signed-in one and load its progress. */
+  const enterLocal = useCallback((id: string, loaded: UserState) => {
+    saveAccountState(id, loaded)
+    setSession(id)
+    commit(loaded)
+    setUserId(id)
+    setSyncError(null)
     setStatus('ready')
   }, [commit])
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    if (!supabase) throw new Error('Supabase is not configured')
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+  const leaveLocal = useCallback(() => {
+    setSession(null)
+    setStatus('signedOut')
+    setUserId(null)
+    commit(EMPTY)
+  }, [commit])
+
+  const signIn = useCallback(async (login: string, password: string) => {
+    if (!supabase) {
+      const id = await verifyLogin(login, password)
+      enterLocal(id, loadAccountState(id) ?? newUserState(login.trim()))
+      return
+    }
+    const { error } = await supabase.auth.signInWithPassword({ email: login, password })
     if (error) throw new Error(error.message)
-  }, [])
+  }, [enterLocal])
 
   const signUp = useCallback(async (email: string, password: string, username: string) => {
-    if (!supabase) throw new Error('Supabase is not configured')
+    if (!supabase) {
+      const id = await createAccount(username, password)
+      // Progress from before log-in existed carries over when the same username signs up.
+      const legacy = legacyProfile()
+      const keep = legacy && legacy.username.toLowerCase() === username.trim().toLowerCase()
+      if (keep) clearLegacyProfile()
+      enterLocal(id, keep ? { ...legacy, username: username.trim() } : newUserState(username.trim()))
+      return 'ready' as const
+    }
     const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { username } } })
     if (error) throw new Error(error.message)
     return data.session ? 'ready' as const : 'confirm' as const
-  }, [])
+  }, [enterLocal])
 
   const signOut = useCallback(async () => {
     if (supabase) {
       const { error } = await supabase.auth.signOut()
       if (error) throw new Error(error.message)
     } else {
-      clearLocal()
-      setStatus('signedOut')
+      leaveLocal()
     }
+  }, [leaveLocal])
+
+  const signInWithGoogle = useCallback(async () => {
+    if (!supabase) throw new Error('Google sign-in needs the Supabase project connected.')
+    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })
+    if (error) throw new Error(error.message)
   }, [])
+
+  const deleteLocalAccount = useCallback(() => {
+    if (isCloud || !userId) return
+    deleteAccount(userId)
+    leaveLocal()
+  }, [userId, leaveLocal])
+
+  const rename = useCallback((username: string) => {
+    if (!isCloud && usernameTaken(username, userId ?? undefined)) throw new Error('Another account in this browser already uses that username.')
+    commit({ ...stateRef.current, username })
+  }, [commit, userId])
 
   const earn = useCallback((activity: Activity, also?: (s: UserState) => UserState): EarnResult => {
     const before = stateRef.current
@@ -178,9 +244,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const update = useCallback((change: (s: UserState) => UserState) => commit(change(stateRef.current)), [commit])
 
   const resetProgress = useCallback(() => {
-    const fresh = { ...newUserState(stateRef.current.username), avatar: stateRef.current.avatar }
-    if (!isCloud) clearLocal()
-    commit(fresh)
+    commit({ ...newUserState(stateRef.current.username), avatar: stateRef.current.avatar, createdAt: stateRef.current.createdAt })
   }, [commit])
 
   const value = useMemo<AppValue>(() => ({
@@ -193,16 +257,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     toasts,
     dismissToast,
     notify,
-    startLocal,
     signIn,
     signUp,
     signOut,
+    signInWithGoogle,
+    deleteLocalAccount,
+    rename,
     earn,
     logTime,
     patch,
     update,
     resetProgress,
-  }), [update, status, userId, state, syncError, toasts, dismissToast, notify, startLocal, signIn, signUp, signOut, earn, logTime, patch, resetProgress])
+  }), [update, status, userId, state, syncError, toasts, dismissToast, notify, signIn, signUp, signOut, signInWithGoogle, deleteLocalAccount, rename, earn, logTime, patch, resetProgress])
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
 }
