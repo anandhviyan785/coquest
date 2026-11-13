@@ -21,6 +21,15 @@ Open http://localhost:5183. With no configuration CoQuest runs in **local mode**
 | `npm run test:reminders` | Test the reminder email builder and unsubscribe tokens |
 | `npm run lint` | Lint with oxlint |
 
+## Deployment
+
+CoQuest is hosted on Vercel and built straight from this GitHub repo (`anandhviyan785/coquest`).
+
+- **Every push to `main` goes live.** Vercel runs `npm run build` and publishes the result to production. `vercel.json` sends deep links such as `/learn/python` to the app.
+- **Fixes made on this machine deploy themselves.** Two git hooks in `.git/hooks` do it: *pre-commit* typechecks (a commit that does not compile is refused, so it can never go live) and *post-commit* pushes `main` to GitHub. Hooks are local and not stored in the repo, so after a fresh clone push by hand with `git push`.
+- **Commits must be authored by the GitHub account that owns the Vercel project.** Vercel's free (Hobby) plan blocks a deployment whose commit author is a different account. This repo's author is set to `anandhviyan785` for that reason (`git config user.email`).
+- If a deployment fails, the previous production version keeps running. Check the build log in the Vercel dashboard.
+
 ## Local mode vs. cloud mode
 
 | Feature | Local mode | With Supabase |
