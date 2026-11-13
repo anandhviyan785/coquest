@@ -1,9 +1,11 @@
-import { Check, Lock, Skull, Star } from 'lucide-react'
+import { BookOpen, Check, Lock, Skull, Star } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { LangLogo } from '../components/LangLogo'
 import { Mascot } from '../components/Mascot'
 import { LinkButton, cx } from '../components/ui'
-import { COURSES, LANG_GLYPH, courseById, courseProgress, findBoss, findLesson, isUnlocked, nextStep, stepPath } from '../content'
+import { CODING_BASICS, DEV_TERMS, GLOSSARIES } from '../content/glossary'
+import { COURSES, courseById, courseProgress, findBoss, findLesson, isUnlocked, nextStep, stepPath } from '../content'
 import { XP } from '../lib/gamification'
 import { COMPILER_HELP, compilerConfigured, needsCompiler } from '../lib/runner'
 import type { Course, Unit } from '../lib/types'
@@ -167,7 +169,7 @@ export function Learn() {
           const pct = courseProgress(c, state.lessons).pct
           return (
             <button key={c.id} role="tab" aria-selected={active} onClick={() => navigate(`/learn/${c.id}`)} className={cx('flex shrink-0 items-center gap-2.5 rounded-xl border-2 border-b-4 px-3 py-2 transition-colors', active ? 'border-blue-line bg-blue-soft' : 'border-line bg-white hover:bg-surface')}>
-              <span className={cx('flex h-8 min-w-8 items-center justify-center rounded-lg px-1 font-mono text-[12px] font-bold', active ? 'bg-blue text-white' : 'bg-surface text-mute')}>{LANG_GLYPH[c.id]}</span>
+              <LangLogo lang={c.id} size={30} />
               <span className="text-left">
                 <span className={cx('block text-[15px] font-bold leading-tight', active ? 'text-blue' : 'text-body')}>{c.name}</span>
                 <span className="tnum block text-[12px] font-bold text-faint">{pct}%</span>
@@ -176,6 +178,15 @@ export function Learn() {
           )
         })}
       </div>
+
+      <Link to={`/learn/${course.id}/glossary`} className="mb-6 flex items-center gap-4 rounded-2xl border-2 border-b-4 border-line px-5 py-4 transition-colors hover:bg-surface active:translate-y-0.5 active:border-b-2">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-soft text-blue"><BookOpen size={22} strokeWidth={2.4} /></span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[17px] font-bold text-body">{course.name} glossary</span>
+          <span className="block text-[15px] text-mute">{GLOSSARIES[course.id].length + CODING_BASICS.length + DEV_TERMS.length} key terms explained in plain language</span>
+        </span>
+        <span className="label hidden text-[13px] text-blue sm:block">Open</span>
+      </Link>
 
       {needsCompiler(course.id) && !compilerConfigured && (
         <p className="mb-6 rounded-2xl border-2 border-gold bg-[#FFF8DC] px-5 py-4 text-[15px] font-bold leading-relaxed text-body" role="note">{COMPILER_HELP} Until then you can read these lessons and answer the questions, but the coding exercises cannot be checked.</p>

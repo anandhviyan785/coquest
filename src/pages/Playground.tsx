@@ -1,8 +1,9 @@
 import { CircleAlert, LoaderCircle, Play, RotateCcw } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { CodeEditor } from '../components/CodeEditor'
+import { LangLogo } from '../components/LangLogo'
 import { Button, PageHeader, cx } from '../components/ui'
-import { COURSES, LANG_GLYPH } from '../content'
+import { COURSES } from '../content'
 import { explainError } from '../lib/errors'
 import { compilerConfigured, previewDocument, runCode, warmRuntime } from '../lib/runner'
 import type { RunResult } from '../lib/runner'
@@ -102,7 +103,7 @@ export function Playground() {
         <div className="flex gap-1 overflow-x-auto rounded-xl border-2 border-line bg-card p-1" role="tablist" aria-label="Language">
           {COURSES.map((c) => (
             <button key={c.id} role="tab" aria-selected={c.id === lang} onClick={() => setLang(c.id)} className={cx('flex h-8 shrink-0 items-center gap-2 rounded-lg px-3 text-[13px] font-semibold transition-colors', c.id === lang ? 'bg-blue text-white' : 'text-mute hover:text-ink')}>
-              <span className="font-mono text-[11px] opacity-80">{LANG_GLYPH[c.id]}</span>{c.name}
+              <LangLogo lang={c.id} size={18} />{c.name}
             </button>
           ))}
         </div>

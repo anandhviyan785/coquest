@@ -6,6 +6,7 @@ import { BossBattle } from './pages/BossBattle'
 import { Bosses } from './pages/Bosses'
 import { Daily } from './pages/Daily'
 import { Duels } from './pages/Duels'
+import { Glossary } from './pages/Glossary'
 import { Leaderboard } from './pages/Leaderboard'
 import { Learn } from './pages/Learn'
 import { LessonPage } from './pages/Lesson'
@@ -42,6 +43,7 @@ export default function App() {
         <Route index element={<Learn />} />
         <Route path="/learn" element={<Learn />} />
         <Route path="/learn/:courseId" element={<Learn />} />
+        <Route path="/learn/:courseId/glossary" element={<Glossary />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/quests" element={<Quests />} />
         <Route path="/shop" element={<Shop />} />
