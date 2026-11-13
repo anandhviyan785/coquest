@@ -23,7 +23,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 export const isEmail = (text: string): boolean => EMAIL.test(text.trim())
 
 /** `email` is missing on accounts made before sign-up asked for one. */
-interface Account { id: string; username: string; email?: string; salt: string; hash: string; iterations: number; createdAt: string }
+interface Account { id: string; username: string; email?: string; googleSub?: string; salt: string; hash: string; iterations: number; createdAt: string }
 
 // ── Storage helpers ───────────────────────────────────────────────────────
 const read = <T>(key: string, fallback: T): T => {
@@ -91,13 +91,50 @@ export const createAccount = async (username: string, email: string, password: s
   return account.id
 }
 
+const USERNAME_MAX = 20
+
+/** A free username built from a Google name or email, such as "ada_lovelace" or "ada_lovelace2". */
+const freeUsername = (seed: string): string => {
+  const base = seed.toLowerCase().replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '').slice(0, USERNAME_MAX - 3) || 'explorer'
+  const padded = base.length < 3 ? `${base}_${'x'.repeat(3 - base.length)}` : base
+  let candidate = padded
+  for (let n = 2; usernameTaken(candidate); n += 1) candidate = `${padded}${n}`
+  return candidate
+}
+
+/**
+ * Finds the account for a Google profile, or creates one that has no password. Accounts are matched
+ * by Google id first and by email second, so a player who signed up with that email can still use Google.
+ */
+export const googleAccount = (profile: { sub: string; email: string; name: string }): { id: string; username: string; created: boolean } => {
+  const list = accounts()
+  const found = list.find((a) => a.googleSub === profile.sub) ?? list.find((a) => a.email !== undefined && sameName(a.email, profile.email))
+  if (found) {
+    if (found.googleSub !== profile.sub) write(ACCOUNTS_KEY, list.map((a) => (a.id === found.id ? { ...a, googleSub: profile.sub } : a)))
+    return { id: found.id, username: found.username, created: false }
+  }
+  const account: Account = {
+    id: crypto.randomUUID(),
+    username: freeUsername(profile.name || profile.email.split('@')[0]),
+    email: profile.email.trim().toLowerCase(),
+    googleSub: profile.sub,
+    salt: '',
+    hash: '',
+    iterations: ITERATIONS,
+    createdAt: new Date().toISOString(),
+  }
+  write(ACCOUNTS_KEY, [...list, account])
+  return { id: account.id, username: account.username, created: true }
+}
+
 /** Returns the account id when the email or username and the password match. */
 export const verifyLogin = async (login: string, password: string): Promise<string> => {
   const account = accounts().find((a) => sameName(a.username, login) || (a.email !== undefined && sameName(a.email, login)))
   // Hash even when the user does not exist, so both failures take the same time.
   const salt = account ? fromBase64(account.salt) : crypto.getRandomValues(new Uint8Array(16))
   const hash = await derive(password, salt, account?.iterations ?? ITERATIONS)
-  if (!account || !equal(hash, account.hash)) throw new Error(LOGIN_ERROR)
+  // Accounts made with Google have no password hash, so a password can never match them.
+  if (!account || account.hash === '' || !equal(hash, account.hash)) throw new Error(LOGIN_ERROR)
   return account.id
 }
 

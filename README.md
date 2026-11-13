@@ -60,6 +60,14 @@ supabase functions deploy tutor
 
 Set `ALLOWED_ORIGIN` as a secret too if you want to restrict the function to your site's origin.
 
+## Sign in with Google using only Google Cloud (no Supabase)
+
+1. Google Cloud Console → APIs & Services → OAuth consent screen: External, then **Publish app**.
+2. Credentials → Create credentials → OAuth client ID → **Web application**. Under *Authorized JavaScript origins* add your site (for example `https://coquest-git-main-pyquest1.vercel.app`, and `http://localhost:5173` for development). No redirect URI is needed.
+3. Copy the **Client ID** (the secret is not used) into Vercel → Settings → Environment Variables as `VITE_GOOGLE_CLIENT_ID`, then redeploy.
+
+The Continue with Google button then opens Google's popup. The player's account is kept in their browser like any local account: it does not follow them to another device, and Google is not asked to verify anything on a server. For cross-device accounts, use the Supabase route below.
+
 ## Sign in with Google and reminder emails through Gmail
 
 Both need the Supabase project connected (above). One Google OAuth client is used for both.

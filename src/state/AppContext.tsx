@@ -4,7 +4,8 @@ import { awardAchievements } from '../lib/achievements'
 import { dayKey, weekStartOf } from '../lib/dates'
 import { applyActivity, levelFromXp, newUserState } from '../lib/gamification'
 import type { Activity } from '../lib/gamification'
-import { clearLegacyProfile, createAccount, deleteAccount, getSession, legacyProfile, loadAccountState, renameAccount, saveAccountState, setSession, usernameTaken, verifyLogin } from '../lib/localAuth'
+import { clearLegacyProfile, createAccount, deleteAccount, getSession, googleAccount, legacyProfile, loadAccountState, renameAccount, saveAccountState, setSession, usernameTaken, verifyLogin } from '../lib/localAuth'
+import { signInWithGooglePopup } from '../lib/googleSignIn'
 import { loadCloud, saveCloud } from '../lib/repo'
 import { isCloud, supabase } from '../lib/supabase'
 import type { LangId, UserState } from '../lib/types'
@@ -204,10 +205,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [leaveLocal])
 
   const signInWithGoogle = useCallback(async () => {
-    if (!supabase) throw new Error('Google sign-in needs the Supabase project connected.')
+    if (!supabase) {
+      const profile = await signInWithGooglePopup()
+      const { id, username } = googleAccount(profile)
+      enterLocal(id, loadAccountState(id) ?? newUserState(username))
+      return
+    }
     const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })
     if (error) throw new Error(error.message)
-  }, [])
+  }, [enterLocal])
 
   const deleteLocalAccount = useCallback(() => {
     if (isCloud || !userId) return

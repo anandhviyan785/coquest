@@ -7,6 +7,7 @@ import { Wordmark } from '../components/Layout'
 import { Mascot } from '../components/Mascot'
 import { Button, cx } from '../components/ui'
 import { COURSES } from '../content'
+import { googleConfigured } from '../lib/googleSignIn'
 import { MIN_PASSWORD, isEmail, legacyProfile } from '../lib/localAuth'
 import { useApp } from '../state/AppContext'
 
@@ -178,7 +179,7 @@ export function Auth() {
 
   const google = async () => {
     setFormError(null)
-    if (!cloud) {
+    if (!cloud && !googleConfigured) {
       setFormError('Google sign-in is not switched on for this copy of CoQuest yet. Use your email for now.')
       return
     }
