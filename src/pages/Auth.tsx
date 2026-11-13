@@ -178,6 +178,10 @@ export function Auth() {
 
   const google = async () => {
     setFormError(null)
+    if (!cloud) {
+      setFormError('Google sign-in is not switched on for this copy of CoQuest yet. Use your email for now.')
+      return
+    }
     setBusy(true)
     try {
       rememberVisit()
@@ -198,8 +202,8 @@ export function Auth() {
     <div className="grid min-h-full bg-white lg:grid-cols-[minmax(0,1fr)_minmax(480px,580px)]">
       <BrandPanel />
 
-      <main className="flex flex-col justify-center px-5 py-8 sm:px-10">
-        <div className="mx-auto w-full max-w-[400px]">
+      <main className="flex flex-col justify-center bg-surface/60 px-5 py-8 sm:px-10">
+        <div className="mx-auto w-full max-w-[420px] rounded-3xl border-2 border-line bg-white p-6 shadow-[0_12px_40px_-16px_rgba(28,176,246,0.35)] sm:p-8">
           <div className="mb-6 flex flex-col items-center lg:hidden">
             <Wordmark size={30} />
             <Mascot expression="happy" motion="wave" size={104} className="mt-3" />
@@ -216,12 +220,8 @@ export function Auth() {
             ))}
           </div>
 
-          {cloud && (
-            <>
-              <Button size="lg" variant="secondary" className="w-full !text-body" onClick={() => void google()} disabled={busy}><GoogleMark />Continue with Google</Button>
-              <div className="my-5 flex items-center gap-3 text-[12px] font-bold uppercase tracking-wider text-faint"><span className="h-0.5 flex-1 bg-line" />or with email<span className="h-0.5 flex-1 bg-line" /></div>
-            </>
-          )}
+          <Button size="lg" variant="secondary" className="w-full !text-body" onClick={() => void google()} disabled={busy}><GoogleMark />Continue with Google</Button>
+          <div className="my-5 flex items-center gap-3 text-[12px] font-bold uppercase tracking-wider text-faint"><span className="h-0.5 flex-1 rounded-full bg-line" />or use email<span className="h-0.5 flex-1 rounded-full bg-line" /></div>
 
           <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
             {signingUp ? (
@@ -251,7 +251,11 @@ export function Auth() {
             <Button type="submit" size="lg" className="mt-1 w-full" disabled={busy}>{busy ? 'One moment…' : signingUp ? 'Create account' : 'Log in'}</Button>
           </form>
 
-          <p className="mt-6 text-center text-[13px] leading-relaxed text-faint">
+          <p className="mt-6 text-center text-[15px] text-mute">
+            {signingUp ? 'Already have an account? ' : 'New to CoQuest? '}
+            <button type="button" onClick={() => go(signingUp ? 'login' : 'signup')} className="font-bold text-blue hover:underline">{signingUp ? 'Log in' : 'Create an account'}</button>
+          </p>
+          <p className="mt-3 text-center text-[13px] leading-relaxed text-faint">
             {cloud
               ? signingUp ? 'Your progress is saved to your account and follows you to any device.' : 'Your progress is saved to your account.'
               : 'Your account and progress are saved on this device only.'}
