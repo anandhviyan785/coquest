@@ -9,8 +9,8 @@ type Variant = 'primary' | 'blue' | 'secondary' | 'ghost' | 'success' | 'danger'
 type Size = 'sm' | 'md' | 'lg'
 
 const VARIANT: Record<Variant, string> = {
-  primary: 'bg-green text-white border-green-dark hover:brightness-105',
-  success: 'bg-green text-white border-green-dark hover:brightness-105',
+  primary: 'bg-blue text-white border-blue-dark hover:brightness-105',
+  success: 'bg-blue text-white border-blue-dark hover:brightness-105',
   blue: 'bg-blue text-white border-blue-dark hover:brightness-105',
   danger: 'bg-bad text-white border-bad-dark hover:brightness-105',
   gold: 'bg-gold text-white border-gold-dark hover:brightness-105',
