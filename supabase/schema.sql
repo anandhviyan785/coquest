@@ -1,4 +1,4 @@
--- PyQuest database schema. Run this once in the Supabase SQL editor (or `supabase db push`).
+-- CoQuest database schema. Run this once in the Supabase SQL editor (or `supabase db push`).
 
 -- Public profile: what leaderboards and duels show about a player.
 create table if not exists public.profiles (

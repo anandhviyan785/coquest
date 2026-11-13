@@ -1,4 +1,4 @@
-/* PyQuest SQL sandbox: an in-memory SQLite database (sql.js / WebAssembly) inside a Web Worker.
+/* CoQuest SQL sandbox: an in-memory SQLite database (sql.js / WebAssembly) inside a Web Worker.
    Every run starts from a fresh database seeded with the exercise's tables. */
 const SQLJS = 'https://cdn.jsdelivr.net/npm/sql.js@1.12.0/dist/'
 importScripts(SQLJS + 'sql-wasm.js')

@@ -8,7 +8,7 @@ const check = (name: string, ok: boolean) => {
   if (!ok) failed += 1
 }
 
-const base = { username: 'ada', streak: 0, xp: 0, lastActive: null, today: '2026-11-13', appUrl: 'https://pyquest.example', unsubscribeUrl: 'https://x.supabase.co/functions/v1/unsubscribe?u=1&t=2' }
+const base = { username: 'ada', streak: 0, xp: 0, lastActive: null, today: '2026-11-13', appUrl: 'https://coquest.example', unsubscribeUrl: 'https://x.supabase.co/functions/v1/unsubscribe?u=1&t=2' }
 
 check('new player gets a first-lesson nudge', reminderCopy(base).subject.includes('first lesson'))
 check('active player gets a streak message', reminderCopy({ ...base, streak: 5, xp: 120, lastActive: '2026-11-12' }).subject.startsWith('5-day streak'))
@@ -25,7 +25,7 @@ check('token for another user fails', !(await verifyUnsubscribe('00000000-1d2a-4
 check('token with wrong secret fails', !(await verifyUnsubscribe(id, token, 'other-secret')))
 
 const email = buildReminder({ ...base, username: 'José', streak: 3, xp: 90, lastActive: '2026-11-13' })
-const raw = toGmailRaw({ from: 'PyQuest <sender@gmail.com>', to: 'learner@gmail.com', email, unsubscribeUrl: base.unsubscribeUrl, boundary: 'B' })
+const raw = toGmailRaw({ from: 'CoQuest <sender@gmail.com>', to: 'learner@gmail.com', email, unsubscribeUrl: base.unsubscribeUrl, boundary: 'B' })
 const mime = Buffer.from(raw.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8')
 check('raw is base64url', /^[A-Za-z0-9_-]+$/.test(raw))
 check('non-ASCII subject is encoded', mime.includes('Subject: =?UTF-8?B?'))

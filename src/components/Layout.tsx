@@ -41,7 +41,7 @@ const navClass = (active: boolean) =>
   )
 
 export function Wordmark({ size = 30 }: { size?: number }) {
-  return <span className="font-extrabold lowercase leading-none tracking-tight text-blue" style={{ fontSize: size }}>pyquest</span>
+  return <span className="font-extrabold lowercase leading-none tracking-tight text-blue" style={{ fontSize: size }}>coquest</span>
 }
 
 function useDismiss(open: boolean, close: () => void) {
@@ -101,7 +101,7 @@ function Sidebar() {
   const { state } = useApp()
   return (
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r-2 border-line px-4 lg:flex">
-      <Link to="/" className="px-4 pb-6 pt-8" aria-label="PyQuest home"><Wordmark /></Link>
+      <Link to="/" className="px-4 pb-6 pt-8" aria-label="CoQuest home"><Wordmark /></Link>
       <nav className="flex flex-col gap-2" aria-label="Main">
         {NAV.map(({ to, label, icon: Icon }) => (
           <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => navClass(isActive)}>

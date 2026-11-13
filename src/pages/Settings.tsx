@@ -75,7 +75,7 @@ export function Settings() {
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `pyquest-progress-${state.username}.json`
+    link.download = `coquest-progress-${state.username}.json`
     link.click()
     URL.revokeObjectURL(url)
   }
@@ -140,7 +140,7 @@ export function Settings() {
 
       <h2 className="mb-2.5 text-[13px] font-semibold uppercase tracking-[0.08em] text-mute">Your data</h2>
       <Panel>
-        <Row title="Export progress" hint="Download everything PyQuest has recorded about your learning as a JSON file.">
+        <Row title="Export progress" hint="Download everything CoQuest has recorded about your learning as a JSON file.">
           <Button variant="secondary" onClick={exportData}><Download size={15} />Export</Button>
         </Row>
         <Row title="Reset progress" hint="Erase all XP, lessons, streaks and achievements and start again. This cannot be undone.">

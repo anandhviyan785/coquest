@@ -171,7 +171,7 @@ export function Auth() {
       )}
 
       <p className="mt-8 text-center text-[15px] font-bold text-body">
-        {signingUp ? 'Have an account?' : 'New to PyQuest?'}{' '}
+        {signingUp ? 'Have an account?' : 'New to CoQuest?'}{' '}
         <button className="label text-[13px] text-blue hover:brightness-90" onClick={() => go(signingUp ? 'login' : 'signup')}>{signingUp ? 'Log in' : 'Sign up'}</button>
       </p>
     </div>

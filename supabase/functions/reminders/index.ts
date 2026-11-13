@@ -1,4 +1,4 @@
-// PyQuest reminder emails — Supabase Edge Function, run once a day by pg_cron (see supabase/cron.sql).
+// CoQuest reminder emails — Supabase Edge Function, run once a day by pg_cron (see supabase/cron.sql).
 // Emails every player who has reminders on and has not had one for REMINDER_EVERY_DAYS days,
 // sending through the Gmail API from the Gmail account named in GMAIL_SENDER.
 //
@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
         const token = await signUnsubscribe(c.user_id, reminderSecret)
         const unsubscribeUrl = `${fnUrl}?u=${encodeURIComponent(c.user_id)}&t=${token}`
         const email = buildReminder({ username: c.username, streak: c.streak, xp: c.xp, lastActive: c.last_active, today, appUrl, unsubscribeUrl })
-        await sendGmail(accessToken, toGmailRaw({ from: `PyQuest <${sender}>`, to: c.email, email, unsubscribeUrl }))
+        await sendGmail(accessToken, toGmailRaw({ from: `CoQuest <${sender}>`, to: c.email, email, unsubscribeUrl }))
         const { error: markError } = await admin.from('profiles').update({ last_reminder_at: new Date().toISOString() }).eq('id', c.user_id)
         if (markError) throw new Error(`sent but not recorded: ${markError.message}`)
         sent += 1

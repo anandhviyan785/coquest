@@ -8,7 +8,7 @@ const MONACO_LANG: Record<LangId, string> = {
 
 /** A light editor theme built from the kit's palette. */
 const defineTheme: BeforeMount = (monaco) => {
-  monaco.editor.defineTheme('pyquest', {
+  monaco.editor.defineTheme('coquest', {
     base: 'vs',
     inherit: true,
     rules: [
@@ -45,7 +45,7 @@ export function CodeEditor({ lang, value, onChange, height = 320, readOnly = fal
       <Editor
         height={height}
         language={MONACO_LANG[lang]}
-        theme="pyquest"
+        theme="coquest"
         value={value}
         beforeMount={defineTheme}
         onChange={(next) => onChange(next ?? '')}

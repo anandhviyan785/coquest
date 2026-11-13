@@ -1,4 +1,4 @@
-/* PyQuest Python sandbox: runs learner code with Pyodide (CPython compiled to WebAssembly)
+/* CoQuest Python sandbox: runs learner code with Pyodide (CPython compiled to WebAssembly)
    inside a Web Worker. Nothing is sent to a server; the page kills this worker on timeout. */
 const PYODIDE = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/'
 importScripts(PYODIDE + 'pyodide.js')

@@ -63,7 +63,7 @@ export const openDuelLink = (code: string, onMessage: (msg: DuelMessage) => void
       close: () => void client.removeChannel(channel),
     }
   }
-  const channel = new BroadcastChannel(`pyquest-duel-${code}`)
+  const channel = new BroadcastChannel(`coquest-duel-${code}`)
   channel.onmessage = (event: MessageEvent<DuelMessage>) => onMessage(event.data)
   return { ready: Promise.resolve(), send: (msg) => channel.postMessage(msg), close: () => channel.close() }
 }

@@ -83,7 +83,7 @@ export function Duels() {
   const beginMatch = useCallback((problemId: string, startsInMs: number, durationMs: number, opponent: Player) => {
     const problem = challengeById(problemId)
     if (!problem) {
-      setError('This duel uses a problem your version of PyQuest does not have.')
+      setError('This duel uses a problem your version of CoQuest does not have.')
       return
     }
     const startAt = Date.now() + startsInMs
@@ -225,7 +225,7 @@ export function Duels() {
             <p className="border-t-2 border-line bg-surface px-6 py-3.5 text-[13px] leading-relaxed text-mute">
               {cloud
                 ? 'Rooms connect over the internet, so your opponent can be anywhere.'
-                : 'Local mode: rooms connect between tabs of this browser, so you can duel a friend on this computer by opening PyQuest in a second tab. Add Supabase keys to duel over the internet.'}
+                : 'Local mode: rooms connect between tabs of this browser, so you can duel a friend on this computer by opening CoQuest in a second tab. Add Supabase keys to duel over the internet.'}
             </p>
           </Panel>
 

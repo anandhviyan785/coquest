@@ -1,5 +1,5 @@
 /**
- * Builds PyQuest reminder emails and signs unsubscribe links.
+ * Builds CoQuest reminder emails and signs unsubscribe links.
  * No imports, so it runs unchanged in Supabase Edge Functions (Deno) and in Node for tests.
  */
 
@@ -80,7 +80,7 @@ export const buildReminder = (input: ReminderInput): ReminderEmail => {
 <body style="margin:0;padding:0;background:#f7f7f7;font-family:Inter,Segoe UI,Helvetica,Arial,sans-serif;color:#3c3c3c;-webkit-text-size-adjust:100%">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f7f7;padding:24px 12px"><tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border:2px solid #e5e5e5;border-radius:16px">
-<tr><td class="pad" style="padding:28px 28px 0;font-size:26px;font-weight:800;color:#1cb0f6">pyquest</td></tr>
+<tr><td class="pad" style="padding:28px 28px 0;font-size:26px;font-weight:800;color:#1cb0f6">coquest</td></tr>
 <tr><td class="pad" style="padding:20px 28px 0">
 <p style="margin:0 0 6px;font-size:15px;color:#777777">Hi ${e(input.username)},</p>
 <h1 style="margin:0 0 10px;font-size:22px;line-height:1.3;color:#3c3c3c">${e(copy.headline)}</h1>

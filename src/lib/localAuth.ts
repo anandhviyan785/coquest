@@ -8,6 +8,8 @@ import type { UserState } from './types'
  * not a substitute for server-side accounts, which cloud mode provides.
  */
 
+// The storage keys keep the app's original "pyquest" prefix on purpose: renaming them would hide every
+// account and progress already saved in people's browsers. They are never shown to users.
 const ACCOUNTS_KEY = 'pyquest:v1:accounts'
 const SESSION_KEY = 'pyquest:v1:session'
 const LEGACY_STATE_KEY = 'pyquest:v1:state'

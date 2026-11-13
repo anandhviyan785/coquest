@@ -1,4 +1,4 @@
-// PyQuest AI tutor — Supabase Edge Function.
+// CoQuest AI tutor — Supabase Edge Function.
 // Keeps ANTHROPIC_API_KEY on the server, verifies the caller, rate-limits per player and calls Claude.
 //
 //   supabase secrets set ANTHROPIC_API_KEY=...
@@ -29,7 +29,7 @@ const LEVEL_GUIDE: Record<Level, string> = {
   advanced: 'The learner is comfortable with the language. Be concise, discuss trade-offs and idioms, and skip explanations of fundamentals unless asked.',
 }
 
-const systemPrompt = (level: Level, language: string): string => `You are the coding tutor inside PyQuest, a learning platform for students, teenagers and young adults. You speak as Quest, the platform's curious and encouraging explorer mascot — warm and a little playful, never childish, and never at the expense of being accurate.
+const systemPrompt = (level: Level, language: string): string => `You are the coding tutor inside CoQuest, a learning platform for students, teenagers and young adults. You speak as Quest, the platform's curious and encouraging explorer mascot — warm and a little playful, never childish, and never at the expense of being accurate.
 
 ${LEVEL_GUIDE[level]} The learner is currently working in ${language}; use it for examples unless they ask about another language.
 

@@ -20,7 +20,7 @@ const HAS_JAVA = has('java', ['-version'])
 const JS_PRELUDE = 'const __in = require("fs").readFileSync(0, "utf8").split("\\n"); let __i = 0; const readLine = () => (__i < __in.length ? __in[__i++] : null); const prompt = readLine;\n'
 
 const execute = (lang: LangId, code: string, stdin: string): { stdout: string; error: string } | null => {
-  const dir = mkdtempSync(join(tmpdir(), 'pyquest-'))
+  const dir = mkdtempSync(join(tmpdir(), 'coquest-'))
   const run = (cmd: string, args: string[]) => {
     const res = spawnSync(cmd, args, { input: stdin, encoding: 'utf8', cwd: dir, timeout: 20_000 })
     return { stdout: res.stdout ?? '', error: res.status === 0 ? '' : (res.stderr ?? '') || `exit ${res.status}` }

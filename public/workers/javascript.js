@@ -1,4 +1,4 @@
-/* PyQuest JavaScript sandbox: runs learner code in a Web Worker with no DOM access.
+/* CoQuest JavaScript sandbox: runs learner code in a Web Worker with no DOM access.
    Network and storage APIs are removed before the code runs; the page kills this worker on timeout. */
 for (const name of ['fetch', 'XMLHttpRequest', 'WebSocket', 'EventSource', 'indexedDB', 'caches', 'importScripts', 'BroadcastChannel']) {
   try {

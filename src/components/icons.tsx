@@ -1,5 +1,5 @@
 /**
- * PyQuest's own flat, colourful icon set, drawn to sit where the Figma kit places its
+ * CoQuest's own flat, colourful icon set, drawn to sit where the Figma kit places its
  * illustrated icons (navigation, stat bar, shop). All artwork here is original.
  */
 import type { ReactNode } from 'react'

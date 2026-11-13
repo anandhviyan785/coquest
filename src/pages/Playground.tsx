@@ -154,7 +154,7 @@ export function Playground() {
             {isMarkup
               ? 'The preview renders in a sandboxed frame with scripts disabled.'
               : remote
-                ? compilerConfigured ? 'C++ and Java are compiled and run on your Piston sandbox server, never on the PyQuest server.' : 'C++ and Java need a compile server: set VITE_PISTON_URL to a Piston instance you host.'
+                ? compilerConfigured ? 'C++ and Java are compiled and run on your Piston sandbox server, never on the CoQuest server.' : 'C++ and Java need a compile server: set VITE_PISTON_URL to a Piston instance you host.'
                 : 'This code runs in an isolated worker inside your browser. Nothing is sent to a server, and runs are stopped after 8 seconds.'}
           </p>
         </div>

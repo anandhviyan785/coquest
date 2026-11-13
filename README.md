@@ -1,4 +1,4 @@
-# PyQuest
+# CoQuest
 
 A gamified platform for learning to code: a lesson path for seven languages, a real in-browser code runner, XP, streaks, leagues, boss battles, live duels, daily challenges and an AI tutor. QUEST, the mascot, guides the way.
 
@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5183. With no configuration PyQuest runs in **local mode**: pick a username and everything works on this device, with progress saved in the browser.
+Open http://localhost:5183. With no configuration CoQuest runs in **local mode**: pick a username and everything works on this device, with progress saved in the browser.
 
 | Command | What it does |
 | --- | --- |
@@ -62,7 +62,7 @@ Both need the Supabase project connected (above). One Google OAuth client is use
   - `https://<PROJECT_REF>.supabase.co/auth/v1/callback` (Google sign-in)
   - `https://developers.google.com/oauthplayground` (to get the Gmail token in step 3)
 
-**2. Turn on Google sign-in** — Supabase dashboard → Authentication → Providers → Google: paste the client ID and secret. Under Authentication → URL Configuration, set the Site URL to where PyQuest is hosted. A **Continue with Google** button then appears on the welcome, sign-up and log-in screens.
+**2. Turn on Google sign-in** — Supabase dashboard → Authentication → Providers → Google: paste the client ID and secret. Under Authentication → URL Configuration, set the Site URL to where CoQuest is hosted. A **Continue with Google** button then appears on the welcome, sign-up and log-in screens.
 
 **3. Get a Gmail refresh token for the sending account** — open the [OAuth 2.0 Playground](https://developers.google.com/oauthplayground), click the gear, tick *Use your own OAuth credentials* and paste the client ID and secret. Authorise `https://www.googleapis.com/auth/gmail.send` while signed in to the Gmail account the reminders should come from, then exchange the code and copy the **refresh token**.
 
