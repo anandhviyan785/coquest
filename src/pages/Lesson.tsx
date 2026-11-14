@@ -31,7 +31,9 @@ function QuestionStep({ question, onAnswered, onNext }: { question: Question; on
     onAnswered(correct)
   }
 
-  const [before, after] = question.type === 'fill' ? question.code.split('___') : ['', '']
+  const [before, ...rest] = question.type === 'fill' ? question.code.split('___') : ['', '']
+  // A second blank (such as a closing tag) repeats whatever is typed in the first one.
+  const after = rest.join(typed.trim() || '___')
   const answerText = question.type === 'choice' ? question.options[question.answer] : question.answers[0]
 
   return (
