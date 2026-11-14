@@ -29,7 +29,15 @@ interface Account { id: string; username: string; email?: string; googleSub?: st
 const read = <T>(key: string, fallback: T): T => {
   try {
     const raw = localStorage.getItem(key)
-    return raw ? (JSON.parse(raw) as T) : fallback
+    if (!raw) return fallback
+    try {
+      return JSON.parse(raw) as T
+    } catch (err) {
+      // Keep a copy of unreadable data so a later write cannot destroy it for good.
+      console.error(`Could not read ${key}; saving a backup copy`, err)
+      try { localStorage.setItem(`${key}.corrupt-${Date.now()}`, raw) } catch { /* storage is full or blocked */ }
+      return fallback
+    }
   } catch (err) {
     console.error(`Could not read ${key}`, err)
     return fallback
@@ -45,7 +53,11 @@ const write = (key: string, value: unknown): void => {
   }
 }
 
-const accounts = (): Account[] => read<Account[]>(ACCOUNTS_KEY, [])
+const accounts = (): Account[] => {
+  const list = read<unknown>(ACCOUNTS_KEY, [])
+  // Valid JSON of the wrong shape must not crash start-up.
+  return Array.isArray(list) ? list.filter((a): a is Account => typeof a === 'object' && a !== null && typeof (a as Account).id === 'string') : []
+}
 const sameName = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase()
 
 // ── Hashing ───────────────────────────────────────────────────────────────
@@ -87,6 +99,8 @@ export const createAccount = async (username: string, email: string, password: s
     iterations: ITERATIONS,
     createdAt: new Date().toISOString(),
   }
+  // Hashing takes a moment: check again so a double submit cannot create the account twice.
+  if (usernameTaken(username) || emailTaken(email)) throw new Error('That username or email is already taken on this device. Log in instead.')
   write(ACCOUNTS_KEY, [...accounts(), account])
   return account.id
 }

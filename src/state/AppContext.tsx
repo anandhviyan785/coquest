@@ -73,6 +73,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
   const stateRef = useRef(state)
   const toastId = useRef(0)
+  /** The signed-in cloud user whose progress is already loaded, so a repeat SIGNED_IN does not reload it. */
+  const loadedUser = useRef<string | null>(null)
 
   const commit = useCallback((next: UserState) => {
     stateRef.current = next
@@ -103,15 +105,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     let cancelled = false
     const adopt = async (id: string | null, name: string) => {
       if (!id) {
+        loadedUser.current = null
         setUserId(null)
         setStatus('signedOut')
         return
       }
+      // Supabase re-emits SIGNED_IN on tab focus: keep the progress already on screen.
+      if (loadedUser.current === id) return
       try {
         const loaded = await loadCloud(id, name)
         if (cancelled) return
+        loadedUser.current = id
         commit(loaded)
         setUserId(id)
+        setSyncError(null)
         setStatus('ready')
       } catch (err) {
         if (cancelled) return

@@ -41,6 +41,8 @@ const daySeed = (day: string): number => Number(day.replace(/\D/g, '')) || 0
 export function useDailyReminder(): void {
   const { status, state } = useApp()
   const wasMet = useRef<boolean | null>(null)
+  const stateRef = useRef(state)
+  stateRef.current = state
 
   useEffect(() => {
     if (status !== 'ready' || !state.onboarded || !state.profile.reminders) return
@@ -60,7 +62,12 @@ export function useDailyReminder(): void {
     wasMet.current = met
 
     const check = () => {
-      if (notificationPermission() !== 'granted' || met) return
+      // Recompute from the latest state so a tab left open past midnight uses today's values.
+      const now = stateRef.current
+      const today = dayKey()
+      const left = now.dailyGoal - (now.days[today]?.xp ?? 0)
+      const streak = liveStreak(now)
+      if (notificationPermission() !== 'granted' || left <= 0) return
       const hour = new Date().getHours()
       const context = { left, streak }
       if (streak > 0 && hour >= LAST_CHANCE_HOUR && lastSent('last-chance') !== today) {
