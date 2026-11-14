@@ -1,4 +1,4 @@
-import { BarChart3, Bot, CalendarCheck, LogOut, Settings as SettingsIcon, Skull, X } from 'lucide-react'
+import { BarChart3, CalendarCheck, LogOut, Settings as SettingsIcon, Skull, X } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
@@ -27,7 +27,6 @@ const NAV: NavItem[] = [
 const MORE: Array<{ to: string; label: string; icon: LucideIcon }> = [
   { to: '/daily', label: 'Daily challenge', icon: CalendarCheck },
   { to: '/bosses', label: 'Boss battles', icon: Skull },
-  { to: '/tutor', label: 'AI tutor', icon: Bot },
   { to: '/stats', label: 'Statistics', icon: BarChart3 },
   { to: '/settings', label: 'Settings', icon: SettingsIcon },
 ]

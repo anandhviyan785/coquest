@@ -27,7 +27,6 @@ const Quests = lazy(() => import('./pages/Quests').then((m) => ({ default: m.Que
 const Settings = lazy(() => import('./pages/Settings').then((m) => ({ default: m.Settings })))
 const Shop = lazy(() => import('./pages/Shop').then((m) => ({ default: m.Shop })))
 const Stats = lazy(() => import('./pages/Stats').then((m) => ({ default: m.Stats })))
-const Tutor = lazy(() => import('./pages/Tutor').then((m) => ({ default: m.Tutor })))
 
 function Loading() {
   return (
@@ -88,7 +87,6 @@ export default function App() {
           <Route path="/playground" element={<Playground />} />
           <Route path="/daily" element={<Daily />} />
           <Route path="/duels" element={<Duels />} />
-          <Route path="/tutor" element={<Tutor />} />
           <Route path="/stats" element={<Stats />} />
           <Route path="*" element={<NotFoundBody />} />
         </Route>

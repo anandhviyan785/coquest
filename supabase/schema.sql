@@ -35,18 +35,9 @@ create table if not exists public.daily_results (
 
 create index if not exists daily_results_day_idx on public.daily_results (day, ms);
 
--- Tutor usage, written by the `tutor` Edge Function to enforce a daily message limit.
-create table if not exists public.tutor_usage (
-  user_id uuid not null references auth.users (id) on delete cascade,
-  day date not null,
-  messages integer not null default 0,
-  primary key (user_id, day)
-);
-
 alter table public.profiles enable row level security;
 alter table public.progress enable row level security;
 alter table public.daily_results enable row level security;
-alter table public.tutor_usage enable row level security;
 
 -- Profiles: any signed-in player can read; players write only their own row.
 create policy "profiles are readable by signed-in players" on public.profiles for select to authenticated using (true);
@@ -61,29 +52,6 @@ create policy "players update their own progress" on public.progress for update 
 -- Daily results: readable by signed-in players; each player posts one time per day and cannot change it.
 create policy "daily results are readable by signed-in players" on public.daily_results for select to authenticated using (true);
 create policy "players post their own daily result" on public.daily_results for insert to authenticated with check ((select auth.uid()) = user_id and day = current_date);
-
--- tutor_usage has no policies: only the Edge Function's service role can touch it.
-
--- Atomically counts one tutor message and reports whether the player is still under the daily limit.
-create or replace function public.count_tutor_message(p_user uuid, p_limit integer)
-returns boolean
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  used integer;
-begin
-  insert into public.tutor_usage (user_id, day, messages)
-  values (p_user, current_date, 1)
-  on conflict (user_id, day) do update set messages = public.tutor_usage.messages + 1
-  returning messages into used;
-  return used <= p_limit;
-end;
-$$;
-
-revoke all on function public.count_tutor_message(uuid, integer) from public, anon, authenticated;
-grant execute on function public.count_tutor_message(uuid, integer) to service_role;
 
 -- ── Reminder emails ────────────────────────────────────────────────────────
 -- Players get a reminder email about every 3 days unless they turn it off.

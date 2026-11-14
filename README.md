@@ -1,6 +1,6 @@
 # CoQuest
 
-A gamified platform for learning to code: a lesson path for seven languages, a real in-browser code runner, XP, streaks, leagues, boss battles, live duels, daily challenges and an AI tutor. QUEST, the mascot, guides the way.
+A gamified platform for learning to code: a lesson path for seven languages, a real in-browser code runner, XP, streaks, leagues, boss battles, live duels and daily challenges. QUEST, the mascot, guides the way.
 
 Built with React, TypeScript, Tailwind CSS, Lucide, Recharts, Monaco and Supabase.
 
@@ -40,25 +40,12 @@ The Vercel project is `coquest` in the `pyquest1` team (Hobby plan).
 | Accounts (email + password) | No — username only | Yes |
 | Leaderboards | Shows only you | Everyone in your league |
 | Duels | Between two tabs of one browser | Over the internet |
-| AI tutor | Off | On, once the function is deployed |
 
 ## Connect Supabase
 
 1. Create a project at supabase.com.
 2. Run `supabase/schema.sql` in the SQL editor.
 3. Copy `.env.example` to `.env` and fill in the project URL and anon key, then restart the dev server.
-
-### Turn on the AI tutor
-
-The tutor calls Claude from a Supabase Edge Function so the API key never reaches the browser. It verifies the signed-in player and allows 60 messages per player per day.
-
-```bash
-supabase link --project-ref <your-project-ref>
-supabase secrets set ANTHROPIC_API_KEY=<your-key>
-supabase functions deploy tutor
-```
-
-Set `ALLOWED_ORIGIN` as a secret too if you want to restrict the function to your site's origin.
 
 ## Sign in with Google using only Google Cloud (no Supabase)
 
@@ -125,12 +112,12 @@ Workers are terminated after 8 seconds or 20,000 characters of output, so infini
 ```
 src/
   content/      Courses, lessons, bosses and the challenge pool (data only)
-  lib/          Game rules, code runner, persistence, duel messaging, tutor client
+  lib/          Game rules, code runner, persistence, duel messaging
   state/        App context: auth, progress and XP-earning actions
   components/   Mascot, editor, workbench, layout and UI primitives
   pages/        One file per screen
 public/workers/ Sandboxed runtimes
-supabase/       Database schema and the tutor Edge Function
+supabase/       Database schema and Edge Functions
 scripts/        Content verification
 ```
 
