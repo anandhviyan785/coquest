@@ -69,7 +69,7 @@ function MoreMenu({ placement }: { placement: 'side' | 'top' }) {
   useEffect(() => setOpen(false), [location.pathname])
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className={placement === 'top' ? 'relative min-w-0 flex-1' : 'relative'}>
       {placement === 'side' ? (
         <button onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="menu" className={cx(navClass(active || open), 'w-full')}>
           <MoreIcon size={32} />More
@@ -199,7 +199,7 @@ function TabBar() {
   return (
     <nav className="coquest-glass-tabbar fixed inset-x-3 z-40 flex items-stretch gap-1 rounded-[26px] border px-1.5 py-1.5 lg:hidden" aria-label="Main">
       {TABS.map(({ to, label, icon: Icon }) => (
-        <NavLink key={to} to={to} end={to === '/'} aria-label={label} className={({ isActive }) => tab(isActive)}><Icon size={20} /><span>{label}</span></NavLink>
+        <NavLink key={to} to={to} end={to === '/'} aria-label={label} className={({ isActive }) => tab(isActive)}><Icon size={20} /><span className="max-w-full truncate">{label}</span></NavLink>
       ))}
       <NavLink to="/profile" aria-label="Profile" className={({ isActive }) => tab(isActive)}><Avatar avatar={state.avatar} size={20} /><span>Profile</span></NavLink>
       <MoreMenu placement="top" />
