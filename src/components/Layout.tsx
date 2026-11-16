@@ -75,8 +75,8 @@ function MoreMenu({ placement }: { placement: 'side' | 'top' }) {
           <MoreIcon size={32} />More
         </button>
       ) : (
-        <button onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="menu" aria-label="More" className={cx('flex h-12 w-12 items-center justify-center rounded-xl border-2', active || open ? 'border-blue-line bg-blue-soft' : 'border-transparent')}>
-          <MoreIcon size={32} />
+        <button onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="menu" aria-label="More" className={cx('flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl py-2 text-[10px] font-bold leading-none transition-colors', active || open ? 'bg-white/80 text-blue shadow-sm' : 'text-mute hover:bg-white/40')}>
+          <MoreIcon size={20} /><span>More</span>
         </button>
       )}
       {open && (
@@ -195,13 +195,13 @@ function Rail() {
 
 function TabBar() {
   const { state } = useApp()
-  const tab = (active: boolean) => cx('flex h-12 w-12 items-center justify-center rounded-xl border-2', active ? 'border-blue-line bg-blue-soft' : 'border-transparent')
+  const tab = (active: boolean) => cx('flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl py-2 text-[10px] font-bold leading-none transition-colors', active ? 'bg-white/80 text-blue shadow-sm' : 'text-mute hover:bg-white/40')
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t-2 border-line bg-card px-2 py-2 lg:hidden" aria-label="Main">
+    <nav className="coquest-glass-tabbar fixed inset-x-3 z-40 flex items-stretch gap-1 rounded-[26px] border px-1.5 py-1.5 lg:hidden" aria-label="Main">
       {TABS.map(({ to, label, icon: Icon }) => (
-        <NavLink key={to} to={to} end={to === '/'} aria-label={label} className={({ isActive }) => tab(isActive)}><Icon size={32} /></NavLink>
+        <NavLink key={to} to={to} end={to === '/'} aria-label={label} className={({ isActive }) => tab(isActive)}><Icon size={20} /><span>{label}</span></NavLink>
       ))}
-      <NavLink to="/profile" aria-label="Profile" className={({ isActive }) => tab(isActive)}><Avatar avatar={state.avatar} size={32} /></NavLink>
+      <NavLink to="/profile" aria-label="Profile" className={({ isActive }) => tab(isActive)}><Avatar avatar={state.avatar} size={20} /><span>Profile</span></NavLink>
       <MoreMenu placement="top" />
     </nav>
   )
