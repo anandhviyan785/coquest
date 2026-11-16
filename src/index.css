@@ -170,3 +170,22 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+/* Floating Liquid Glass navigation for phone screens. */
+.coquest-glass-tabbar {
+  bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
+  background: color-mix(in srgb, var(--color-card) 78%, transparent);
+  border-color: color-mix(in srgb, var(--color-line) 72%, transparent);
+  box-shadow: 0 10px 32px rgb(24 56 84 / 0.17), inset 0 1px 0 rgb(255 255 255 / 0.78);
+  -webkit-backdrop-filter: blur(24px) saturate(1.7);
+  backdrop-filter: blur(24px) saturate(1.7);
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .coquest-glass-tabbar {
+    background: var(--color-card);
+    border-color: var(--color-line);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
