@@ -195,9 +195,9 @@ function Rail() {
 
 function TabBar() {
   const { state } = useApp()
-  const tab = (active: boolean) => cx('flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl py-2 text-[10px] font-bold leading-none transition-colors', active ? 'bg-white/80 text-blue shadow-sm' : 'text-mute hover:bg-white/40')
+  const tab = (active: boolean) => cx('flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl py-2 text-[10px] font-bold leading-none transition-colors', active ? 'bg-blue-soft text-blue' : 'text-mute hover:bg-surface')
   return (
-    <nav className="coquest-glass-tabbar fixed inset-x-3 z-40 flex items-stretch gap-1 rounded-[26px] border px-1.5 py-1.5 lg:hidden" aria-label="Main">
+    <nav className="mobile-tabbar fixed inset-x-3 z-40 flex items-stretch gap-1 rounded-[26px] border px-1.5 py-1.5 lg:hidden" aria-label="Main">
       {TABS.map(({ to, label, icon: Icon }) => (
         <NavLink key={to} to={to} end={to === '/'} aria-label={label} className={({ isActive }) => tab(isActive)}><Icon size={20} /><span className="max-w-full truncate">{label}</span></NavLink>
       ))}
