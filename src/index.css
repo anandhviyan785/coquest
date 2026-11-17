@@ -171,18 +171,6 @@ body {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
-/* Solid phone navigation bar with a clear active state. */
-.mobile-tabbar {
-  bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
-  background: var(--color-card);
-  border-color: var(--color-line);
-  box-shadow: 0 3px 12px rgb(15 23 42 / 0.12);
-}
-
-:root[data-theme='dark'] .mobile-tabbar {
-  box-shadow: 0 3px 12px rgb(0 0 0 / 0.32);
-}
-
 @media (prefers-contrast: more) {
-  .mobile-tabbar { border-color: var(--color-ink); box-shadow: 0 0 0 1px var(--color-ink); }
+  .mobile-glass-nav { border-color: var(--color-ink); box-shadow: 0 0 0 1px var(--color-ink); }
 }

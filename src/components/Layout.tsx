@@ -1,7 +1,8 @@
 import { BarChart3, CalendarCheck, LogOut, Settings as SettingsIcon, Skull, X } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import type { ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import type { ReactNode, RefObject } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { achievementById } from '../lib/achievements'
 import { leagueFromXp, liveStreak, nextLeague } from '../lib/gamification'
@@ -12,6 +13,7 @@ import { Avatar } from './Avatar'
 import { Wordmark } from './Wordmark'
 import { BoltIcon, ChestIcon, DuelIcon, FlameIcon, GemIcon, LeagueIcon, LearnIcon, MoreIcon, PracticeIcon, QuestsIcon, ShopIcon } from './icons'
 import { Bar, cx } from './ui'
+import LiquidGlass from 'liquid-glass-react'
 
 interface NavItem { to: string; label: string; icon: (props: { size?: number }) => ReactNode }
 
@@ -42,12 +44,12 @@ const navClass = (active: boolean) =>
 
 export { Wordmark }
 
-function useDismiss(open: boolean, close: () => void) {
+function useDismiss(open: boolean, close: () => void, popupRef?: RefObject<HTMLDivElement | null>) {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!open) return
     const onPointer = (event: PointerEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) close()
+      if (ref.current && !ref.current.contains(event.target as Node) && !popupRef?.current?.contains(event.target as Node)) close()
     }
     const onKey = (event: KeyboardEvent) => event.key === 'Escape' && close()
     document.addEventListener('pointerdown', onPointer)
@@ -56,7 +58,7 @@ function useDismiss(open: boolean, close: () => void) {
       document.removeEventListener('pointerdown', onPointer)
       document.removeEventListener('keydown', onKey)
     }
-  }, [open, close])
+  }, [open, close, popupRef])
   return ref
 }
 
@@ -64,9 +66,22 @@ function MoreMenu({ placement }: { placement: 'side' | 'top' }) {
   const { signOut, notify } = useApp()
   const [open, setOpen] = useState(false)
   const location = useLocation()
-  const ref = useDismiss(open, () => setOpen(false))
+  const popupRef = useRef<HTMLDivElement>(null)
+  const ref = useDismiss(open, () => setOpen(false), popupRef)
   const active = MORE.some((item) => location.pathname.startsWith(item.to))
   useEffect(() => setOpen(false), [location.pathname])
+  const menuContent = (
+    <>
+      {MORE.map(({ to, label, icon: Icon }) => (
+        <NavLink key={to} to={to} role="menuitem" className={({ isActive }) => cx('label flex items-center gap-3 px-5 py-3 text-[13px]', isActive ? 'bg-blue-soft text-blue' : 'text-mute hover:bg-surface')}>
+          <Icon size={18} strokeWidth={2.4} />{label}
+        </NavLink>
+      ))}
+      <button role="menuitem" onClick={() => signOut().catch((err: unknown) => notify({ kind: 'error', title: 'Could not sign out', body: err instanceof Error ? err.message : undefined }))} className="label flex w-full items-center gap-3 border-t-2 border-line px-5 py-3 text-[13px] text-mute hover:bg-surface">
+        <LogOut size={18} strokeWidth={2.4} />Sign out
+      </button>
+    </>
+  )
 
   return (
     <div ref={ref} className={placement === 'top' ? 'relative min-w-0 flex-1' : 'relative'}>
@@ -79,18 +94,12 @@ function MoreMenu({ placement }: { placement: 'side' | 'top' }) {
           <MoreIcon size={20} /><span>More</span>
         </button>
       )}
-      {open && (
-        <div role="menu" className={cx('animate-rise absolute z-50 w-60 overflow-hidden rounded-2xl border-2 border-line bg-card py-2', placement === 'side' ? 'left-full top-0 ml-3' : 'bottom-full right-0 mb-3')}>
-          {MORE.map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} role="menuitem" className={({ isActive }) => cx('label flex items-center gap-3 px-5 py-3 text-[13px]', isActive ? 'bg-blue-soft text-blue' : 'text-mute hover:bg-surface')}>
-              <Icon size={18} strokeWidth={2.4} />{label}
-            </NavLink>
-          ))}
-          <button role="menuitem" onClick={() => signOut().catch((err: unknown) => notify({ kind: 'error', title: 'Could not sign out', body: err instanceof Error ? err.message : undefined }))} className="label flex w-full items-center gap-3 border-t-2 border-line px-5 py-3 text-[13px] text-mute hover:bg-surface">
-            <LogOut size={18} strokeWidth={2.4} />Sign out
-          </button>
-        </div>
-      )}
+      {open && (placement === 'side' ? (
+        <div ref={popupRef} role="menu" className="animate-rise absolute left-full top-0 z-50 ml-3 w-60 overflow-hidden rounded-2xl border-2 border-line bg-card py-2">{menuContent}</div>
+      ) : createPortal(
+        <div ref={popupRef} role="menu" className="animate-rise fixed right-3 z-[60] mb-3 w-60 overflow-hidden rounded-2xl border-2 border-line bg-card py-2 shadow-xl" style={{ bottom: 'calc(max(0.75rem, env(safe-area-inset-bottom)) + 5.5rem)' }}>{menuContent}</div>,
+        document.body,
+      ))}
     </div>
   )
 }
@@ -197,13 +206,25 @@ function TabBar() {
   const { state } = useApp()
   const tab = (active: boolean) => cx('flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl py-2 text-[10px] font-bold leading-none transition-colors', active ? 'bg-blue-soft text-blue' : 'text-mute hover:bg-surface')
   return (
-    <nav className="mobile-tabbar fixed inset-x-3 z-40 flex items-stretch gap-1 rounded-[26px] border px-1.5 py-1.5 lg:hidden" aria-label="Main">
-      {TABS.map(({ to, label, icon: Icon }) => (
-        <NavLink key={to} to={to} end={to === '/'} aria-label={label} className={({ isActive }) => tab(isActive)}><Icon size={20} /><span className="max-w-full truncate">{label}</span></NavLink>
-      ))}
-      <NavLink to="/profile" aria-label="Profile" className={({ isActive }) => tab(isActive)}><Avatar avatar={state.avatar} size={20} /><span>Profile</span></NavLink>
-      <MoreMenu placement="top" />
-    </nav>
+    <LiquidGlass
+      className="z-40 w-fit px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pointer-events-auto lg:hidden"
+      displacementScale={24}
+      blurAmount={0.12}
+      saturation={145}
+      aberrationIntensity={1}
+      elasticity={0}
+      cornerRadius={26}
+      padding="6px"
+      style={{ position: 'fixed', left: '50%', top: 'calc(100% - 54px)', bottom: 'auto', maxWidth: '100%' }}
+    >
+      <nav className="mobile-glass-nav relative flex w-[min(calc(100vw-1.5rem),27rem)] items-stretch gap-1 rounded-[22px] border-2 border-line/70 bg-card/75 p-1.5 shadow-lg backdrop-blur-xl" aria-label="Main">
+        {TABS.map(({ to, label, icon: Icon }) => (
+          <NavLink key={to} to={to} end={to === '/'} aria-label={label} className={({ isActive }) => tab(isActive)}><Icon size={20} /><span className="max-w-full truncate">{label}</span></NavLink>
+        ))}
+        <NavLink to="/profile" aria-label="Profile" className={({ isActive }) => tab(isActive)}><Avatar avatar={state.avatar} size={20} /><span>Profile</span></NavLink>
+        <MoreMenu placement="top" />
+      </nav>
+    </LiquidGlass>
   )
 }
 
