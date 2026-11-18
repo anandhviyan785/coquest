@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react'
-import { Route, Routes, useLocation } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { Mascot } from './components/Mascot'
 import { isAppPath, pageByPath } from './content/seo'
 import { applySeo } from './lib/useSeo'
@@ -65,6 +65,8 @@ export default function App() {
     <Suspense fallback={<Loading />}>
       <Routes>
         {/* Focused, full-screen flows */}
+        {/* Signed-in players who land on the log-in page (just logged in) go to their path */}
+        <Route path="/login" element={<Navigate to="/learn" replace />} />
         <Route path="/lesson/:lessonId" element={<LessonPage />} />
         <Route path="/boss/:bossId" element={<BossBattle />} />
 
