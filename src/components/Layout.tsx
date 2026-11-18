@@ -229,10 +229,13 @@ function TabBar() {
 }
 
 function ToastCard({ toast, onDone }: { toast: Toast; onDone: () => void }) {
+  // Keep the latest callback in a ref so re-renders do not restart the timer.
+  const done = useRef(onDone)
+  done.current = onDone
   useEffect(() => {
-    const timer = setTimeout(onDone, 5500)
+    const timer = setTimeout(() => done.current(), 5500)
     return () => clearTimeout(timer)
-  }, [onDone])
+  }, [toast.id])
   const tone = toast.kind === 'error' ? 'border-bad' : toast.kind === 'achievement' ? 'border-gold' : 'border-blue-line'
   return (
     <div className={cx('animate-rise flex w-80 max-w-[calc(100vw-2rem)] items-start gap-3 rounded-2xl border-2 bg-card p-4', tone)} role="status">

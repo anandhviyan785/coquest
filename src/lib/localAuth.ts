@@ -35,7 +35,11 @@ const read = <T>(key: string, fallback: T): T => {
     } catch (err) {
       // Keep a copy of unreadable data so a later write cannot destroy it for good.
       console.error(`Could not read ${key}; saving a backup copy`, err)
-      try { localStorage.setItem(`${key}.corrupt-${Date.now()}`, raw) } catch { /* storage is full or blocked */ }
+      // One backup per key: this runs on every read, so a fresh copy each time would fill storage.
+      try {
+        const backupKey = `${key}.corrupt`
+        if (localStorage.getItem(backupKey) === null) localStorage.setItem(backupKey, raw)
+      } catch { /* storage is full or blocked */ }
       return fallback
     }
   } catch (err) {
@@ -152,6 +156,9 @@ export const verifyLogin = async (login: string, password: string): Promise<stri
   return account.id
 }
 
+/** The stored username for an account id, if it exists. */
+export const usernameOf = (id: string): string | undefined => accounts().find((a) => a.id === id)?.username
+
 export const renameAccount = (id: string, username: string): void => {
   const list = accounts()
   const current = list.find((a) => a.id === id)
@@ -160,9 +167,11 @@ export const renameAccount = (id: string, username: string): void => {
 }
 
 export const deleteAccount = (id: string): void => {
+  // Check the stored session before the account disappears, since getSession ignores unknown accounts.
+  const wasSignedIn = read<string | null>(SESSION_KEY, null) === id
   write(ACCOUNTS_KEY, accounts().filter((a) => a.id !== id))
   localStorage.removeItem(stateKey(id))
-  if (getSession() === id) setSession(null)
+  if (wasSignedIn) setSession(null)
 }
 
 // ── Session and progress ──────────────────────────────────────────────────

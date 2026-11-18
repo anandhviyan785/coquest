@@ -4,7 +4,7 @@ import { awardAchievements } from '../lib/achievements'
 import { dayKey, weekStartOf } from '../lib/dates'
 import { applyActivity, levelFromXp, newUserState } from '../lib/gamification'
 import type { Activity } from '../lib/gamification'
-import { clearLegacyProfile, createAccount, deleteAccount, getSession, googleAccount, legacyProfile, loadAccountState, renameAccount, saveAccountState, setSession, usernameTaken, verifyLogin } from '../lib/localAuth'
+import { clearLegacyProfile, createAccount, deleteAccount, getSession, googleAccount, legacyProfile, loadAccountState, renameAccount, saveAccountState, setSession, usernameOf, usernameTaken, verifyLogin } from '../lib/localAuth'
 import { signInWithGooglePopup } from '../lib/googleSignIn'
 import { loadCloud, saveCloud } from '../lib/repo'
 import { isCloud, supabase } from '../lib/supabase'
@@ -112,21 +112,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
       // Supabase re-emits SIGNED_IN on tab focus: keep the progress already on screen.
       if (loadedUser.current === id) return
+      loadedUser.current = id // claim before the await so a second SIGNED_IN cannot load twice
       try {
         const loaded = await loadCloud(id, name)
         if (cancelled) return
-        loadedUser.current = id
         commit(loaded)
         setUserId(id)
         setSyncError(null)
         setStatus('ready')
       } catch (err) {
+        loadedUser.current = null
         if (cancelled) return
         setSyncError(messageOf(err))
         setStatus('signedOut')
       }
     }
-    supabase.auth.getSession().then(({ data }) => adopt(data.session?.user.id ?? null, nameOf(data.session?.user)))
+    supabase.auth.getSession()
+      .then(({ data }) => adopt(data.session?.user.id ?? null, nameOf(data.session?.user)))
+      .catch((err) => {
+        if (cancelled) return
+        setSyncError(messageOf(err))
+        setStatus('signedOut')
+      })
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') void adopt(session?.user.id ?? null, nameOf(session?.user))
     })
@@ -180,7 +187,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const signIn = useCallback(async (login: string, password: string) => {
     if (!supabase) {
       const id = await verifyLogin(login, password)
-      enterLocal(id, loadAccountState(id) ?? newUserState(login.trim()))
+      enterLocal(id, loadAccountState(id) ?? newUserState(usernameOf(id) ?? login.trim()))
       return
     }
     const { error } = await supabase.auth.signInWithPassword({ email: login, password })
