@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Code2, ShieldCheck } from 'lucide-react'
+import { Check, ChevronDown, ShieldCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { DIFFICULTY_NAME, difficultyForLevel, puzzleStreak } from '../content/puzzles'
 import { dayKey } from '../lib/dates'
@@ -54,9 +54,8 @@ export function FeatureTiles({ course }: { course: Course }) {
 export function CompactShortcuts({ course, onOpenLanguages }: { course: Course; onOpenLanguages: () => void }) {
   return (
     <div className="mb-6 flex gap-3">
-      <button onClick={onOpenLanguages} aria-haspopup="dialog" aria-label={`Language: ${course.name}. Change language`} className="press soft-card flex min-w-0 flex-1 items-center gap-2 px-2.5 py-2.5 text-left sm:gap-3 sm:px-3">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-soft text-blue sm:h-9 sm:w-9"><Code2 size={18} strokeWidth={2.6} /></span>
-        <LangLogo lang={course.id} size={22} />
+      <button onClick={onOpenLanguages} aria-haspopup="dialog" aria-label={`Language: ${course.name}. Change language`} className="press soft-card flex min-w-0 flex-1 items-center gap-3 px-3.5 py-2.5 text-left">
+        <LangLogo lang={course.id} size={28} />
         <span className="min-w-0 flex-1">
           <span className="label block text-[10px] text-faint">Language</span>
           <span className="block truncate text-[15px] font-bold text-body">{course.name}</span>
