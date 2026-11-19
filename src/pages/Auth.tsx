@@ -35,6 +35,26 @@ const rememberVisit = (): void => {
   }
 }
 
+const LAST_LOGIN_KEY = 'pyquest:v1:last-login'
+const LOGIN_MAX = 254
+
+/** The email or username this browser last logged in with (never a password). */
+const lastLogin = (): string => {
+  try {
+    return (localStorage.getItem(LAST_LOGIN_KEY) ?? '').slice(0, LOGIN_MAX)
+  } catch {
+    return ''
+  }
+}
+
+const rememberLogin = (login: string): void => {
+  try {
+    localStorage.setItem(LAST_LOGIN_KEY, login.slice(0, LOGIN_MAX))
+  } catch (err) {
+    console.error('Could not remember the login name', err)
+  }
+}
+
 /** Password strength for the sign-up meter: how many of four simple habits it has. */
 const strength = (password: string): { filled: number; label: string; color: string } => {
   if (password.length < MIN_PASSWORD) return { filled: 1, label: 'Too short', color: 'var(--color-bad)' }
@@ -117,7 +137,8 @@ export function Auth() {
   const [mode, setMode] = useState<Mode>(() => (new URLSearchParams(search).has('signup') || !wasHereBefore() ? 'signup' : 'login'))
   const [username, setUsername] = useState(() => legacy?.username ?? '')
   const [email, setEmail] = useState('')
-  const [login, setLogin] = useState('')
+  // Players who signed out find their email or username already filled in.
+  const [login, setLogin] = useState(lastLogin)
   const [password, setPassword] = useState('')
   const [shown, setShown] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
@@ -169,9 +190,11 @@ export function Auth() {
       rememberVisit()
       if (signingUp) {
         const outcome = await signUp(email.trim(), password, username.trim())
+        rememberLogin(cloud ? email.trim() : username.trim())
         if (outcome === 'confirm') setNotice('Almost there. Check your email for a confirmation link, then log in.')
       } else {
         await signIn(login.trim(), password)
+        rememberLogin(login.trim())
       }
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Something went wrong. Try again.')

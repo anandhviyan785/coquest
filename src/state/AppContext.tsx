@@ -62,6 +62,8 @@ interface AppValue {
 
 const AppContext = createContext<AppValue | null>(null)
 const SAVE_DELAY_MS = 700
+const CLOUD_LOAD_ATTEMPTS = 3
+const CLOUD_RETRY_MS = 1500
 const EMPTY = newUserState('Explorer')
 
 /**
@@ -103,10 +105,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Boot: restore a local profile, or follow the Supabase session.
   useEffect(() => {
     if (!supabase) {
+      // A remembered sign-in stays signed in. If its progress is missing (storage cleared or
+      // unreadable), the player starts afresh but is not sent back to the log-in screen.
       const id = getSession()
-      const saved = id ? loadAccountState(id) : null
-      if (id && saved) {
-        commit(saved)
+      if (id) {
+        commit(loadAccountState(id) ?? newUserState(usernameOf(id) ?? 'Explorer'))
         setUserId(id)
         setStatus('ready')
       } else {
@@ -125,18 +128,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // Supabase re-emits SIGNED_IN on tab focus: keep the progress already on screen.
       if (loadedUser.current === id) return
       loadedUser.current = id // claim before the await so a second SIGNED_IN cannot load twice
-      try {
-        const loaded = await loadCloud(id, name)
-        if (cancelled) return
-        commit(loaded)
-        setUserId(id)
-        setSyncError(null)
-        setStatus('ready')
-      } catch (err) {
-        loadedUser.current = null
-        if (cancelled) return
-        setSyncError(messageOf(err))
-        setStatus('signedOut')
+      // A signed-in player is not sent to the log-in screen because of a brief network failure:
+      // loading is retried a few times before giving up.
+      for (let attempt = 1; ; attempt += 1) {
+        try {
+          const loaded = await loadCloud(id, name)
+          if (cancelled) return
+          commit(loaded)
+          setUserId(id)
+          setSyncError(null)
+          setStatus('ready')
+          return
+        } catch (err) {
+          if (cancelled) return
+          if (attempt < CLOUD_LOAD_ATTEMPTS) {
+            await new Promise((resolve) => setTimeout(resolve, CLOUD_RETRY_MS * attempt))
+            continue
+          }
+          console.error('Could not load cloud progress', err)
+          loadedUser.current = null
+          setSyncError(messageOf(err))
+          setStatus('signedOut')
+          return
+        }
       }
     }
     supabase.auth.getSession()
