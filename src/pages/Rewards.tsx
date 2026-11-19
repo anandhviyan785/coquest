@@ -62,7 +62,7 @@ function TodayChest({ onReveal }: { onReveal: (rarity: Rarity, loot: Loot) => vo
         </div>
       </div>
       {claimable ? (
-        <Button variant="gold" size="lg" className="mt-5 w-full" onClick={() => void claim()} disabled={busy} data-sfx="none">{busy ? 'Opening…' : 'Claim reward'}</Button>
+        <Button variant="gold" size="lg" className="mt-5 w-full" onClick={() => void claim()} disabled={busy}>{busy ? 'Opening…' : 'Claim reward'}</Button>
       ) : (
         <p className="mt-5 flex items-center justify-center gap-2 rounded-2xl bg-white/12 py-3 text-[15px] font-bold"><Check size={18} strokeWidth={3} />Today's reward claimed</p>
       )}
@@ -112,7 +112,7 @@ function BonusChests({ onReveal }: { onReveal: (rarity: Rarity, loot: Loot) => v
           <Chest rarity={c.rarity} size={72} idle />
           <p className="mt-1 text-[15px] font-bold" style={{ color: RARITY[c.rarity].color }}>{RARITY[c.rarity].name}</p>
           <p className="mb-3 truncate text-[12px] text-faint">From {c.source}</p>
-          <Button size="sm" onClick={() => open(c.id, c.rarity)} data-sfx="none">Open</Button>
+          <Button size="sm" onClick={() => open(c.id, c.rarity)}>Open</Button>
         </li>
       ))}
     </ul>

@@ -248,7 +248,6 @@ export const newUserState = (username: string): UserState => ({
   wager: null,
   history: [],
   createdAt: new Date().toISOString(),
-  settings: { sfx: true, music: false, volume: 0.7 },
   rewardClaims: {},
   chests: [],
   puzzles: {},

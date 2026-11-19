@@ -15,7 +15,6 @@ import { DIFFICULTY_NAME, HARD_BONUS_GEMS, KIND_LABEL, MAX_ATTEMPTS, PUZZLE_XP, 
 import type { Puzzle } from '../content/puzzles'
 import { dayKey, shortDate } from '../lib/dates'
 import { levelFromXp } from '../lib/gamification'
-import { play } from '../lib/sfx'
 import type { LangId } from '../lib/types'
 import { useApp } from '../state/AppContext'
 
@@ -83,10 +82,7 @@ export function PuzzlePage() {
     setBusy(true)
     try {
       const outcome = await finishPuzzle(puzzle, lang, solved, used)
-      if (outcome) {
-        reward(outcome)
-        if (outcome.gems > 0) setTimeout(() => play('gem'), 500)
-      }
+      if (outcome) reward(outcome)
       setPhase('finished')
     } catch (err) {
       notify({ kind: 'error', title: 'Could not save your puzzle', body: err instanceof Error ? err.message : 'Please try again.' })
@@ -100,13 +96,11 @@ export function PuzzlePage() {
     setAttempts(used)
     if (isCorrect(puzzle, answer)) {
       setFeedback('right')
-      play('solve')
       setCelebrate(true)
       void finish(true, used)
       return
     }
     setFeedback('wrong')
-    play('wrong')
     if (used >= MAX_ATTEMPTS) void finish(false, used)
   }
 
@@ -145,9 +139,9 @@ export function PuzzlePage() {
             <span className="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1.5"><BoltIcon size={16} />Up to {PUZZLE_XP[puzzle.difficulty]} XP</span>
             {puzzle.difficulty === 3 && <span className="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1.5"><GemIcon size={16} />+{HARD_BONUS_GEMS} gems</span>}
           </div>
-          <Button variant="gold" size="lg" className="mt-6 w-full" data-sfx="open" onClick={() => setPhase('playing')}>Start puzzle</Button>
+          <Button variant="gold" size="lg" className="mt-6 w-full" onClick={() => setPhase('playing')}>Start puzzle</Button>
         </section>
-        <button onClick={() => setPicking(true)} data-sfx="open" className="press soft-card mt-4 flex w-full items-center gap-3 p-3.5 text-left">
+        <button onClick={() => setPicking(true)} className="press soft-card mt-4 flex w-full items-center gap-3 p-3.5 text-left">
           {course && <LangLogo lang={course.id} size={30} />}
           <span className="flex-1 text-[15px] font-bold text-body">Puzzle language: {LANG_LABEL[lang]}</span>
           <span className="label text-[12px] text-blue">Change</span>
@@ -217,7 +211,7 @@ export function PuzzlePage() {
         {feedback === 'wrong' && left > 0 ? (
           <Button size="lg" variant="secondary" className="w-full" onClick={retry}>Try again</Button>
         ) : (
-          <Button size="lg" className="w-full" disabled={!isAnswered(puzzle, answer) || busy || feedback !== null} onClick={check} data-sfx="none">{busy ? 'Saving…' : 'Check'}</Button>
+          <Button size="lg" className="w-full" disabled={!isAnswered(puzzle, answer) || busy || feedback !== null} onClick={check}>{busy ? 'Saving…' : 'Check'}</Button>
         )}
       </div>
     </div>

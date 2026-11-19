@@ -110,8 +110,6 @@ export interface UserState {
   wager: { base: number; target: number } | null
   history: HistoryItem[]
   createdAt: string
-  /** Sound effects, music and volume. Saved with the account so they follow the player. */
-  settings: SoundSettings
   /** Daily Rewards chests claimed, keyed by day. */
   rewardClaims: Record<string, RewardClaim>
   /** Bonus chests won from milestones and achievements, waiting to be opened. */
@@ -121,8 +119,6 @@ export interface UserState {
   /** Every gem earned or spent, newest first. */
   gemLog: GemTx[]
 }
-
-export interface SoundSettings { sfx: boolean; music: boolean; /** 0 to 1. */ volume: number }
 
 export type Rarity = 'rare' | 'epic' | 'legendary'
 

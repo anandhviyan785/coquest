@@ -12,7 +12,6 @@ export const hydrate = (raw: unknown, fallbackName: string): UserState => {
     ...base,
     ...saved,
     profile: { ...base.profile, ...saved.profile },
-    settings: { ...base.settings, ...saved.settings },
     rewardClaims: saved.rewardClaims ?? {},
     chests: Array.isArray(saved.chests) ? saved.chests : [],
     puzzles: saved.puzzles ?? {},

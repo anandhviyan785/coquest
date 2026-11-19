@@ -24,7 +24,7 @@ export function FeatureTiles({ course }: { course: Course }) {
 
   return (
     <div className="mb-4 grid grid-cols-2 gap-3 sm:gap-4">
-      <Link to="/rewards" aria-label={claimable ? 'Daily Rewards: a chest is ready to claim' : 'Daily Rewards'} data-sfx="open" className="press grad-night glow-blue relative flex min-h-[168px] flex-col justify-between overflow-hidden rounded-[24px] p-4 text-white">
+      <Link to="/rewards" aria-label={claimable ? 'Daily Rewards: a chest is ready to claim' : 'Daily Rewards'} className="press grad-night glow-blue relative flex min-h-[168px] flex-col justify-between overflow-hidden rounded-[24px] p-4 text-white">
         {claimable && <span className="absolute right-3 top-3 h-3.5 w-3.5 rounded-full border-2 border-white bg-bad" aria-hidden="true"><span className="absolute inset-0 animate-ping rounded-full bg-bad" /></span>}
         <Chest rarity={rarity} size={84} idle={claimable} open={!claimable} className="-ml-1 -mt-1" />
         <span>
@@ -33,7 +33,7 @@ export function FeatureTiles({ course }: { course: Course }) {
         </span>
       </Link>
 
-      <Link to="/puzzle" aria-label={solvedToday ? 'Daily Puzzle: done for today' : 'Daily Puzzle'} data-sfx="open" className="press grad-hero glow-blue relative flex min-h-[168px] flex-col justify-between overflow-hidden rounded-[24px] p-4 text-white">
+      <Link to="/puzzle" aria-label={solvedToday ? 'Daily Puzzle: done for today' : 'Daily Puzzle'} className="press grad-hero glow-blue relative flex min-h-[168px] flex-col justify-between overflow-hidden rounded-[24px] p-4 text-white">
         {solvedToday && <span className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-white text-blue"><Check size={16} strokeWidth={3.5} /></span>}
         <span className="relative flex h-[84px] w-[84px] items-center justify-center">
           <span className="animate-glow absolute inset-1 rounded-[22px] bg-white/35 blur-md" /><span className="absolute inset-2 rounded-[20px] bg-white shadow-lg" />
@@ -54,7 +54,7 @@ export function FeatureTiles({ course }: { course: Course }) {
 export function CompactShortcuts({ course, onOpenLanguages }: { course: Course; onOpenLanguages: () => void }) {
   return (
     <div className="mb-6 flex gap-3">
-      <button onClick={onOpenLanguages} data-sfx="open" aria-haspopup="dialog" aria-label={`Language: ${course.name}. Change language`} className="press soft-card flex min-w-0 flex-1 items-center gap-2 px-2.5 py-2.5 text-left sm:gap-3 sm:px-3">
+      <button onClick={onOpenLanguages} aria-haspopup="dialog" aria-label={`Language: ${course.name}. Change language`} className="press soft-card flex min-w-0 flex-1 items-center gap-2 px-2.5 py-2.5 text-left sm:gap-3 sm:px-3">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-soft text-blue sm:h-9 sm:w-9"><Code2 size={18} strokeWidth={2.6} /></span>
         <LangLogo lang={course.id} size={22} />
         <span className="min-w-0 flex-1">
@@ -63,7 +63,7 @@ export function CompactShortcuts({ course, onOpenLanguages }: { course: Course; 
         </span>
         <ChevronDown size={18} strokeWidth={3} className="shrink-0 text-faint" />
       </button>
-      <Link to={`/learn/${course.id}/glossary`} data-sfx="open" aria-label={`${course.name} glossary`} className="press soft-card flex shrink-0 items-center gap-2 px-3 py-2.5 sm:px-3.5" style={{ perspective: 200 }}>
+      <Link to={`/learn/${course.id}/glossary`} aria-label={`${course.name} glossary`} className="press soft-card flex shrink-0 items-center gap-2 px-3 py-2.5 sm:px-3.5" style={{ perspective: 200 }}>
         <BookIcon size={30} className="book-flip" />
         <span className="text-[15px] font-bold text-body">Glossary</span>
       </Link>

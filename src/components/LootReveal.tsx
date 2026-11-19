@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { RARITY } from '../lib/rewards'
-import { play } from '../lib/sfx'
 import type { Loot, Rarity } from '../lib/types'
 import { Chest } from './Chest'
 import { Confetti } from './Confetti'
@@ -13,22 +12,14 @@ const SHAKE_MS = 900
 
 /**
  * The chest-opening moment: the chest shakes, bursts open, and each reward springs in one after
- * another. Sounds play once per stage. Closing returns to the page.
+ * another. Closing returns to the page.
  */
 export function LootReveal({ rarity, loot, onClose }: { rarity: Rarity; loot: Loot; onClose: () => void }) {
   const [phase, setPhase] = useState<Phase>('shaking')
 
   useEffect(() => {
-    play('chest')
-    const timer = setTimeout(() => {
-      setPhase('open')
-      play('claim')
-    }, SHAKE_MS)
-    const gem = setTimeout(() => play('gem'), SHAKE_MS + 450)
-    return () => {
-      clearTimeout(timer)
-      clearTimeout(gem)
-    }
+    const timer = setTimeout(() => setPhase('open'), SHAKE_MS)
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {

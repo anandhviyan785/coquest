@@ -13,7 +13,7 @@ import { useApp } from '../state/AppContext'
 
 function Card({ to, icon: Icon, title, body, done, tone }: { to: string; icon: LucideIcon; title: string; body: string; done?: boolean; tone: string }) {
   return (
-    <Link to={to} data-sfx="open" className="press soft-card flex items-center gap-4 p-4">
+    <Link to={to} className="press soft-card flex items-center gap-4 p-4">
       <span className={cx('flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white', tone)}><Icon size={24} strokeWidth={2.4} /></span>
       <span className="min-w-0 flex-1">
         <span className="block text-[16px] font-bold text-body">{title}</span>
@@ -45,7 +45,7 @@ export function Practice() {
         </div>
       </header>
 
-      <Link to="/puzzle" data-sfx="open" className="press grad-hero glow-blue relative mb-4 flex items-center gap-4 overflow-hidden rounded-[24px] p-5 text-white">
+      <Link to="/puzzle" className="press grad-hero glow-blue relative mb-4 flex items-center gap-4 overflow-hidden rounded-[24px] p-5 text-white">
         <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[20px] bg-white shadow-lg"><PuzzleIcon size={46} className={solved ? undefined : 'piece-rock'} /></span>
         <span className="min-w-0 flex-1">
           <span className="block text-xl font-extrabold">Daily Puzzle</span>

@@ -123,7 +123,7 @@ function UnitSection({ course, unit, index, nodes, selected, onSelect }: { cours
                 onClick={() => onSelect(isOpen ? null : node.id)}
                 aria-label={`${node.title}${node.state === 'locked' ? ' (locked)' : node.state === 'done' ? ' (completed)' : ''}`}
                 aria-expanded={isOpen}
-                data-sfx="open"
+               
                 className={cx('relative flex items-center justify-center rounded-[50%] transition-transform hover:scale-105 active:translate-y-2', node.state === 'current' && 'outline outline-[6px] outline-offset-[6px] outline-blue-line')}
                 style={{ width: NODE_W, height: NODE_H, background: coloured ? `linear-gradient(160deg, ${color.to}, ${color.fill})` : 'var(--color-line)', boxShadow: coloured ? `0 8px 0 ${color.edge}, 0 14px 24px -10px ${color.fill}` : '0 8px 0 #c3cfe3', color: coloured ? '#fff' : '#A3B1C9' }}
               >

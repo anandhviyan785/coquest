@@ -8,7 +8,6 @@ import { dayKey } from '../lib/dates'
 import { leagueFromXp, liveStreak, nextLeague } from '../lib/gamification'
 import { questStatus } from '../lib/quests'
 import { canClaimDaily } from '../lib/rewards'
-import { play } from '../lib/sfx'
 import { useApp } from '../state/AppContext'
 import type { Toast } from '../state/AppContext'
 import { Avatar } from './Avatar'
@@ -80,7 +79,7 @@ function MoreMenu() {
   useEffect(() => setOpen(false), [location.pathname])
   return (
     <div ref={ref} className="relative">
-      <button onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="menu" data-sfx="open" className={cx(navClass(active || open), 'w-full')}>
+      <button onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="menu" className={cx(navClass(active || open), 'w-full')}>
         <MoreIcon size={32} />More
       </button>
       {open && (
@@ -297,7 +296,7 @@ function ToastCard({ toast, onDone }: { toast: Toast; onDone: () => void }) {
         <p className="text-[15px] font-bold text-ink">{toast.title}</p>
         {toast.body && <p className="mt-0.5 text-[13px] text-mute">{toast.body}</p>}
       </div>
-      <button onClick={onDone} className="text-faint hover:text-mute" aria-label="Dismiss" data-sfx="none"><X size={18} strokeWidth={3} /></button>
+      <button onClick={onDone} className="text-faint hover:text-mute" aria-label="Dismiss"><X size={18} strokeWidth={3} /></button>
     </div>
   )
 }
@@ -313,12 +312,10 @@ export function Toasts() {
   )
 }
 
-/** Turns an EarnResult into toasts and a sound. Shared by every flow that awards XP. */
+/** Turns an EarnResult into toasts. Shared by every flow that awards XP. */
 export function useRewardToasts() {
   const { notify } = useApp()
   return (result: { achievements: string[]; leveledUp: number | null }) => {
-    if (result.achievements.length > 0) play('achievement')
-    else if (result.leveledUp) play('streak')
     if (result.leveledUp) notify({ kind: 'level', title: `Level ${result.leveledUp} reached`, body: 'A Rare chest is waiting in Rewards.' })
     result.achievements.forEach((id) => {
       const a = achievementById(id)

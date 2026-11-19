@@ -33,7 +33,7 @@ function Options({ options, value, onPick, locked, correct }: { options: string[
         const chosen = value === i
         const right = correct === i
         return (
-          <button key={opt} disabled={locked} onClick={() => onPick(i)} aria-pressed={chosen} data-sfx="select"
+          <button key={opt} disabled={locked} onClick={() => onPick(i)} aria-pressed={chosen}
             className={cx('press rounded-2xl border-2 border-b-4 px-4 py-3.5 text-left font-mono text-[15px] font-bold transition-colors', right ? 'border-ok bg-green-soft text-ok' : chosen ? 'border-blue bg-blue-soft text-blue' : 'border-line bg-card text-body hover:bg-surface')}>
             {opt}
           </button>
@@ -69,7 +69,7 @@ export function PuzzleBoard({ puzzle, answer, onChange, locked, reveal }: { puzz
             const right = reveal && puzzle.answer === i
             return (
               <li key={i}>
-                <button disabled={locked} onClick={() => onChange({ kind: 'index', value: i })} aria-pressed={chosen} aria-label={`Line ${i + 1}: ${line.trim() || 'blank'}`} data-sfx="select"
+                <button disabled={locked} onClick={() => onChange({ kind: 'index', value: i })} aria-pressed={chosen} aria-label={`Line ${i + 1}: ${line.trim() || 'blank'}`}
                   className={cx('flex w-full items-start gap-3 border-b border-line px-3 py-2.5 text-left last:border-b-0 transition-colors', right ? 'bg-green-soft text-ok' : chosen ? 'bg-blue-soft text-blue' : 'text-ink hover:bg-blue-soft/50')}>
                   <span className="tnum w-5 shrink-0 text-right text-faint">{i + 1}</span>
                   <span className="whitespace-pre-wrap break-all">{line || ' '}</span>
@@ -89,7 +89,7 @@ export function PuzzleBoard({ puzzle, answer, onChange, locked, reveal }: { puzz
             {chosen.length === 0 && <li className="py-6 text-center text-[14px] text-faint">Tap the lines below in the right order</li>}
             {chosen.map((i, at) => (
               <li key={i}>
-                <button disabled={locked} onClick={() => onChange({ kind: 'order', value: chosen.filter((c) => c !== i) })} data-sfx="tap"
+                <button disabled={locked} onClick={() => onChange({ kind: 'order', value: chosen.filter((c) => c !== i) })}
                   className={cx('animate-pop flex w-full items-center gap-2 rounded-xl border-2 border-b-4 bg-card px-3 py-2 text-left font-mono text-[13px] font-bold', reveal ? (puzzle.lines[at] === puzzle.lines[i] ? 'border-ok text-ok' : 'border-bad text-bad') : 'border-blue-line text-ink')}>
                   <span className="tnum text-faint">{at + 1}</span><span className="whitespace-pre">{puzzle.lines[i]}</span>
                 </button>
@@ -99,7 +99,7 @@ export function PuzzleBoard({ puzzle, answer, onChange, locked, reveal }: { puzz
           <ul className="flex flex-wrap gap-2" aria-label="Lines to place">
             {remaining.map((i) => (
               <li key={i}>
-                <button disabled={locked} onClick={() => onChange({ kind: 'order', value: [...chosen, i] })} data-sfx="select" aria-label={`Add line: ${puzzle.lines[i].trim()}`}
+                <button disabled={locked} onClick={() => onChange({ kind: 'order', value: [...chosen, i] })} aria-label={`Add line: ${puzzle.lines[i].trim()}`}
                   className="press rounded-xl border-2 border-b-4 border-line bg-card px-3 py-2 font-mono text-[13px] font-bold text-body hover:bg-surface">
                   <span className="whitespace-pre">{puzzle.lines[i].trim()}</span>
                 </button>
