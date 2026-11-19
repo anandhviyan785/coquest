@@ -77,9 +77,22 @@ const playNote = (ac: AudioContext, out: AudioNode, n: Note, start: number) => {
   osc.stop(start + n.at + n.len + 0.05)
 }
 
-/** Plays a named sound effect if sound effects are on. */
+/**
+ * The one switch for all audio. It stays off on the welcome, sign-up and log-in screens and through
+ * QUEST's greeting, and turns on only once a signed-in player reaches the main app. Every sound
+ * and the music check it here, so no stray call elsewhere can make a noise early.
+ */
+let active = false
+
+export const setAudioActive = (on: boolean): void => {
+  if (active === on) return
+  active = on
+  syncMusic()
+}
+
+/** Plays a named sound effect if audio is active and sound effects are on. */
 export const play = (name: SoundName): void => {
-  if (!settings.sfx || settings.volume <= 0) return
+  if (!active || !settings.sfx || settings.volume <= 0) return
   const now = performance.now()
   if (now - (lastPlayed.get(name) ?? 0) < MIN_GAP_MS || voices >= MAX_VOICES) return
   const ac = audio()
@@ -101,6 +114,7 @@ let musicTimer: ReturnType<typeof setInterval> | null = null
 let musicStep = 0
 
 const tickMusic = () => {
+  if (!active) return
   const ac = audio()
   if (!ac || !master) return
   const freq = MUSIC_STEPS[musicStep % MUSIC_STEPS.length]
@@ -110,7 +124,7 @@ const tickMusic = () => {
 }
 
 const syncMusic = () => {
-  const want = settings.music && settings.volume > 0 && unlocked
+  const want = active && settings.music && settings.volume > 0 && unlocked
   if (want && !musicTimer) musicTimer = setInterval(tickMusic, STEP_SECONDS * 1000)
   if (!want && musicTimer) {
     clearInterval(musicTimer)

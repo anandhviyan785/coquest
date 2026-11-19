@@ -52,8 +52,10 @@ export default function App() {
   const { status, state } = useApp()
   const { pathname } = useLocation()
   useDailyReminder()
-  useSoundSystem(state.settings)
   const publicPage = pageByPath(pathname)
+  // Silent on the welcome, sign-up and log-in screens and through QUEST's greeting; sound starts
+  // once a signed-in player reaches the app. Returning players who are already onboarded get it at once.
+  useSoundSystem(state.settings, status === 'ready' && state.onboarded && !publicPage)
   usePrivateSeo(isAppPath(pathname) && status !== 'loading', pathname)
 
   // Public landing pages are open to everyone, signed in or not.

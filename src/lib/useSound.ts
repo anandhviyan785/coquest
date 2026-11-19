@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { configure, onVisibility, play, unlock } from './sfx'
+import { configure, onVisibility, play, setAudioActive, unlock } from './sfx'
 import type { SoundName } from './sfx'
 import type { SoundSettings } from './types'
 
@@ -21,9 +21,14 @@ const soundFor = (target: EventTarget | null): SoundName | null => {
   return 'tap'
 }
 
-/** Keeps the sound engine in step with the player's settings and wires up click sounds. */
-export function useSoundSystem(settings: SoundSettings): void {
+/**
+ * Keeps the sound engine in step with the player's settings and wires up click sounds. `active`
+ * is false until the player is signed in and past QUEST's greeting; until then nothing plays.
+ * The saved settings themselves are never changed by this.
+ */
+export function useSoundSystem(settings: SoundSettings, active: boolean): void {
   useEffect(() => configure(settings), [settings])
+  useEffect(() => setAudioActive(active), [active])
 
   useEffect(() => {
     const onPointer = (event: PointerEvent) => {
