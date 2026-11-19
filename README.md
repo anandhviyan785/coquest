@@ -19,6 +19,7 @@ Open http://localhost:5183. With no configuration CoQuest runs in **local mode**
 | `npm run build` | Typecheck and build for production |
 | `npm run verify` | Run every exercise's reference solution against its tests |
 | `npm run test:reminders` | Test the reminder email builder and unsubscribe tokens |
+| `npm run test:rewards` | Test Daily Rewards, chests and Daily Puzzle rules, and check every puzzle |
 | `npm run lint` | Lint with oxlint |
 
 ## Deployment
@@ -40,11 +41,13 @@ The Vercel project is `coquest` in the `pyquest1` team (Hobby plan).
 | Accounts (email + password) | No — username only | Yes |
 | Leaderboards | Shows only you | Everyone in your league |
 | Duels | Between two tabs of one browser | Over the internet |
+| Daily Rewards and Daily Puzzle | Checked in the browser | Decided by the database: one claim per day, rewards set by the server |
+| Language, sound settings, gems, chests | Saved in the browser | Synced to your account |
 
 ## Connect Supabase
 
 1. Create a project at supabase.com.
-2. Run `supabase/schema.sql` in the SQL editor.
+2. Run `supabase/schema.sql` in the SQL editor, then `supabase/rewards.sql` (Daily Rewards and Daily Puzzle tables and functions).
 3. Copy `.env.example` to `.env` and fill in the project URL and anon key, then restart the dev server.
 
 ## Sign in with Google using only Google Cloud (no Supabase)

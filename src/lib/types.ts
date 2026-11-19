@@ -70,7 +70,7 @@ export interface DayLog {
 
 export interface LessonResult { at: string; accuracy: number; xp: number; perfect: boolean }
 
-export type HistoryKind = 'lesson' | 'boss' | 'daily' | 'duel' | 'reward'
+export type HistoryKind = 'lesson' | 'boss' | 'daily' | 'duel' | 'reward' | 'puzzle'
 export interface HistoryItem { at: string; kind: HistoryKind; title: string; xp: number }
 
 /** What the player told QUEST in the welcome flow. */
@@ -110,4 +110,29 @@ export interface UserState {
   wager: { base: number; target: number } | null
   history: HistoryItem[]
   createdAt: string
+  /** Sound effects, music and volume. Saved with the account so they follow the player. */
+  settings: SoundSettings
+  /** Daily Rewards chests claimed, keyed by day. */
+  rewardClaims: Record<string, RewardClaim>
+  /** Bonus chests won from milestones and achievements, waiting to be opened. */
+  chests: ChestItem[]
+  /** Daily Puzzle results, keyed by day. */
+  puzzles: Record<string, PuzzleResult>
+  /** Every gem earned or spent, newest first. */
+  gemLog: GemTx[]
 }
+
+export interface SoundSettings { sfx: boolean; music: boolean; /** 0 to 1. */ volume: number }
+
+export type Rarity = 'rare' | 'epic' | 'legendary'
+
+/** What a chest held. */
+export interface Loot { rarity: Rarity; xp: number; gems: number; savers: number; bonusChest: Rarity | null }
+
+export interface RewardClaim extends Loot { at: string; /** 1 to 7: the day of the weekly reward cycle. */ cycleDay: number }
+
+export interface ChestItem { id: string; rarity: Rarity; source: string; at: string }
+
+export interface PuzzleResult { at: string; lang: LangId; puzzleId: string; solved: boolean; attempts: number; xp: number; gems: number }
+
+export interface GemTx { at: string; amount: number; reason: string }

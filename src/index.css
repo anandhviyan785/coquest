@@ -12,11 +12,11 @@
   --font-mono: 'JetBrains Mono Variable', ui-monospace, Consolas, monospace;
 
   /* Surfaces and text */
-  --color-bg: #ffffff;
-  --color-surface: #f7f7f7;
+  --color-bg: #fbf9ff;
+  --color-surface: #f4f0fc;
   --color-card: #ffffff;
-  --color-raised: #f7f7f7;
-  --color-line: #e5e5e5;
+  --color-raised: #f4f0fc;
+  --color-line: #e8e1f5;
   --color-ink: #3c3c3c;
   --color-body: #4b4b4b;
   --color-mute: #777777;
@@ -29,13 +29,15 @@
   --color-green-soft: #d7ffb8;
 
   /* Accent and selection */
-  --color-blue: #1cb0f6;
-  --color-blue-dark: #1899d6;
-  --color-blue-soft: #ddf4ff;
-  --color-blue-line: #84d8ff;
-  --color-sky: #1cb0f6;
-  --color-cyan: #1cb0f6;
-  --color-ice: #1899d6;
+  /* Purple is the theme colour. The token names stay "blue" so existing markup keeps working. */
+  --color-blue: #8a4dff;
+  --color-blue-dark: #6c2ee0;
+  --color-blue-soft: #f1e9ff;
+  --color-blue-line: #c9a8ff;
+  --color-sky: #a77bff;
+  --color-cyan: #8a4dff;
+  --color-ice: #6c2ee0;
+  --color-magenta: #d14dff;
 
   /* Status */
   --color-ok: #58a700;
@@ -53,6 +55,32 @@
   --animate-rise: rise 0.25s ease-out;
   --animate-bob: bob 3.2s ease-in-out infinite;
   --animate-shake: shake 0.35s ease-in-out;
+  --animate-wiggle: wiggle 2.6s ease-in-out infinite;
+  --animate-glow: glow 2.4s ease-in-out infinite;
+  --animate-spring: spring 0.5s cubic-bezier(0.2, 1.6, 0.4, 1);
+  --animate-float-up: float-up 1.2s ease-out forwards;
+
+  @keyframes wiggle {
+    0%, 70%, 100% { transform: rotate(0) scale(1); }
+    76% { transform: rotate(-8deg) scale(1.05); }
+    82% { transform: rotate(7deg) scale(1.05); }
+    88% { transform: rotate(-4deg) scale(1.02); }
+    94% { transform: rotate(2deg); }
+  }
+  @keyframes glow {
+    0%, 100% { opacity: 0.55; transform: scale(0.92); }
+    50% { opacity: 1; transform: scale(1.08); }
+  }
+  @keyframes spring {
+    0% { transform: scale(0.6); opacity: 0; }
+    60% { transform: scale(1.08); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+  @keyframes float-up {
+    0% { transform: translateY(0); opacity: 0; }
+    15% { opacity: 1; }
+    100% { transform: translateY(-36px); opacity: 0; }
+  }
 
   @keyframes pop {
     from { transform: scale(0.85); opacity: 0; }
@@ -76,27 +104,27 @@
 
 /* Dark theme: the same tokens, re-pointed. Light is the default above. */
 :root[data-theme='dark'] {
-  --color-bg: #131f24;
-  --color-surface: #1c2b33;
-  --color-card: #1a272e;
-  --color-raised: #202f36;
-  --color-line: #37464f;
+  --color-bg: #120e1d;
+  --color-surface: #1d1730;
+  --color-card: #19142a;
+  --color-raised: #231c3a;
+  --color-line: #352b52;
   --color-ink: #f1f7fb;
   --color-body: #dce6ec;
-  --color-mute: #99aab5;
-  --color-faint: #6b808c;
+  --color-mute: #a99fc4;
+  --color-faint: #6f6690;
   --color-notice: #3a3316;
-  --color-blue-soft: #16384a;
-  --color-blue-line: #2d7da6;
+  --color-blue-soft: #2a1d4d;
+  --color-blue-line: #6a45b5;
   --color-green-soft: #1f3a12;
   --color-bad-soft: #43201f;
   --color-ok: #7ad43a;
   --color-bad-dark: #ff7676;
-  --color-blue-dark: #49c0f8;
-  --scrollbar: #37464f;
+  --color-blue-dark: #b48cff;
+  --scrollbar: #352b52;
   color-scheme: dark;
 }
-:root[data-theme='dark'] ::selection { background: #1d5775; }
+:root[data-theme='dark'] ::selection { background: #4a2d8a; }
 
 html, body, #root { height: 100%; }
 
@@ -124,6 +152,25 @@ body {
 .grad-primary { background: var(--color-gold); }
 .grad-secondary { background: var(--color-blue); }
 .grad-premium { background: var(--color-blue-soft); }
+
+/* ── Purple theme surfaces ───────────────────────────────────────────────── */
+.grad-hero { background: linear-gradient(135deg, #8a4dff 0%, #a54dff 55%, #d14dff 100%); }
+.grad-gold { background: linear-gradient(135deg, #ffb800 0%, #ff8a00 100%); }
+.grad-night { background: linear-gradient(160deg, #2a1660 0%, #4b23a8 60%, #7a3cf0 100%); }
+.glow-purple { box-shadow: 0 10px 30px -10px rgb(138 77 255 / 0.55), 0 2px 0 rgb(108 46 224 / 0.15); }
+.glow-gold { box-shadow: 0 10px 30px -10px rgb(255 168 0 / 0.6); }
+.soft-card { background: var(--color-card); border: 2px solid var(--color-line); border-radius: 1.25rem; box-shadow: 0 6px 18px -12px rgb(76 29 149 / 0.35); }
+
+/* Buttons and cards that spring when pressed and lift on hover. */
+.press { transition: transform 0.18s cubic-bezier(0.2, 1.6, 0.4, 1), box-shadow 0.2s ease; }
+.press:hover { transform: translateY(-2px); }
+.press:active { transform: translateY(1px) scale(0.97); }
+
+/* Book pages flipping and a puzzle piece rocking, for the shortcut icons. */
+.book-flip { transform-origin: 50% 50%; animation: book-flip 3.4s ease-in-out infinite; }
+@keyframes book-flip { 0%, 80%, 100% { transform: rotateY(0); } 88% { transform: rotateY(160deg); } }
+.piece-rock { animation: piece-rock 3s ease-in-out infinite; transform-origin: 50% 60%; }
+@keyframes piece-rock { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-10deg) translateY(-2px); } 60% { transform: rotate(8deg); } }
 
 .tnum { font-variant-numeric: tabular-nums; }
 

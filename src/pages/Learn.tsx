@@ -1,15 +1,15 @@
-import { BookOpen, Check, Lock, Skull, Star } from 'lucide-react'
+import { Check, Lock, Skull, Star } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { LangLogo } from '../components/LangLogo'
+import { useNavigate, useParams } from 'react-router-dom'
+import { CompactShortcuts, FeatureTiles, SaverNotice } from '../components/HomeShortcuts'
+import { LanguagePicker } from '../components/LanguagePicker'
 import { Mascot } from '../components/Mascot'
 import { QuestCheer } from '../components/QuestCheer'
 import { LinkButton, cx } from '../components/ui'
-import { CODING_BASICS, DEV_TERMS, GLOSSARIES } from '../content/glossary'
-import { COURSES, courseById, courseProgress, findBoss, findLesson, isUnlocked, nextStep, stepPath } from '../content'
+import { COURSES, courseById, findBoss, findLesson, isUnlocked, nextStep, stepPath } from '../content'
 import { XP } from '../lib/gamification'
 import { COMPILER_HELP, compilerConfigured, needsCompiler } from '../lib/runner'
-import type { Course, Unit } from '../lib/types'
+import type { Course, LangId, Unit } from '../lib/types'
 import { useApp } from '../state/AppContext'
 
 const NODE_GAP = 92
@@ -18,14 +18,14 @@ const NODE_H = 58
 const OFFSETS = [0, -44, -70, -44, 0, 44, 70, 44]
 const LAST_COURSE_KEY = 'pyquest:v1:course'
 
-/** Banner and node colours, one per unit, cycling through the blue theme. */
+/** Banner and node colours, one per unit, cycling through the purple theme. */
 const UNIT_COLORS = [
-  { fill: '#1CB0F6', edge: '#1899D6' },
-  { fill: '#2B70C9', edge: '#1F5AA6' },
-  { fill: '#00B8D4', edge: '#0097AE' },
-  { fill: '#4A62D8', edge: '#3A4EB4' },
-  { fill: '#1CB0F6', edge: '#1899D6' },
-  { fill: '#2B70C9', edge: '#1F5AA6' },
+  { fill: '#8A4DFF', edge: '#6C2EE0', to: '#B04DFF' },
+  { fill: '#6D3FE8', edge: '#5228C2', to: '#8F5CFF' },
+  { fill: '#B24DF0', edge: '#8E2FCC', to: '#D86BFF' },
+  { fill: '#5B4BE0', edge: '#4334B8', to: '#8A6DFF' },
+  { fill: '#9A3FE0', edge: '#7A28BC', to: '#C25CFF' },
+  { fill: '#7B4DFF', edge: '#5F31DD', to: '#A47BFF' },
 ]
 
 type NodeState = 'done' | 'current' | 'open' | 'locked'
@@ -42,7 +42,7 @@ const buildNodes = (course: Course, unit: Unit, done: Record<string, unknown>, c
   }))
 }
 
-function NodePopover({ node, color, onClose }: { node: PathNode; color: { fill: string; edge: string }; onClose: () => void }) {
+function NodePopover({ node, color, onClose }: { node: PathNode; color: { fill: string; edge: string; to: string }; onClose: () => void }) {
   const { state } = useApp()
   const ref = useRef<HTMLDivElement>(null)
   const boss = node.boss ? findBoss(node.id) : undefined
@@ -94,12 +94,17 @@ function UnitSection({ course, unit, index, nodes, selected, onSelect }: { cours
 
   return (
     <section aria-label={unit.title} className="mb-10">
-      <header className="flex items-center justify-between gap-4 rounded-2xl border-b-4 px-5 py-4 text-white" style={{ background: color.fill, borderColor: color.edge }}>
-        <div className="min-w-0">
-          <p className="label text-[13px] text-white/80">{course.name} · Unit {index + 1}</p>
-          <h2 className="mt-0.5 truncate text-xl font-bold">{unit.title}</h2>
+      <header className="glow-purple overflow-hidden rounded-[22px] border-b-4 px-5 py-4 text-white" style={{ background: `linear-gradient(135deg, ${color.fill}, ${color.to})`, borderColor: color.edge }}>
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="label text-[13px] text-white/80">{course.name} · Unit {index + 1}</p>
+            <h2 className="mt-0.5 truncate text-xl font-bold">{unit.title}</h2>
+          </div>
+          <span className="label tnum shrink-0 rounded-xl border-2 border-b-4 border-black/15 bg-white/10 px-3 py-2 text-[13px]">{done} / {nodes.length}</span>
         </div>
-        <span className="label tnum shrink-0 rounded-xl border-2 border-b-4 border-black/15 px-3 py-2 text-[13px]">{done} / {nodes.length}</span>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-black/20" role="progressbar" aria-label={`${unit.title} progress`} aria-valuenow={done} aria-valuemin={0} aria-valuemax={nodes.length}>
+          <div className="h-full rounded-full bg-white transition-[width] duration-700 ease-out" style={{ width: `${nodes.length ? (done / nodes.length) * 100 : 0}%` }} />
+        </div>
       </header>
 
       <div className="relative mx-auto mt-8" style={{ height: nodes.length * NODE_GAP + 16 }}>
@@ -118,8 +123,9 @@ function UnitSection({ course, unit, index, nodes, selected, onSelect }: { cours
                 onClick={() => onSelect(isOpen ? null : node.id)}
                 aria-label={`${node.title}${node.state === 'locked' ? ' (locked)' : node.state === 'done' ? ' (completed)' : ''}`}
                 aria-expanded={isOpen}
-                className={cx('relative flex items-center justify-center rounded-[50%] transition-transform active:translate-y-2', node.state === 'current' && 'outline outline-[6px] outline-offset-[6px] outline-line')}
-                style={{ width: NODE_W, height: NODE_H, background: coloured ? color.fill : 'var(--color-line)', boxShadow: `0 8px 0 ${coloured ? color.edge : '#B7B7B7'}`, color: coloured ? '#fff' : '#AFAFAF' }}
+                data-sfx="open"
+                className={cx('relative flex items-center justify-center rounded-[50%] transition-transform hover:scale-105 active:translate-y-2', node.state === 'current' && 'outline outline-[6px] outline-offset-[6px] outline-blue-line')}
+                style={{ width: NODE_W, height: NODE_H, background: coloured ? `linear-gradient(160deg, ${color.to}, ${color.fill})` : 'var(--color-line)', boxShadow: coloured ? `0 8px 0 ${color.edge}, 0 14px 24px -10px ${color.fill}` : '0 8px 0 #c9c0dc', color: coloured ? '#fff' : '#AFA6C4' }}
               >
                 {node.state === 'locked' ? (node.boss ? <Skull size={30} strokeWidth={2.4} /> : <Lock size={26} strokeWidth={3} />) : node.boss ? <Skull size={32} strokeWidth={2.4} /> : node.state === 'done' ? <Check size={32} strokeWidth={4} /> : <Star size={30} fill="currentColor" />}
               </button>
@@ -140,6 +146,9 @@ export function Learn() {
   const navigate = useNavigate()
   const { state } = useApp()
 
+  const { patch } = useApp()
+  // The language is saved on the account (profile.language). Older versions kept it in this
+  // browser only, so that is read as a fallback for players who have not picked one since.
   const remembered = (() => {
     try {
       return localStorage.getItem(LAST_COURSE_KEY) ?? ''
@@ -147,49 +156,30 @@ export function Learn() {
       return ''
     }
   })()
-  const course = courseById(courseId ?? '') ?? courseById(remembered) ?? COURSES[0]
+  const course = courseById(courseId ?? '') ?? courseById(state.profile.language ?? '') ?? courseById(remembered) ?? COURSES[0]
   const current = nextStep(course, state.lessons)
   const [selected, setSelected] = useState<string | null>(null)
+  const [picking, setPicking] = useState(false)
 
   useEffect(() => {
     setSelected(null)
-    try {
-      localStorage.setItem(LAST_COURSE_KEY, course.id)
-    } catch (err) {
-      console.error('Could not remember the selected course', err)
-    }
-  }, [course.id])
+    if (state.profile.language !== course.id) patch({ profile: { ...state.profile, language: course.id } })
+  }, [course.id, state.profile, patch])
+
+  const pickLanguage = (id: LangId) => {
+    setPicking(false)
+    navigate(`/learn/${id}`)
+  }
 
   const units = useMemo(() => course.units.map((unit) => ({ unit, nodes: buildNodes(course, unit, state.lessons, current) })), [course, state.lessons, current])
 
   return (
     <div>
-      <div className="-mx-1 mb-6 flex gap-2 overflow-x-auto px-1 pb-2" role="tablist" aria-label="Courses">
-        {COURSES.map((c) => {
-          const active = c.id === course.id
-          const pct = courseProgress(c, state.lessons).pct
-          return (
-            <button key={c.id} role="tab" aria-selected={active} onClick={() => navigate(`/learn/${c.id}`)} className={cx('flex shrink-0 items-center gap-2.5 rounded-xl border-2 border-b-4 px-3 py-2 transition-colors', active ? 'border-blue-line bg-blue-soft' : 'border-line bg-card hover:bg-surface')}>
-              <LangLogo lang={c.id} size={30} />
-              <span className="text-left">
-                <span className={cx('block text-[15px] font-bold leading-tight', active ? 'text-blue' : 'text-body')}>{c.name}</span>
-                <span className="tnum block text-[12px] font-bold text-faint">{pct}%</span>
-              </span>
-            </button>
-          )
-        })}
-      </div>
+      <CompactShortcuts course={course} onOpenLanguages={() => setPicking(true)} />
+      <FeatureTiles course={course} />
+      <SaverNotice />
 
       <QuestCheer />
-
-      <Link to={`/learn/${course.id}/glossary`} className="mb-6 flex items-center gap-4 rounded-2xl border-2 border-b-4 border-line px-5 py-4 transition-colors hover:bg-surface active:translate-y-0.5 active:border-b-2">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-soft text-blue"><BookOpen size={22} strokeWidth={2.4} /></span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-[17px] font-bold text-body">{course.name} glossary</span>
-          <span className="block text-[15px] text-mute">{GLOSSARIES[course.id].length + CODING_BASICS.length + DEV_TERMS.length} key terms explained in plain language</span>
-        </span>
-        <span className="label hidden text-[13px] text-blue sm:block">Open</span>
-      </Link>
 
       {needsCompiler(course.id) && !compilerConfigured && (
         <p className="mb-6 rounded-2xl border-2 border-gold bg-notice px-5 py-4 text-[15px] font-bold leading-relaxed text-body" role="note">{COMPILER_HELP} Until then you can read these lessons and answer the questions, but the coding exercises cannot be checked.</p>
@@ -199,11 +189,13 @@ export function Learn() {
         <UnitSection key={unit.id} course={course} unit={unit} index={i} nodes={nodes} selected={selected} onSelect={setSelected} />
       ))}
 
+      <LanguagePicker open={picking} current={course.id} onPick={pickLanguage} onClose={() => setPicking(false)} />
+
       {!current && (
         <div className="flex flex-col items-center rounded-2xl border-2 border-line p-8 text-center">
           <Mascot expression="victorious" size={130} />
           <p className="mt-3 text-xl font-bold text-ink">{course.name} complete!</p>
-          <p className="mt-1 text-[15px] text-mute">Every lesson and boss in this course is done. Pick another language above.</p>
+          <p className="mt-1 text-[15px] text-mute">Every lesson and boss in this course is done. Pick another language from the language box above.</p>
         </div>
       )}
     </div>

@@ -1,4 +1,5 @@
 import { dayKey } from './dates'
+import { addGems } from './gamification'
 import type { UserState } from './types'
 
 export interface Quest { id: string; title: string; target: number; reward: number; progress: (s: UserState, day: string) => number }
@@ -22,5 +23,5 @@ export const questStatus = (s: UserState, day: string = dayKey()): QuestStatus[]
 export const claimQuest = (s: UserState, id: string, day: string = dayKey()): UserState => {
   const status = questStatus(s, day).find((q) => q.quest.id === id)
   if (!status || !status.done || status.claimed) return s
-  return { ...s, gems: s.gems + status.quest.reward, questClaims: { [day]: [...(s.questClaims[day] ?? []), id] } }
+  return { ...addGems(s, status.quest.reward, `Daily quest: ${status.quest.title}`), questClaims: { [day]: [...(s.questClaims[day] ?? []), id] } }
 }

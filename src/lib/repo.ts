@@ -1,7 +1,7 @@
 import { dayKey, weekStartOf } from './dates'
 import { leagueFromXp, liveStreak, newUserState } from './gamification'
 import { supabase } from './supabase'
-import type { UserState } from './types'
+import type { LangId, Loot, Rarity, UserState } from './types'
 
 /** Fills in any fields missing from older saved states. */
 export const hydrate = (raw: unknown, fallbackName: string): UserState => {
@@ -12,6 +12,11 @@ export const hydrate = (raw: unknown, fallbackName: string): UserState => {
     ...base,
     ...saved,
     profile: { ...base.profile, ...saved.profile },
+    settings: { ...base.settings, ...saved.settings },
+    rewardClaims: saved.rewardClaims ?? {},
+    chests: Array.isArray(saved.chests) ? saved.chests : [],
+    puzzles: saved.puzzles ?? {},
+    gemLog: Array.isArray(saved.gemLog) ? saved.gemLog : [],
     // Anyone who already had saved progress before the welcome flow existed skips it.
     onboarded: saved.onboarded ?? true,
   }
@@ -113,4 +118,29 @@ export const signedInEmail = async (): Promise<string | null> => {
   if (!supabase) return null
   const { data } = await supabase.auth.getUser()
   return data.user?.email ?? null
+}
+
+// ── Daily Rewards and Daily Puzzle (cloud only) ───────────────────────────
+// These run as database functions (supabase/schema.sql) so the server decides the reward and
+// a second claim on the same day is refused, whatever the browser sends.
+
+const RARITIES: Rarity[] = ['rare', 'epic', 'legendary']
+
+export const claimDailyCloud = async (day: string): Promise<Loot & { cycleDay: number }> => {
+  if (!supabase) throw new Error('Supabase is not configured')
+  const { data, error } = await supabase.rpc('claim_daily_reward', { p_day: day })
+  if (error) throw new Error(error.message.includes('already_claimed') ? "Today's chest has already been claimed." : error.message)
+  const row = (Array.isArray(data) ? data[0] : data) as { cycle_day: number; rarity: string; xp: number; gems: number; savers: number; bonus_chest: string | null } | null
+  if (!row || !RARITIES.includes(row.rarity as Rarity)) throw new Error('The server sent an unexpected reward.')
+  const bonus = row.bonus_chest && RARITIES.includes(row.bonus_chest as Rarity) ? (row.bonus_chest as Rarity) : null
+  return { cycleDay: row.cycle_day, rarity: row.rarity as Rarity, xp: row.xp, gems: row.gems, savers: row.savers, bonusChest: bonus }
+}
+
+export const recordPuzzleCloud = async (day: string, lang: LangId, puzzleId: string, difficulty: number, solved: boolean, attempts: number): Promise<{ xp: number; gems: number }> => {
+  if (!supabase) throw new Error('Supabase is not configured')
+  const { data, error } = await supabase.rpc('complete_daily_puzzle', { p_day: day, p_lang: lang, p_puzzle_id: puzzleId, p_difficulty: difficulty, p_solved: solved, p_attempts: attempts })
+  if (error) throw new Error(error.message.includes('already_played') ? "Today's puzzle has already been played." : error.message)
+  const row = (Array.isArray(data) ? data[0] : data) as { xp: number; gems: number } | null
+  if (!row) throw new Error('The server sent an unexpected result.')
+  return { xp: row.xp, gems: row.gems }
 }

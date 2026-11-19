@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 
-const COLORS = ['#1CB0F6', '#FFC800', '#FF9600', '#CE82FF', '#58CC02', '#FF4B4B']
+const COLORS = ['#8A4DFF', '#FFC800', '#FF9600', '#CE82FF', '#58CC02', '#FF4B4B']
 const COUNT = 18
 
 interface Piece { dx: number; dy: number; rot: number; color: string; round: boolean; delay: number }

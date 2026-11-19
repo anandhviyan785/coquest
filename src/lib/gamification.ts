@@ -1,5 +1,5 @@
-import { addDays, dayKey, daysBetween, weekStartOf } from './dates'
-import type { DayLog, HistoryItem, LangId, UserState } from './types'
+import { addDays, dayKey, daysBetween, weekStartOf } from './dates.ts'
+import type { DayLog, HistoryItem, LangId, UserState } from './types.ts'
 
 export const XP = {
   lesson: 20,
@@ -30,6 +30,17 @@ export const SHOP = {
   wager: { cost: 50, days: 7, payout: 100 },
 } as const
 const HISTORY_LIMIT = 60
+const GEM_LOG_LIMIT = 100
+
+/** Adds (or, when negative, spends) gems and records why in the gem history. */
+export const addGems = (s: UserState, amount: number, reason: string): UserState =>
+  amount === 0
+    ? s
+    : {
+        ...s,
+        gems: Math.max(0, s.gems + amount),
+        gemLog: [{ at: new Date().toISOString(), amount, reason }, ...(s.gemLog ?? [])].slice(0, GEM_LOG_LIMIT),
+      }
 
 // ── Levels ────────────────────────────────────────────────────────────────
 /** Total XP needed to reach a level. Level 1 = 0, 2 = 100, 3 = 300, 4 = 600 … */
@@ -145,9 +156,8 @@ export const applyActivity = (state: UserState, a: Activity, today: string = day
     langs: a.lang ? { ...prev.langs, [a.lang]: (prev.langs[a.lang] ?? 0) + a.xp } : prev.langs,
   }
   const next: UserState = {
-    ...rolled,
+    ...addGems(rolled, gemsForXp(a.xp), a.title),
     xp: rolled.xp + a.xp,
-    gems: rolled.gems + gemsForXp(a.xp),
     weeklyXp: rolled.weeklyXp + a.xp,
     days: { ...rolled.days, [today]: day },
     history: [{ at: new Date().toISOString(), kind: a.kind, title: a.title, xp: a.xp }, ...rolled.history].slice(
@@ -167,7 +177,7 @@ const note = (s: UserState, title: string): UserState => ({
 /** Pays out a won wager, or clears one whose streak was broken. */
 const settleWager = (s: UserState, newDay: boolean): UserState => {
   if (!s.wager) return s
-  if (s.streak >= s.wager.target) return note({ ...s, gems: s.gems + SHOP.wager.payout, wager: null }, `Double or Nothing won: +${SHOP.wager.payout} gems`)
+  if (s.streak >= s.wager.target) return note({ ...addGems(s, SHOP.wager.payout, 'Double or Nothing won'), wager: null }, `Double or Nothing won: +${SHOP.wager.payout} gems`)
   if (newDay && s.streak <= s.wager.base) return note({ ...s, wager: null }, 'Double or Nothing lost: streak broken')
   return s
 }
@@ -175,14 +185,14 @@ const settleWager = (s: UserState, newDay: boolean): UserState => {
 export const canBuyFreeze = (s: UserState): boolean => s.gems >= SHOP.freeze.cost && s.freezes < SHOP.freeze.max
 
 export const buyFreeze = (s: UserState): UserState =>
-  canBuyFreeze(s) ? note({ ...s, gems: s.gems - SHOP.freeze.cost, freezes: s.freezes + 1 }, 'Bought a Streak Freeze') : s
+  canBuyFreeze(s) ? note({ ...addGems(s, -SHOP.freeze.cost, 'Bought a Streak Freeze'), freezes: s.freezes + 1 }, 'Bought a Streak Freeze') : s
 
 export const canPlaceWager = (s: UserState): boolean => s.gems >= SHOP.wager.cost && s.wager === null
 
 export const placeWager = (s: UserState, today: string = dayKey()): UserState => {
   if (!canPlaceWager(s)) return s
   const base = liveStreak(s, today)
-  return note({ ...s, gems: s.gems - SHOP.wager.cost, wager: { base, target: base + SHOP.wager.days } }, 'Placed a Double or Nothing wager')
+  return note({ ...addGems(s, -SHOP.wager.cost, 'Placed a Double or Nothing wager'), wager: { base, target: base + SHOP.wager.days } }, 'Placed a Double or Nothing wager')
 }
 
 /** Consecutive days, ending today or yesterday, on which the daily goal was met. */
@@ -238,4 +248,9 @@ export const newUserState = (username: string): UserState => ({
   wager: null,
   history: [],
   createdAt: new Date().toISOString(),
+  settings: { sfx: true, music: false, volume: 0.7 },
+  rewardClaims: {},
+  chests: [],
+  puzzles: {},
+  gemLog: [],
 })

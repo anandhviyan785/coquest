@@ -1,4 +1,4 @@
-import { CalendarCheck, Check, Gift, GraduationCap, Lock, Pencil, Skull, Swords, Upload } from 'lucide-react'
+import { BarChart3, CalendarCheck, Check, Gift, GraduationCap, Lock, LogOut, Pencil, Puzzle, Settings as SettingsIcon, Skull, Swords, Upload } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import type { ReactNode } from 'react'
@@ -13,7 +13,7 @@ import { leagueFromXp, levelProgress, liveStreak, totals } from '../lib/gamifica
 import type { HistoryKind } from '../lib/types'
 import { useApp } from '../state/AppContext'
 
-const HISTORY_ICON: Record<HistoryKind, LucideIcon> = { lesson: GraduationCap, boss: Skull, daily: CalendarCheck, duel: Swords, reward: Gift }
+const HISTORY_ICON: Record<HistoryKind, LucideIcon> = { lesson: GraduationCap, boss: Skull, daily: CalendarCheck, duel: Swords, reward: Gift, puzzle: Puzzle }
 const BADGE_COLORS = ['#FF4B4B', '#58CC02', '#1CB0F6', '#FF9600', '#CE82FF', '#00CD9C', '#FFC800']
 
 const when = (iso: string): string => new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
@@ -31,7 +31,7 @@ function Tile({ icon, value, label }: { icon: ReactNode; value: ReactNode; label
 }
 
 export function Profile() {
-  const { state, patch, notify, cloud } = useApp()
+  const { state, patch, notify, cloud, signOut } = useApp()
   const [picking, setPicking] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
 
@@ -58,11 +58,11 @@ export function Profile() {
 
   return (
     <div>
-      <div className="relative flex h-[228px] items-end justify-center overflow-hidden rounded-2xl bg-blue-soft">
+      <div className="grad-hero glow-purple relative flex h-[228px] items-end justify-center overflow-hidden rounded-[28px]">
         <button onClick={() => setPicking(true)} aria-label="Change profile picture" className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-xl border-2 border-b-4 border-line bg-card text-body hover:bg-surface active:translate-y-0.5 active:border-b-2">
           <Pencil size={20} strokeWidth={2.6} />
         </button>
-        <button onClick={() => setPicking(true)} aria-label="Change profile picture" className="translate-y-6 rounded-full outline-dashed outline-[3px] outline-offset-4 outline-blue">
+        <button onClick={() => setPicking(true)} aria-label="Change profile picture" className="translate-y-6 rounded-full outline-dashed outline-[3px] outline-offset-4 outline-white">
           <Avatar avatar={state.avatar} size={176} />
         </button>
       </div>
@@ -137,6 +137,12 @@ export function Profile() {
           })}
         </ol>
       )}
+
+      <div className="mt-9 grid gap-3 sm:grid-cols-3">
+        <Link to="/settings" className="press soft-card flex items-center gap-3 p-4 font-bold text-body"><SettingsIcon size={20} className="text-blue" />Settings</Link>
+        <Link to="/stats" className="press soft-card flex items-center gap-3 p-4 font-bold text-body"><BarChart3 size={20} className="text-blue" />Statistics</Link>
+        <button onClick={() => signOut().catch((err: unknown) => notify({ kind: 'error', title: 'Could not sign out', body: err instanceof Error ? err.message : undefined }))} className="press soft-card flex items-center gap-3 p-4 text-left font-bold text-body"><LogOut size={20} className="text-blue" />Sign out</button>
+      </div>
 
       <Modal open={picking} onClose={() => setPicking(false)}>
         <h2 className="text-xl font-bold text-ink">Profile picture</h2>

@@ -4,6 +4,7 @@ import { Mascot } from './components/Mascot'
 import { isAppPath, pageByPath } from './content/seo'
 import { applySeo } from './lib/useSeo'
 import { useDailyReminder } from './lib/useDailyReminder'
+import { useSoundSystem } from './lib/useSound'
 import { Auth } from './pages/Auth'
 import { Landing } from './pages/public/Landing'
 import { NotFound, NotFoundBody } from './pages/public/NotFound'
@@ -22,6 +23,9 @@ const Learn = lazy(() => import('./pages/Learn').then((m) => ({ default: m.Learn
 const LessonPage = lazy(() => import('./pages/Lesson').then((m) => ({ default: m.LessonPage })))
 const Onboarding = lazy(() => import('./pages/Onboarding').then((m) => ({ default: m.Onboarding })))
 const Playground = lazy(() => import('./pages/Playground').then((m) => ({ default: m.Playground })))
+const Practice = lazy(() => import('./pages/Practice').then((m) => ({ default: m.Practice })))
+const PuzzlePage = lazy(() => import('./pages/Puzzle').then((m) => ({ default: m.PuzzlePage })))
+const Rewards = lazy(() => import('./pages/Rewards').then((m) => ({ default: m.Rewards })))
 const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })))
 const Quests = lazy(() => import('./pages/Quests').then((m) => ({ default: m.Quests })))
 const Settings = lazy(() => import('./pages/Settings').then((m) => ({ default: m.Settings })))
@@ -48,6 +52,7 @@ export default function App() {
   const { status, state } = useApp()
   const { pathname } = useLocation()
   useDailyReminder()
+  useSoundSystem(state.settings)
   const publicPage = pageByPath(pathname)
   usePrivateSeo(isAppPath(pathname) && status !== 'loading', pathname)
 
@@ -77,6 +82,8 @@ export default function App() {
           <Route path="/learn/:courseId" element={<Learn />} />
           <Route path="/learn/:courseId/glossary" element={<Glossary />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/practice" element={<Practice />} />
+          <Route path="/rewards" element={<Rewards />} />
           <Route path="/quests" element={<Quests />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/profile" element={<Profile />} />
@@ -88,6 +95,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/playground" element={<Playground />} />
           <Route path="/daily" element={<Daily />} />
+          <Route path="/puzzle" element={<PuzzlePage />} />
           <Route path="/duels" element={<Duels />} />
           <Route path="/stats" element={<Stats />} />
           <Route path="*" element={<NotFoundBody />} />

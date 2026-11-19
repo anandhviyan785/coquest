@@ -7,10 +7,19 @@ import { ThemePicker } from '../components/ThemePicker'
 import { notificationPermission, requestNotifications, showNotification } from '../lib/notify'
 import type { Permission } from '../lib/notify'
 import { fetchReminderPref, setReminderPref, signedInEmail } from '../lib/repo'
+import { play } from '../lib/sfx'
 import { REMINDER_HOUR } from '../lib/useDailyReminder'
 import { useApp } from '../state/AppContext'
 
 const USERNAME = /^[A-Za-z0-9_]{3,20}$/
+
+function Switch({ label, on, onChange }: { label: string; on: boolean; onChange: (next: boolean) => void }) {
+  return (
+    <button role="switch" aria-checked={on} aria-label={label} onClick={() => onChange(!on)} className={cx('relative h-8 w-14 shrink-0 rounded-full transition-colors', on ? 'bg-blue' : 'bg-line')}>
+      <span className={cx('absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-[left]', on ? 'left-7' : 'left-1')} />
+    </button>
+  )
+}
 
 function Row({ title, hint, children }: { title: string; hint: string; children: React.ReactNode }) {
   return (
@@ -158,8 +167,25 @@ export function Settings() {
         <Row title="Welcome tour" hint="Meet QUEST again and choose your language, reason, level and daily goal afresh.">
           <Button variant="secondary" onClick={() => patch({ onboarded: false })}>Replay</Button>
         </Row>
-        <Row title="Streak freezes" hint="A freeze is used automatically to protect your streak when you miss a day. Earn more at 7, 30 and 100-day streaks.">
+        <Row title="Streak savers" hint="A streak saver is used automatically to protect your streak when you miss a day. Win them from Epic and Legendary chests, at 7, 30 and 100-day streaks, or in the shop.">
           <span className="tnum text-xl font-semibold">{state.freezes}</span>
+        </Row>
+      </Panel>
+
+      <h2 className="mb-2.5 text-[13px] font-semibold uppercase tracking-[0.08em] text-mute">Sound</h2>
+      <Panel className="mb-7">
+        <Row title="Sound effects" hint="Clicks, correct and wrong answers, chests, rewards and achievements.">
+          <Switch label="Sound effects" on={state.settings.sfx} onChange={(sfx) => { patch({ settings: { ...state.settings, sfx } }); if (sfx) setTimeout(() => play('correct'), 50) }} />
+        </Row>
+        <Row title="Music" hint="A calm background tune while you learn. Plays only after you tap somewhere, and pauses when CoQuest is in the background.">
+          <Switch label="Music" on={state.settings.music} onChange={(music) => patch({ settings: { ...state.settings, music } })} />
+        </Row>
+        <Row title="Volume" hint="Applies to sound effects and music.">
+          <label className="flex w-56 items-center gap-3">
+            <span className="sr-only">Volume</span>
+            <input type="range" min={0} max={100} step={5} value={Math.round(state.settings.volume * 100)} onChange={(e) => patch({ settings: { ...state.settings, volume: Number(e.target.value) / 100 } })} onPointerUp={() => play('xp')} className="w-full accent-[var(--color-blue)]" aria-label="Volume" />
+            <span className="tnum w-10 text-right text-sm font-semibold text-mute">{Math.round(state.settings.volume * 100)}%</span>
+          </label>
         </Row>
       </Panel>
 

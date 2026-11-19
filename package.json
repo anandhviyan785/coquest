@@ -12,6 +12,7 @@
     "lint": "oxlint",
     "verify": "node scripts/verify-content.ts",
     "test:reminders": "node scripts/test-reminders.ts",
+    "test:rewards": "node scripts/test-rewards.ts",
     "preview": "vite preview"
   },
   "dependencies": {

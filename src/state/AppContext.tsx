@@ -6,13 +6,19 @@ import { applyActivity, levelFromXp, newUserState } from '../lib/gamification'
 import type { Activity } from '../lib/gamification'
 import { clearLegacyProfile, createAccount, deleteAccount, getSession, googleAccount, legacyProfile, loadAccountState, renameAccount, saveAccountState, setSession, usernameOf, usernameTaken, verifyLogin } from '../lib/localAuth'
 import { signInWithGooglePopup } from '../lib/googleSignIn'
-import { loadCloud, saveCloud } from '../lib/repo'
+import { claimDailyCloud, loadCloud, recordPuzzleCloud, saveCloud } from '../lib/repo'
+import { claimDaily, milestoneChests, openChest } from '../lib/rewards'
+import { recordPuzzle, puzzleReward } from '../content/puzzles'
+import type { Puzzle } from '../content/puzzles'
+import { addGems } from '../lib/gamification'
 import { isCloud, supabase } from '../lib/supabase'
-import type { LangId, UserState } from '../lib/types'
+import type { LangId, Loot, RewardClaim, UserState } from '../lib/types'
 
 type Status = 'loading' | 'signedOut' | 'ready'
 
 export interface EarnResult { xp: number; achievements: string[]; leveledUp: number | null }
+
+export interface PuzzleOutcome extends EarnResult { gems: number }
 
 export interface Toast { id: number; kind: 'achievement' | 'level' | 'info' | 'error'; title: string; body?: string }
 
@@ -46,6 +52,12 @@ interface AppValue {
   /** Applies a pure state transition, such as a shop purchase or a quest claim. */
   update: (change: (s: UserState) => UserState) => void
   resetProgress: () => void
+  /** Claims today's Daily Rewards chest (checked by the server when one is connected). Null if already claimed. */
+  claimDailyReward: () => Promise<RewardClaim | null>
+  /** Opens a bonus chest from the inventory. */
+  openBonusChest: (id: string) => Loot | null
+  /** Records today's Daily Puzzle and pays its reward. Null if today's puzzle was already played. */
+  finishPuzzle: (puzzle: Puzzle, lang: LangId, solved: boolean, attempts: number) => Promise<PuzzleOutcome | null>
 }
 
 const AppContext = createContext<AppValue | null>(null)
@@ -243,7 +255,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const earn = useCallback((activity: Activity, also?: (s: UserState) => UserState): EarnResult => {
     const before = stateRef.current
     const applied = applyActivity(also ? also(before) : before, activity)
-    const { state: next, earned } = awardAchievements(applied)
+    const { state: awarded, earned } = awardAchievements(applied)
+    const next = milestoneChests(before, awarded, earned)
     commit(next)
     const levelBefore = levelFromXp(before.xp)
     const levelAfter = levelFromXp(next.xp)
@@ -269,6 +282,35 @@ export function AppProvider({ children }: { children: ReactNode }) {
     commit({ ...newUserState(username), avatar, createdAt, profile, onboarded: true })
   }, [commit])
 
+  /** Seeds chest rolls with the account, so a chest's contents cannot be re-rolled by reloading. */
+  const seed = userId ?? stateRef.current.username
+
+  const claimDailyReward = useCallback(async (): Promise<RewardClaim | null> => {
+    if (stateRef.current.rewardClaims[dayKey()]) return null
+    const server = isCloud ? await claimDailyCloud(dayKey()) : undefined
+    const { state: next, claim } = claimDaily(stateRef.current, seed, dayKey(), server)
+    if (claim) commit(next)
+    return claim
+  }, [commit, seed])
+
+  const openBonusChest = useCallback((id: string): Loot | null => {
+    const { state: next, loot } = openChest(stateRef.current, id, seed)
+    if (loot) commit(next)
+    return loot
+  }, [commit, seed])
+
+  const finishPuzzle = useCallback(async (puzzle: Puzzle, lang: LangId, solved: boolean, attempts: number): Promise<PuzzleOutcome | null> => {
+    const today = dayKey()
+    if (stateRef.current.puzzles[today]) return null
+    const reward = isCloud ? await recordPuzzleCloud(today, lang, puzzle.id, puzzle.difficulty, solved, attempts) : puzzleReward(puzzle.difficulty, solved, attempts)
+    const result = { at: new Date().toISOString(), lang, puzzleId: puzzle.id, solved, attempts, xp: reward.xp, gems: reward.gems }
+    const earned = earn(
+      { xp: reward.xp, kind: 'puzzle', title: `Daily Puzzle: ${puzzle.title}`, lang, correct: solved ? 1 : 0, attempts },
+      (s) => addGems(recordPuzzle(s, result, today), reward.gems, 'Daily Puzzle hard bonus'),
+    )
+    return { ...earned, gems: reward.gems }
+  }, [earn])
+
   const value = useMemo<AppValue>(() => ({
     status,
     cloud: isCloud,
@@ -290,7 +332,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     patch,
     update,
     resetProgress,
-  }), [update, status, userId, state, syncError, toasts, dismissToast, notify, signIn, signUp, signOut, signInWithGoogle, deleteLocalAccount, rename, earn, logTime, patch, resetProgress])
+    claimDailyReward,
+    openBonusChest,
+    finishPuzzle,
+  }), [claimDailyReward, openBonusChest, finishPuzzle, update, status, userId, state, syncError, toasts, dismissToast, notify, signIn, signUp, signOut, signInWithGoogle, deleteLocalAccount, rename, earn, logTime, patch, resetProgress])
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
 }

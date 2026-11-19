@@ -297,7 +297,7 @@ export const PUBLIC_PAGES: PublicPage[] = [
 ]
 
 /** First path segment of every address that belongs to the signed-in app (and its sign-in page). */
-const APP_ROOTS = ['login', 'learn', 'lesson', 'boss', 'leaderboard', 'quests', 'shop', 'profile', 'bosses', 'settings', 'playground', 'daily', 'duels', 'stats']
+const APP_ROOTS = ['login', 'learn', 'lesson', 'boss', 'leaderboard', 'quests', 'shop', 'profile', 'bosses', 'settings', 'playground', 'daily', 'duels', 'stats', 'practice', 'rewards', 'puzzle']
 
 export const isAppPath = (path: string): boolean => APP_ROOTS.includes(path.split('/')[1] ?? '')
 

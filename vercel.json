@@ -4,8 +4,8 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/:root(login|learn|lesson|boss|leaderboard|quests|shop|profile|bosses|settings|playground|daily|duels|stats)/:rest*", "destination": "/index.html" },
-    { "source": "/:root(login|learn|lesson|boss|leaderboard|quests|shop|profile|bosses|settings|playground|daily|duels|stats)", "destination": "/index.html" }
+    { "source": "/:root(login|learn|lesson|boss|leaderboard|quests|shop|profile|bosses|settings|playground|daily|duels|stats|practice|rewards|puzzle)/:rest*", "destination": "/index.html" },
+    { "source": "/:root(login|learn|lesson|boss|leaderboard|quests|shop|profile|bosses|settings|playground|daily|duels|stats|practice|rewards|puzzle)", "destination": "/index.html" }
   ],
   "headers": [
     { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
