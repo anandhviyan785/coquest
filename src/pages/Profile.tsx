@@ -58,7 +58,7 @@ export function Profile() {
 
   return (
     <div>
-      <div className="grad-hero glow-purple relative flex h-[228px] items-end justify-center overflow-hidden rounded-[28px]">
+      <div className="grad-hero glow-blue relative flex h-[228px] items-end justify-center overflow-hidden rounded-[28px]">
         <button onClick={() => setPicking(true)} aria-label="Change profile picture" className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-xl border-2 border-b-4 border-line bg-card text-body hover:bg-surface active:translate-y-0.5 active:border-b-2">
           <Pencil size={20} strokeWidth={2.6} />
         </button>

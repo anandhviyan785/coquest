@@ -46,7 +46,7 @@ const isActive = (match: string[], path: string): boolean =>
 const navClass = (active: boolean) =>
   cx(
     'label press flex h-[52px] items-center gap-5 rounded-2xl border-2 px-3 text-[15px] transition-colors',
-    active ? 'border-blue-line bg-blue-soft text-blue glow-purple' : 'border-transparent text-mute hover:bg-surface',
+    active ? 'border-blue-line bg-blue-soft text-blue glow-blue' : 'border-transparent text-mute hover:bg-surface',
   )
 
 export { Wordmark }
@@ -259,7 +259,7 @@ function TabBar() {
       padding="6px"
       style={{ position: 'fixed', left: '50%', top: 'calc(100% - 58px)', bottom: 'auto', maxWidth: '100%' }}
     >
-      <nav className="mobile-glass-nav relative flex w-[min(calc(100vw-1.5rem),28rem)] items-stretch gap-1 rounded-[24px] border-2 border-line/70 bg-card/80 p-1.5 shadow-[0_12px_32px_-12px_rgb(76_29_149/0.45)] backdrop-blur-xl" aria-label="Main">
+      <nav className="mobile-glass-nav relative flex w-[min(calc(100vw-1.5rem),28rem)] items-stretch gap-1 rounded-[24px] border-2 border-line/70 bg-card/80 p-1.5 shadow-[0_12px_32px_-12px_rgb(23_58_130/0.45)] backdrop-blur-xl" aria-label="Main">
         {items.map(({ to, label, icon: Icon, match }) => {
           const on = isActive(match, pathname)
           return (
@@ -288,7 +288,7 @@ function ToastCard({ toast, onDone }: { toast: Toast; onDone: () => void }) {
     const timer = setTimeout(() => done.current(), 5500)
     return () => clearTimeout(timer)
   }, [toast.id])
-  const tone = toast.kind === 'error' ? 'border-bad' : toast.kind === 'achievement' ? 'border-gold glow-gold' : 'border-blue-line glow-purple'
+  const tone = toast.kind === 'error' ? 'border-bad' : toast.kind === 'achievement' ? 'border-gold glow-gold' : 'border-blue-line glow-blue'
   return (
     <div className={cx('animate-spring flex w-80 max-w-[calc(100vw-2rem)] items-start gap-3 rounded-2xl border-2 bg-card p-4', tone)} role="status">
       {toast.kind === 'achievement' && <QuestsIcon size={30} />}

@@ -52,7 +52,7 @@ function TodayChest({ onReveal }: { onReveal: (rarity: Rarity, loot: Loot) => vo
   }
 
   return (
-    <section className="grad-night glow-purple relative overflow-hidden rounded-[28px] p-5 text-white sm:p-6">
+    <section className="grad-night glow-blue relative overflow-hidden rounded-[28px] p-5 text-white sm:p-6">
       <div className="flex items-center gap-4">
         <Chest rarity={rarity} size={132} idle={claimable} open={!claimable} />
         <div className="min-w-0 flex-1">
@@ -76,7 +76,7 @@ function WeekTrack() {
   return (
     <ol className="grid grid-cols-7 gap-1.5 sm:gap-2" aria-label="This week's chests">
       {slots.map((slot) => (
-        <li key={slot.day} className={cx('flex flex-col items-center gap-1 rounded-2xl border-2 px-0.5 py-2', slot.state === 'available' ? 'border-blue bg-blue-soft glow-purple' : 'border-line bg-card', slot.state === 'locked' && 'opacity-60')} aria-label={`Day ${slot.day}, ${RARITY[slot.rarity].name}: ${slot.state}`}>
+        <li key={slot.day} className={cx('flex flex-col items-center gap-1 rounded-2xl border-2 px-0.5 py-2', slot.state === 'available' ? 'border-blue bg-blue-soft glow-blue' : 'border-line bg-card', slot.state === 'locked' && 'opacity-60')} aria-label={`Day ${slot.day}, ${RARITY[slot.rarity].name}: ${slot.state}`}>
           <span className="label text-[10px] text-faint">Day {slot.day}</span>
           <span className="relative">
             <Chest rarity={slot.rarity} size={slot.day === 7 ? 42 : 36} glow={false} open={slot.state === 'claimed'} idle={slot.state === 'available'} />

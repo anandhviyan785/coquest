@@ -45,7 +45,7 @@ export function Practice() {
         </div>
       </header>
 
-      <Link to="/puzzle" data-sfx="open" className="press grad-hero glow-purple relative mb-4 flex items-center gap-4 overflow-hidden rounded-[24px] p-5 text-white">
+      <Link to="/puzzle" data-sfx="open" className="press grad-hero glow-blue relative mb-4 flex items-center gap-4 overflow-hidden rounded-[24px] p-5 text-white">
         <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[20px] bg-white shadow-lg"><PuzzleIcon size={46} className={solved ? undefined : 'piece-rock'} /></span>
         <span className="min-w-0 flex-1">
           <span className="block text-xl font-extrabold">Daily Puzzle</span>
@@ -55,10 +55,10 @@ export function Practice() {
       </Link>
 
       <div className="grid gap-3">
-        <Card to="/daily" icon={CalendarCheck} title="Daily coding challenge" body={`${challenge.title} · ${challenge.difficulty} · write and run real code`} done={Boolean(state.daily[today])} tone="bg-[#6C2EE0]" />
-        <Card to="/playground" icon={Code2} title="Playground" body="Write and run code freely in any language" tone="bg-[#8A4DFF]" />
-        <Card to="/bosses" icon={Skull} title="Boss battles" body={`${beaten} of ${bosses.length} bosses defeated`} tone="bg-[#B24DF0]" />
-        <Card to="/duels" icon={Swords} title="Duels" body="Race another coder to solve the same problem" tone="bg-[#D14DFF]" />
+        <Card to="/daily" icon={CalendarCheck} title="Daily coding challenge" body={`${challenge.title} · ${challenge.difficulty} · write and run real code`} done={Boolean(state.daily[today])} tone="bg-[#1D5FD1]" />
+        <Card to="/playground" icon={Code2} title="Playground" body="Write and run code freely in any language" tone="bg-[#2470E8]" />
+        <Card to="/bosses" icon={Skull} title="Boss battles" body={`${beaten} of ${bosses.length} bosses defeated`} tone="bg-[#0EA5E9]" />
+        <Card to="/duels" icon={Swords} title="Duels" body="Race another coder to solve the same problem" tone="bg-[#19B8F0]" />
       </div>
     </div>
   )

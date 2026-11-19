@@ -21,8 +21,8 @@ export function LearnIcon({ size = 32, className }: IconProps) {
 
 export function PracticeIcon({ size = 32, className }: IconProps) {
   return svg(size, className, <>
-    <rect x="3" y="5" width="26" height="22" rx="5" fill="#8A4DFF" />
-    <rect x="3" y="5" width="26" height="6" rx="3" fill="#6C2EE0" />
+    <rect x="3" y="5" width="26" height="22" rx="5" fill="#2470E8" />
+    <rect x="3" y="5" width="26" height="6" rx="3" fill="#1D5FD1" />
     <path d="m10 16 4 3.5-4 3.5" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
     <path d="M17 23h5.5" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" />
   </>)
@@ -67,7 +67,7 @@ export function ShopIcon({ size = 32, className }: IconProps) {
 
 export function MoreIcon({ size = 32, className }: IconProps) {
   return svg(size, className, <>
-    <circle cx="16" cy="16" r="12" fill="#CE82FF" />
+    <circle cx="16" cy="16" r="12" fill="#2470E8" />
     <circle cx="10.5" cy="16" r="2" fill="#fff" /><circle cx="16" cy="16" r="2" fill="#fff" /><circle cx="21.5" cy="16" r="2" fill="#fff" />
   </>)
 }
@@ -125,30 +125,30 @@ export function MedalIcon({ size = 24, className }: IconProps) {
   </>)
 }
 
-/** The Rewards tab: a purple and gold treasure chest. */
+/** The Rewards tab: a blue and gold treasure chest. */
 export function RewardsIcon({ size = 32, className }: IconProps) {
   return svg(size, className, <>
-    <rect x="4" y="14" width="24" height="13" rx="3" fill="#8A4DFF" />
-    <path d="M4 14a6 6 0 0 1 6-6h12a6 6 0 0 1 6 6v2H4z" fill="#B48CFF" />
+    <rect x="4" y="14" width="24" height="13" rx="3" fill="#2470E8" />
+    <path d="M4 14a6 6 0 0 1 6-6h12a6 6 0 0 1 6 6v2H4z" fill="#7FB8FF" />
     <rect x="4" y="14.5" width="24" height="2.6" fill="#FFC800" />
     <rect x="13.2" y="12.5" width="5.6" height="8" rx="2" fill="#FFC800" />
-    <circle cx="16" cy="16.4" r="1.3" fill="#6C2EE0" />
+    <circle cx="16" cy="16.4" r="1.3" fill="#1D5FD1" />
   </>)
 }
 
 /** The Daily Puzzle: a jigsaw piece. */
 export function PuzzleIcon({ size = 32, className }: IconProps) {
   return svg(size, className, <>
-    <path d="M6 9a2 2 0 0 1 2-2h5a3 3 0 1 1 6 0h5a2 2 0 0 1 2 2v5a3 3 0 1 0 0 6v5a2 2 0 0 1-2 2h-5a3 3 0 1 0-6 0H8a2 2 0 0 1-2-2v-5a3 3 0 1 1 0-6z" fill="#D14DFF" />
-    <path d="M6 9a2 2 0 0 1 2-2h5a3 3 0 1 1 6 0h5a2 2 0 0 1 2 2v3H6z" fill="#E58CFF" />
+    <path d="M6 9a2 2 0 0 1 2-2h5a3 3 0 1 1 6 0h5a2 2 0 0 1 2 2v5a3 3 0 1 0 0 6v5a2 2 0 0 1-2 2h-5a3 3 0 1 0-6 0H8a2 2 0 0 1-2-2v-5a3 3 0 1 1 0-6z" fill="#19B8F0" />
+    <path d="M6 9a2 2 0 0 1 2-2h5a3 3 0 1 1 6 0h5a2 2 0 0 1 2 2v3H6z" fill="#9FD0FF" />
   </>)
 }
 
 /** The glossary: an open book. */
 export function BookIcon({ size = 32, className }: IconProps) {
   return svg(size, className, <>
-    <path d="M3 8c4.5-1.8 9-1.5 13 1v17c-4-2.5-8.5-2.8-13-1z" fill="#8A4DFF" />
-    <path d="M29 8c-4.5-1.8-9-1.5-13 1v17c4-2.5 8.5-2.8 13-1z" fill="#B48CFF" />
+    <path d="M3 8c4.5-1.8 9-1.5 13 1v17c-4-2.5-8.5-2.8-13-1z" fill="#2470E8" />
+    <path d="M29 8c-4.5-1.8-9-1.5-13 1v17c4-2.5 8.5-2.8 13-1z" fill="#7FB8FF" />
     <path d="M6 12c2.5-.7 5-.5 7 .5M6 16c2.5-.7 5-.5 7 .5M19 12.5c2-1 4.5-1.2 7-.5M19 16.5c2-1 4.5-1.2 7-.5" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" opacity="0.8" />
   </>)
 }
@@ -156,7 +156,7 @@ export function BookIcon({ size = 32, className }: IconProps) {
 /** Profile tab, for players without a picture. */
 export function ProfileIcon({ size = 32, className }: IconProps) {
   return svg(size, className, <>
-    <circle cx="16" cy="11" r="6" fill="#8A4DFF" />
-    <path d="M5 27a11 9 0 0 1 22 0z" fill="#B48CFF" />
+    <circle cx="16" cy="11" r="6" fill="#2470E8" />
+    <path d="M5 27a11 9 0 0 1 22 0z" fill="#7FB8FF" />
   </>)
 }

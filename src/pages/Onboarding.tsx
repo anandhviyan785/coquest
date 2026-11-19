@@ -66,7 +66,7 @@ function Bars({ level }: { level: number }) {
   return (
     <span className="flex h-6 items-end gap-[3px]" aria-hidden="true">
       {[1, 2, 3, 4].map((n) => (
-        <span key={n} className="w-[5px] rounded-sm" style={{ height: 6 + n * 4, background: n <= level ? '#8A4DFF' : 'var(--color-line)' }} />
+        <span key={n} className="w-[5px] rounded-sm" style={{ height: 6 + n * 4, background: n <= level ? '#2470E8' : 'var(--color-line)' }} />
       ))}
     </span>
   )

@@ -18,14 +18,14 @@ const NODE_H = 58
 const OFFSETS = [0, -44, -70, -44, 0, 44, 70, 44]
 const LAST_COURSE_KEY = 'pyquest:v1:course'
 
-/** Banner and node colours, one per unit, cycling through the purple theme. */
+/** Banner and node colours, one per unit, cycling through the blue theme. */
 const UNIT_COLORS = [
-  { fill: '#8A4DFF', edge: '#6C2EE0', to: '#B04DFF' },
-  { fill: '#6D3FE8', edge: '#5228C2', to: '#8F5CFF' },
-  { fill: '#B24DF0', edge: '#8E2FCC', to: '#D86BFF' },
-  { fill: '#5B4BE0', edge: '#4334B8', to: '#8A6DFF' },
-  { fill: '#9A3FE0', edge: '#7A28BC', to: '#C25CFF' },
-  { fill: '#7B4DFF', edge: '#5F31DD', to: '#A47BFF' },
+  { fill: '#2470E8', edge: '#1D5FD1', to: '#3BA0FF' },
+  { fill: '#1E6AE0', edge: '#154FB0', to: '#4C8DFA' },
+  { fill: '#0EA5E9', edge: '#0284C7', to: '#38BDF8' },
+  { fill: '#3B5BDB', edge: '#2C46B0', to: '#5C7CFA' },
+  { fill: '#2563EB', edge: '#1D4ED8', to: '#60A5FA' },
+  { fill: '#0B84D8', edge: '#0868AE', to: '#36A9F2' },
 ]
 
 type NodeState = 'done' | 'current' | 'open' | 'locked'
@@ -94,7 +94,7 @@ function UnitSection({ course, unit, index, nodes, selected, onSelect }: { cours
 
   return (
     <section aria-label={unit.title} className="mb-10">
-      <header className="glow-purple overflow-hidden rounded-[22px] border-b-4 px-5 py-4 text-white" style={{ background: `linear-gradient(135deg, ${color.fill}, ${color.to})`, borderColor: color.edge }}>
+      <header className="glow-blue overflow-hidden rounded-[22px] border-b-4 px-5 py-4 text-white" style={{ background: `linear-gradient(135deg, ${color.fill}, ${color.to})`, borderColor: color.edge }}>
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="label text-[13px] text-white/80">{course.name} · Unit {index + 1}</p>
@@ -125,7 +125,7 @@ function UnitSection({ course, unit, index, nodes, selected, onSelect }: { cours
                 aria-expanded={isOpen}
                 data-sfx="open"
                 className={cx('relative flex items-center justify-center rounded-[50%] transition-transform hover:scale-105 active:translate-y-2', node.state === 'current' && 'outline outline-[6px] outline-offset-[6px] outline-blue-line')}
-                style={{ width: NODE_W, height: NODE_H, background: coloured ? `linear-gradient(160deg, ${color.to}, ${color.fill})` : 'var(--color-line)', boxShadow: coloured ? `0 8px 0 ${color.edge}, 0 14px 24px -10px ${color.fill}` : '0 8px 0 #c9c0dc', color: coloured ? '#fff' : '#AFA6C4' }}
+                style={{ width: NODE_W, height: NODE_H, background: coloured ? `linear-gradient(160deg, ${color.to}, ${color.fill})` : 'var(--color-line)', boxShadow: coloured ? `0 8px 0 ${color.edge}, 0 14px 24px -10px ${color.fill}` : '0 8px 0 #c3cfe3', color: coloured ? '#fff' : '#A3B1C9' }}
               >
                 {node.state === 'locked' ? (node.boss ? <Skull size={30} strokeWidth={2.4} /> : <Lock size={26} strokeWidth={3} />) : node.boss ? <Skull size={32} strokeWidth={2.4} /> : node.state === 'done' ? <Check size={32} strokeWidth={4} /> : <Star size={30} fill="currentColor" />}
               </button>

@@ -12,11 +12,11 @@
   --font-mono: 'JetBrains Mono Variable', ui-monospace, Consolas, monospace;
 
   /* Surfaces and text */
-  --color-bg: #fbf9ff;
-  --color-surface: #f4f0fc;
+  --color-bg: #f8fbff;
+  --color-surface: #eff5fe;
   --color-card: #ffffff;
-  --color-raised: #f4f0fc;
-  --color-line: #e8e1f5;
+  --color-raised: #eff5fe;
+  --color-line: #e0e9f7;
   --color-ink: #3c3c3c;
   --color-body: #4b4b4b;
   --color-mute: #777777;
@@ -29,15 +29,15 @@
   --color-green-soft: #d7ffb8;
 
   /* Accent and selection */
-  /* Purple is the theme colour. The token names stay "blue" so existing markup keeps working. */
-  --color-blue: #8a4dff;
-  --color-blue-dark: #6c2ee0;
-  --color-blue-soft: #f1e9ff;
-  --color-blue-line: #c9a8ff;
-  --color-sky: #a77bff;
-  --color-cyan: #8a4dff;
-  --color-ice: #6c2ee0;
-  --color-magenta: #d14dff;
+  /* Blue is the theme colour. The token names stay "blue" so existing markup keeps working. */
+  --color-blue: #2470e8;
+  --color-blue-dark: #1d5fd1;
+  --color-blue-soft: #e6f0ff;
+  --color-blue-line: #9dc2ff;
+  --color-sky: #5fa0ff;
+  --color-cyan: #2470e8;
+  --color-ice: #1d5fd1;
+  --color-aqua: #19b8f0;
 
   /* Status */
   --color-ok: #58a700;
@@ -104,27 +104,27 @@
 
 /* Dark theme: the same tokens, re-pointed. Light is the default above. */
 :root[data-theme='dark'] {
-  --color-bg: #120e1d;
-  --color-surface: #1d1730;
-  --color-card: #19142a;
-  --color-raised: #231c3a;
-  --color-line: #352b52;
+  --color-bg: #0d1422;
+  --color-surface: #16213a;
+  --color-card: #121b2e;
+  --color-raised: #1b2842;
+  --color-line: #2a3a5c;
   --color-ink: #f1f7fb;
   --color-body: #dce6ec;
-  --color-mute: #a99fc4;
-  --color-faint: #6f6690;
+  --color-mute: #9fb0ce;
+  --color-faint: #667a9e;
   --color-notice: #3a3316;
-  --color-blue-soft: #2a1d4d;
-  --color-blue-line: #6a45b5;
+  --color-blue-soft: #16305e;
+  --color-blue-line: #3d6fc8;
   --color-green-soft: #1f3a12;
   --color-bad-soft: #43201f;
   --color-ok: #7ad43a;
   --color-bad-dark: #ff7676;
-  --color-blue-dark: #b48cff;
-  --scrollbar: #352b52;
+  --color-blue-dark: #7fb8ff;
+  --scrollbar: #2a3a5c;
   color-scheme: dark;
 }
-:root[data-theme='dark'] ::selection { background: #4a2d8a; }
+:root[data-theme='dark'] ::selection { background: #1e4a8f; }
 
 html, body, #root { height: 100%; }
 
@@ -153,13 +153,13 @@ body {
 .grad-secondary { background: var(--color-blue); }
 .grad-premium { background: var(--color-blue-soft); }
 
-/* ── Purple theme surfaces ───────────────────────────────────────────────── */
-.grad-hero { background: linear-gradient(135deg, #8a4dff 0%, #a54dff 55%, #d14dff 100%); }
+/* ── Blue theme surfaces ───────────────────────────────────────────────── */
+.grad-hero { background: linear-gradient(135deg, #2470e8 0%, #3b9bff 55%, #19b8f0 100%); }
 .grad-gold { background: linear-gradient(135deg, #ffb800 0%, #ff8a00 100%); }
-.grad-night { background: linear-gradient(160deg, #2a1660 0%, #4b23a8 60%, #7a3cf0 100%); }
-.glow-purple { box-shadow: 0 10px 30px -10px rgb(138 77 255 / 0.55), 0 2px 0 rgb(108 46 224 / 0.15); }
+.grad-night { background: linear-gradient(160deg, #0f2459 0%, #1d4fb8 60%, #2470e8 100%); }
+.glow-blue { box-shadow: 0 10px 30px -10px rgb(36 112 232 / 0.55), 0 2px 0 rgb(29 95 209 / 0.15); }
 .glow-gold { box-shadow: 0 10px 30px -10px rgb(255 168 0 / 0.6); }
-.soft-card { background: var(--color-card); border: 2px solid var(--color-line); border-radius: 1.25rem; box-shadow: 0 6px 18px -12px rgb(76 29 149 / 0.35); }
+.soft-card { background: var(--color-card); border: 2px solid var(--color-line); border-radius: 1.25rem; box-shadow: 0 6px 18px -12px rgb(23 58 130 / 0.35); }
 
 /* Buttons and cards that spring when pressed and lift on hover. */
 .press { transition: transform 0.18s cubic-bezier(0.2, 1.6, 0.4, 1), box-shadow 0.2s ease; }

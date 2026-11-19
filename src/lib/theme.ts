@@ -6,7 +6,7 @@ export type ResolvedTheme = 'light' | 'dark'
 
 export const THEME_KEY = 'pyquest:v1:theme'
 const DARK_QUERY = '(prefers-color-scheme: dark)'
-const CHROME_COLOR: Record<ResolvedTheme, string> = { light: '#8A4DFF', dark: '#120E1D' }
+const CHROME_COLOR: Record<ResolvedTheme, string> = { light: '#2470E8', dark: '#0D1422' }
 
 const isChoice = (value: unknown): value is ThemeChoice => value === 'light' || value === 'dark' || value === 'system'
 

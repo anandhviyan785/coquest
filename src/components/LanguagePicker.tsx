@@ -24,7 +24,7 @@ export function LanguagePicker({ open, current, onPick, onClose }: { open: boole
   if (!open) return null
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-label="Choose a language">
-      <button aria-label="Close" data-sfx="none" className="absolute inset-0 cursor-default bg-[#1a0d3a]/55 backdrop-blur-sm" onClick={onClose} />
+      <button aria-label="Close" data-sfx="none" className="absolute inset-0 cursor-default bg-[#0a1a3a]/55 backdrop-blur-sm" onClick={onClose} />
       <div className="animate-rise relative max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-t-[28px] bg-card p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl sm:rounded-[28px]">
         <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-line sm:hidden" aria-hidden="true" />
         <div className="mb-4 flex items-center gap-3">
@@ -48,7 +48,7 @@ export function LanguagePicker({ open, current, onPick, onClose }: { open: boole
                     onPick(c.id)
                   }}
                   aria-pressed={active}
-                  className={cx('press flex w-full items-center gap-4 rounded-2xl border-2 p-3.5 text-left', active ? 'border-blue bg-blue-soft glow-purple' : 'border-line hover:bg-surface')}
+                  className={cx('press flex w-full items-center gap-4 rounded-2xl border-2 p-3.5 text-left', active ? 'border-blue bg-blue-soft glow-blue' : 'border-line hover:bg-surface')}
                 >
                   <LangLogo lang={c.id} size={40} />
                   <span className="min-w-0 flex-1">

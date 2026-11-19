@@ -54,7 +54,7 @@ export function PuzzleBoard({ puzzle, answer, onChange, locked, reveal }: { puzz
       const value = answer.kind === 'index' ? answer.value : null
       return (
         <div className="space-y-4">
-          {'code' in puzzle && puzzle.code && <Code code={puzzle.code} className="glow-purple" />}
+          {'code' in puzzle && puzzle.code && <Code code={puzzle.code} className="glow-blue" />}
           <Options options={puzzle.options} value={value} onPick={(i) => onChange({ kind: 'index', value: i })} locked={locked} correct={reveal ? puzzle.answer : null} />
         </div>
       )
@@ -117,7 +117,7 @@ export function PuzzleBoard({ puzzle, answer, onChange, locked, reveal }: { puzz
       const value = answer.kind === 'text' ? answer.value : ''
       return (
         <div className="space-y-4">
-          <Code code={puzzle.code} className="glow-purple" />
+          <Code code={puzzle.code} className="glow-blue" />
           <label className="block">
             <span className="label mb-1.5 block text-[12px] text-mute">Your code for ___</span>
             <input value={value} onChange={(e) => onChange({ kind: 'text', value: e.target.value })} disabled={locked} spellCheck={false} autoCapitalize="off" autoComplete="off"

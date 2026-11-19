@@ -135,7 +135,7 @@ export function PuzzlePage() {
     return (
       <div className="mx-auto max-w-xl">
         {header}
-        <section className="grad-hero glow-purple relative overflow-hidden rounded-[28px] p-6 text-center text-white">
+        <section className="grad-hero glow-blue relative overflow-hidden rounded-[28px] p-6 text-center text-white">
           <span className="relative mx-auto flex h-24 w-24 items-center justify-center rounded-[26px] bg-white shadow-xl"><PuzzleIcon size={64} className="piece-rock" /></span>
           <h1 className="mt-3 text-3xl font-extrabold">Daily Puzzle</h1>
           <p className="mt-1 text-[15px] font-bold text-white/85">A new {LANG_LABEL[lang]} puzzle every day. Three tries.</p>

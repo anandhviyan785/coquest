@@ -11,7 +11,7 @@ import { useApp } from '../state/AppContext'
 const TOOLTIP = { contentStyle: { background: 'var(--color-card)', border: '2px solid var(--color-line)', color: 'var(--color-ink)', borderRadius: 10, fontSize: 13 }, labelStyle: { color: 'var(--color-mute)' }, cursor: { fill: 'rgba(148,163,184,0.08)' } }
 const AXIS = { tickLine: false, axisLine: false, tick: { fill: 'var(--color-faint)', fontSize: 12 } }
 const HEAT_WEEKS = 18
-const HEAT = ['var(--color-line)', 'var(--color-blue-soft)', '#C9A8FF', '#8A4DFF', '#6C2EE0']
+const HEAT = ['var(--color-line)', 'var(--color-blue-soft)', '#9DC2FF', '#2470E8', '#1D5FD1']
 
 const minutes = (seconds: number): string => (seconds >= 3600 ? `${(seconds / 3600).toFixed(1)} h` : `${Math.round(seconds / 60)} min`)
 
@@ -29,7 +29,7 @@ function Heatmap({ xpByDay, goal }: { xpByDay: (key: string) => number; goal: nu
             {week.map((key) => {
               const xp = xpByDay(key)
               const future = key > today
-              return <span key={key} title={future ? undefined : `${shortDate(key)}: ${xp} XP`} className="h-[15px] w-[15px] rounded-[4px]" style={{ background: future ? 'transparent' : HEAT[shade(xp)], outline: key === today ? '2px solid #8A4DFF' : undefined }} />
+              return <span key={key} title={future ? undefined : `${shortDate(key)}: ${xp} XP`} className="h-[15px] w-[15px] rounded-[4px]" style={{ background: future ? 'transparent' : HEAT[shade(xp)], outline: key === today ? '2px solid #2470E8' : undefined }} />
             })}
           </div>
         ))}
@@ -92,12 +92,12 @@ export function Stats() {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={month} margin={{ top: 6, right: 6, bottom: 0, left: -18 }}>
-                <defs><linearGradient id="xpFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#8A4DFF" stopOpacity={0.35} /><stop offset="100%" stopColor="#8A4DFF" stopOpacity={0} /></linearGradient></defs>
+                <defs><linearGradient id="xpFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#2470E8" stopOpacity={0.35} /><stop offset="100%" stopColor="#2470E8" stopOpacity={0} /></linearGradient></defs>
                 <CartesianGrid stroke="var(--color-line)" vertical={false} />
                 <XAxis dataKey="date" {...AXIS} interval={6} />
                 <YAxis {...AXIS} allowDecimals={false} />
                 <Tooltip {...TOOLTIP} cursor={{ stroke: 'var(--color-line)' }} formatter={(v) => [`${v} XP`, 'Earned']} />
-                <Area type="monotone" dataKey="xp" stroke="#8A4DFF" strokeWidth={2} fill="url(#xpFill)" />
+                <Area type="monotone" dataKey="xp" stroke="#2470E8" strokeWidth={2} fill="url(#xpFill)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -112,7 +112,7 @@ export function Stats() {
                 <XAxis dataKey="day" {...AXIS} />
                 <YAxis {...AXIS} allowDecimals={false} />
                 <Tooltip {...TOOLTIP} formatter={(v) => [`${v} min`, 'Time']} />
-                <RBar dataKey="minutes" fill="#8A4DFF" radius={[6, 6, 2, 2]} maxBarSize={34} />
+                <RBar dataKey="minutes" fill="#2470E8" radius={[6, 6, 2, 2]} maxBarSize={34} />
               </BarChart>
             </ResponsiveContainer>
           </div>

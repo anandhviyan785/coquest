@@ -24,7 +24,7 @@ export function FeatureTiles({ course }: { course: Course }) {
 
   return (
     <div className="mb-4 grid grid-cols-2 gap-3 sm:gap-4">
-      <Link to="/rewards" aria-label={claimable ? 'Daily Rewards: a chest is ready to claim' : 'Daily Rewards'} data-sfx="open" className="press grad-night glow-purple relative flex min-h-[168px] flex-col justify-between overflow-hidden rounded-[24px] p-4 text-white">
+      <Link to="/rewards" aria-label={claimable ? 'Daily Rewards: a chest is ready to claim' : 'Daily Rewards'} data-sfx="open" className="press grad-night glow-blue relative flex min-h-[168px] flex-col justify-between overflow-hidden rounded-[24px] p-4 text-white">
         {claimable && <span className="absolute right-3 top-3 h-3.5 w-3.5 rounded-full border-2 border-white bg-bad" aria-hidden="true"><span className="absolute inset-0 animate-ping rounded-full bg-bad" /></span>}
         <Chest rarity={rarity} size={84} idle={claimable} open={!claimable} className="-ml-1 -mt-1" />
         <span>
@@ -33,7 +33,7 @@ export function FeatureTiles({ course }: { course: Course }) {
         </span>
       </Link>
 
-      <Link to="/puzzle" aria-label={solvedToday ? 'Daily Puzzle: done for today' : 'Daily Puzzle'} data-sfx="open" className="press grad-hero glow-purple relative flex min-h-[168px] flex-col justify-between overflow-hidden rounded-[24px] p-4 text-white">
+      <Link to="/puzzle" aria-label={solvedToday ? 'Daily Puzzle: done for today' : 'Daily Puzzle'} data-sfx="open" className="press grad-hero glow-blue relative flex min-h-[168px] flex-col justify-between overflow-hidden rounded-[24px] p-4 text-white">
         {solvedToday && <span className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-white text-blue"><Check size={16} strokeWidth={3.5} /></span>}
         <span className="relative flex h-[84px] w-[84px] items-center justify-center">
           <span className="animate-glow absolute inset-1 rounded-[22px] bg-white/35 blur-md" /><span className="absolute inset-2 rounded-[20px] bg-white shadow-lg" />
